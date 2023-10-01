@@ -4,7 +4,12 @@ public class MeteoroidMovement : MonoBehaviour
 {
     public float speed = 5.0f;
     private Vector3 moveDirection; // Store the random movement direction
+    private bool hasCollided = false;
+    private Transform otherTransform;
     private bool followMouse = false; // Flag to indicate if the meteoroid should follow the mouse
+
+    [SerializeField]
+    private float smoothMovementAmount = 5f; // Adjust this value to control the smoothness of the movement
 
     void Start()
     {
@@ -14,12 +19,21 @@ public class MeteoroidMovement : MonoBehaviour
 
     void Update()
     {
+        if (hasCollided)
+        {
+            if (otherTransform != null)
+            {
+                // Smoothly interpolate the position of the meteoroid towards the mouse position
+                transform.position = Vector3.Lerp(transform.position, otherTransform.position, smoothMovementAmount * Time.deltaTime);
+                if ((transform.position - otherTransform.position).magnitude < 0.5f)
+                {
+                    followMouse = true;
+                }
+            }
+        }
         if (followMouse)
         {
-            // Get the mouse position in world space
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            // Set the position of the meteoroid to follow the mouse
-            transform.position = new Vector3(mousePosition.x, mousePosition.y, transform.position.z);
+            transform.position = otherTransform.position;
         }
         else
         {
@@ -28,18 +42,16 @@ public class MeteoroidMovement : MonoBehaviour
         }
     }
 
-    void OnMouseEnter()
+    public void OnTriggerEnter2D(Collider2D collision)
     {
-        // When the mouse enters the meteoroid's collider, stop random movement and follow the mouse
-        followMouse = true;
-    }
+        Debug.Log(collision);
+        if (hasCollided) return;
 
-    void OnMouseExit()
-    {
-        // When the mouse exits the meteoroid's collider, resume random movement
-        followMouse = false;
-        // Choose a new random direction
-        moveDirection = GetRandomDirection();
+        if (collision.CompareTag("Hand"))
+        {
+            otherTransform = collision.transform;
+            hasCollided = true;
+        }
     }
 
     Vector3 GetRandomDirection()

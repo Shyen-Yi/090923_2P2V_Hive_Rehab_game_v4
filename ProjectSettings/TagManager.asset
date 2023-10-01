@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Meteoroid
   - Bucket
+  - Hand
   layers:
   - Default
   - TransparentFX
