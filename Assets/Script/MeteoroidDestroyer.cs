@@ -20,6 +20,7 @@ public class MeteoroidDestroyer : MonoBehaviour
     {
         // Check if the object collided with an object tagged as "Bucket"
 
+        Debug.Log("Deleted by " + collider);
         if (collider.CompareTag("Bucket"))
         {
             // Increase Score Here

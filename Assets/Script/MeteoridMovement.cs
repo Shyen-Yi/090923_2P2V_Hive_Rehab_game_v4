@@ -44,7 +44,7 @@ public class MeteoroidMovement : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
-       
+        Debug.Log(collision);
         if (hasCollided) return;
 
         if (collision.CompareTag("Hand"))
