@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3fc641934a41e46a09403b01ce6a5c86
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - meteoroidPrefab: {fileID: 9146156278652973177, guid: 1d6ca795693b245aca8d361dae6df10e, type: 3}
+  - gameManager: {fileID: 11400000, guid: 3bbeff8e26efb2d47821f5edab51bab1, type: 2}
+  - spawnPoint: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
