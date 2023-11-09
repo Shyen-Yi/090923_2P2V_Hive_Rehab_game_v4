@@ -7,6 +7,7 @@ TagManager:
   - Meteoroid
   - Bucket
   - Hand
+  - MiddlePlante
   layers:
   - Default
   - TransparentFX
