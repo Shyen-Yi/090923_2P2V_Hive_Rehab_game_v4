@@ -8,6 +8,7 @@ TagManager:
   - Bucket
   - Hand
   - MiddlePlante
+  - UICamera
   layers:
   - Default
   - TransparentFX
