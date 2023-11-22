@@ -8,6 +8,7 @@ namespace com.hive.projectr
     {
         private GameSceneManager _sceneManager;
         private CameraManager _cameraManager;
+        private ConfigDataManager _configManager;
         private MonoBehaviourUtil _monoBehaviourUtil;
 
         private bool _isGameInitialized;
@@ -25,6 +26,9 @@ namespace com.hive.projectr
 
             _cameraManager = new CameraManager();
             _cameraManager.OnInit();
+
+            _configManager = new ConfigDataManager();
+            _configManager.OnInit();
 
             _monoBehaviourUtil = FindObjectOfType<MonoBehaviourUtil>();
             if (_monoBehaviourUtil == null)
@@ -48,6 +52,9 @@ namespace com.hive.projectr
 
             _cameraManager.OnDispose();
             _cameraManager = null;
+
+            _configManager.OnDispose();
+            _configManager = null;
 
             _monoBehaviourUtil = null;
         }

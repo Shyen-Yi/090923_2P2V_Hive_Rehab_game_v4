@@ -36,7 +36,7 @@ namespace com.hive.projectr
             base.OnPointerDown(eventData);
 
             _initialScale = transform.localScale;
-            transform.localScale = Vector3.one * PressedSize;
+            transform.localScale = _initialScale * PressedSize;
         }
 
         public override void OnPointerUp(PointerEventData eventData)
@@ -57,12 +57,17 @@ namespace com.hive.projectr
             }
 
             var buttonObj = new GameObject("HiveButton");
-            buttonObj.transform.SetParent(canvas.transform, false);
+            var parent = Selection.activeGameObject != null ? Selection.activeGameObject.transform : canvas.transform;
+            Undo.RegisterCreatedObjectUndo(buttonObj, "Create HiveButton"); // Register the undo action
+            Undo.SetTransformParent(buttonObj.transform, parent, "Parent HiveButton"); // Register the undo action for parenting
 
-            var button = buttonObj.AddComponent<HiveButton>();
+            var img = Undo.AddComponent<Image>(buttonObj); // Register the undo action for adding a component
+            var button = Undo.AddComponent<HiveButton>(buttonObj); // Register the undo action for adding a component
             button.transform.localPosition = Vector3.zero;
             button.transform.localRotation = Quaternion.identity;
             button.transform.localScale = Vector3.one;
+
+            Selection.activeGameObject = buttonObj;
         }
 #endif
     }

@@ -11,5 +11,7 @@ namespace com.hive.projectr
         public static string StatsMenu = "StatsMenu";
         public static string TransitionCoreGame = "TransitionCoreGame";
         public static string CoreGame = "CoreGame";
+        public static string ContactInfo = "ContactInfo";
+        public static string FeatureInfo = "FeatureInfo";
     }
 }
