@@ -13,5 +13,8 @@ namespace com.hive.projectr
         public static string CoreGame = "CoreGame";
         public static string ContactInfo = "ContactInfo";
         public static string FeatureInfo = "FeatureInfo";
+        public static string Share = "Share";
+        public static string ShareMenu = "ShareMenu";
+        public static string Confirm = "Confirm";
     }
 }
