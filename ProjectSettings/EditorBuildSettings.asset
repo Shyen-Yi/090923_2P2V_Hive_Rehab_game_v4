@@ -32,4 +32,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/FeatureInfo.unity
     guid: d80fb1f0c1357e7418166e315718c146
+  - enabled: 1
+    path: Assets/Scenes/Share.unity
+    guid: eb7bd4269e2e6fa48a2774641cddb908
+  - enabled: 1
+    path: Assets/Scenes/ShareMenu.unity
+    guid: ebfb9541653a1fe48a1d7de482c8989a
+  - enabled: 1
+    path: Assets/Scenes/Calibration.unity
+    guid: 92530e07d94c1409c9c49579baebe702
   m_configObjects: {}

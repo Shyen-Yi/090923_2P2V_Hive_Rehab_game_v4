@@ -16,5 +16,6 @@ namespace com.hive.projectr
         public static string Share = "Share";
         public static string ShareMenu = "ShareMenu";
         public static string Confirm = "Confirm";
+        public static string Calibration = "Calibration";
     }
 }

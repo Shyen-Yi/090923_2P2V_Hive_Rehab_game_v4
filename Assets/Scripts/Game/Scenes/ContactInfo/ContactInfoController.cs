@@ -28,14 +28,6 @@ namespace com.hive.projectr
             _crossButton = Config.ExtraButtons[(int)ExtraBtn.Cross];
         }
 
-        protected override void OnShow(ISceneData data)
-        {
-        }
-
-        protected override void OnHide()
-        {
-        }
-
         protected override void OnDispose()
         {
             UnbindActions();
@@ -57,7 +49,7 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(Name);
+            GameSceneManager.Instance.UnloadScene(SceneName);
         }
         #endregion
     }

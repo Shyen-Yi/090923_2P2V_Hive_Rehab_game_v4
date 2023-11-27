@@ -5,7 +5,6 @@ using UnityEngine;
 public class SpawnManager : MonoBehaviour
 {
     public GameObject meteoroidPrefab;
-    public GameManagerScriptableObject gameManager;
     //public float maxX;
     //public float maxY;
     //public Transform spawnPoint;
@@ -34,7 +33,6 @@ public class SpawnManager : MonoBehaviour
         {
             // Prefab doesn't exist, so instantiate it
             Instantiate(meteoroidPrefab, transform.position, Quaternion.identity);
-            gameManager.isGameRunning = true;
         }
         else
         {

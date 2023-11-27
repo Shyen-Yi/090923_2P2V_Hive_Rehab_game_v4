@@ -21,9 +21,21 @@ namespace com.hive.projectr
         }
     }
 
+    public enum GameSceneShowState
+    {
+        New,
+        Uncovered,
+    }
+
+    public enum GameSceneHideState
+    {
+        Remove,
+        Covered,
+    }
+
     public abstract class GameSceneControllerBase
     {
-        public string Name => Scene.name;
+        public string SceneName => Scene.name;
         protected Scene Scene { get; private set; }
         protected int Index { get; private set; }
         protected GeneralSceneConfig Config { get; private set; }
@@ -68,14 +80,16 @@ namespace com.hive.projectr
             OnInit();
         }
 
-        public void Show(ISceneData data)
+        public void Show(ISceneData data, GameSceneShowState showState)
         {
-            OnShow(data);
+            OnShow(data, showState);
+            Config.CanvasGroup.CanvasGroupOn();
         }
 
-        public void Hide()
+        public void Hide(GameSceneHideState hideState)
         {
-            OnHide();
+            OnHide(hideState);
+            Config.CanvasGroup.CanvasGroupOff();
         }
 
         public void Dispose()
@@ -85,11 +99,11 @@ namespace com.hive.projectr
             CameraManager.Instance.RemoveFromMainStackWithOwner(Scene.name);
         }
 
-        #region Override
-        protected abstract void OnShow(ISceneData data);
-        protected abstract void OnHide();
-        protected abstract void OnInit();
-        protected abstract void OnDispose();
+        #region Virtual
+        protected virtual void OnShow(ISceneData data, GameSceneShowState showState) { }
+        protected virtual void OnHide(GameSceneHideState hideState) { }
+        protected virtual void OnInit() { }
+        protected virtual void OnDispose() { }
         #endregion
     }
 }

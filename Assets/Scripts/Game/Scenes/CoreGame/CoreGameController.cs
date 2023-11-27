@@ -20,12 +20,12 @@ namespace com.hive.projectr
         {
         }
 
-        protected override void OnShow(ISceneData data)
+        protected override void OnShow(ISceneData data, GameSceneShowState showState)
         {
             Cursor.visible = false;
         }
 
-        protected override void OnHide()
+        protected override void OnHide(GameSceneHideState hideState)
         {
             Cursor.visible = true;
         }

@@ -9,6 +9,8 @@ namespace com.hive.projectr
 {
     public class GeneralSceneConfig : MonoBehaviour
     {
+        [SerializeField] private CanvasGroup _canvasGroup;
+
         [Header("Extra")]
         [SerializeField] private List<GeneralWidgetConfig> _extraWidgetConfigs;
         [SerializeField] private List<RectTransform> _extraRectTransforms;
@@ -25,6 +27,8 @@ namespace com.hive.projectr
         [SerializeField] private List<Camera> _extraCameras;
         [SerializeField] private List<Sprite> _extraSprites;
         [SerializeField] private List<TMP_ColorGradient> _extraColorGradients;
+
+        public CanvasGroup CanvasGroup => _canvasGroup;
 
         // extra
         public List<GeneralWidgetConfig> ExtraWidgetConfigs => _extraWidgetConfigs;

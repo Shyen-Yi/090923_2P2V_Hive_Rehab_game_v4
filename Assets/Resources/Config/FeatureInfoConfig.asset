@@ -12,7 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85a84a6fe3bd2224a9f6c280f7d02450, type: 3}
   m_Name: FeatureInfoConfig
   m_EditorClassIdentifier: 
-  _featureInfoDict:
-    m_keys: 00000000
-    m_values:
-    - desc: This is the info text for the SettingMenu :D
+  _items:
+  - feature: 0
+    title: Setting
+    desc: Setting Info blablabla
+  - feature: 1
+    title: Share
+    desc: Share Info ohohoh
+  - feature: 2
+    title: Stats
+    desc: Stats Info ohohoh
+  - feature: 3
+    title: Calibration
+    desc: Calibration Info wulala

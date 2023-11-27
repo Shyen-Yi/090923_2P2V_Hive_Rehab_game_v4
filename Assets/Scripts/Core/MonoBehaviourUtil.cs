@@ -12,6 +12,7 @@ namespace com.hive.projectr
         public static Action OnUpdate;
         public static Action OnLateUpdate;
         public static Action OnUpdatePerSec;
+        public static Action OnFixedUpdate;
 
         private Coroutine _tickPerSecRoutine;
 
@@ -66,6 +67,11 @@ namespace com.hive.projectr
         private void LateUpdate()
         {
             OnLateUpdate?.Invoke();
+        }
+
+        private void FixedUpdate()
+        {
+            OnFixedUpdate?.Invoke();
         }
     }
 }

@@ -6,8 +6,6 @@ using System.Collections;
 
 public class HandMovement : MonoBehaviour
 {
-    public GameManagerScriptableObject gameManager;
-    
     public SpriteRenderer spaceship;
     public Sprite spaceshipOn;
     public Sprite spaceshipOff;
@@ -42,30 +40,23 @@ public class HandMovement : MonoBehaviour
 
     private void Update()
     {
-        if (gameManager.isGameRunning == true)
-        {
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);            
-            Cursor.visible = false;
-            mousePosition.z = 0f;
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Cursor.visible = false;
+        mousePosition.z = 0f;
 
-            // this.transform.position = mousePosition;
+        // this.transform.position = mousePosition;
 
-            float clampedX = Mathf.Clamp(mousePosition.x, minX, maxX);
-            float clampedY = Mathf.Clamp(mousePosition.y, minY, maxY);
-            Vector3 clampedMousePosition = new Vector3(clampedX, clampedY, 0f);
+        float clampedX = Mathf.Clamp(mousePosition.x, minX, maxX);
+        float clampedY = Mathf.Clamp(mousePosition.y, minY, maxY);
+        Vector3 clampedMousePosition = new Vector3(clampedX, clampedY, 0f);
 
-            transform.position = clampedMousePosition;
+        transform.position = clampedMousePosition;
 
-            // Debug.Log(clampedX);
-            // Debug.Log(clampedY);
+        // Debug.Log(clampedX);
+        // Debug.Log(clampedY);
 
-            float mouseDelta = Input.GetAxis("Mouse X") + Input.GetAxis("Mouse Y");
-            isMouseMoving = Mathf.Abs(mouseDelta) > 0.01f;
-        }
-        else
-        {
-            Cursor.visible = true;
-        };
+        float mouseDelta = Input.GetAxis("Mouse X") + Input.GetAxis("Mouse Y");
+        isMouseMoving = Mathf.Abs(mouseDelta) > 0.01f;
     }
 
     private IEnumerator startSpaceshipSwapping()

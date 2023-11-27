@@ -5,11 +5,6 @@ using TMPro;
 
 namespace com.hive.projectr
 {
-    public enum FeatureType
-    {
-        Setting,
-    }
-
     public struct FeatureInfoData : ISceneData
     {
         public FeatureType type;
@@ -26,6 +21,7 @@ namespace com.hive.projectr
         private enum ExtraTMP
         {
             Content = 0,
+            Title = 1,
         }
 
         private enum ExtraBtn
@@ -34,6 +30,7 @@ namespace com.hive.projectr
         }
 
         private TMP_Text _contentText;
+        private TMP_Text _titleText;
 
         private HiveButton _crossButton;
         #endregion
@@ -48,27 +45,28 @@ namespace com.hive.projectr
         private void InitExtra()
         {
             _contentText = Config.ExtraTextMeshPros[(int)ExtraTMP.Content];
+            _titleText = Config.ExtraTextMeshPros[(int)ExtraTMP.Title];
 
             _crossButton = Config.ExtraButtons[(int)ExtraBtn.Cross];
         }
 
-        protected override void OnShow(ISceneData data)
+        protected override void OnShow(ISceneData data, GameSceneShowState showState)
         {
             if (data is FeatureInfoData pData)
             {
-                if (FeatureInfoConfig.FeatureInfoDict.TryGetValue(pData.type, out var info))
+                var infoDataList = FeatureInfoConfig.GetDataForFeature(pData.type);
+                if (infoDataList.Count > 0)
                 {
-                    _contentText.text = info.desc;
+                    var index = Random.Range(0, infoDataList.Count);
+                    var infoData = infoDataList[index];
+                    _titleText.text = infoData.Title;
+                    _contentText.text = infoData.Desc;
                 }
                 else
                 {
-                    LogHelper.LogError($"FeatureInfoType {pData.type} has no defined data in FeatureInfoConfigData!");
+                    Logger.LogError($"FeatureInfoType {pData.type} has no defined data in FeatureInfoConfig!");
                 }
             }
-        }
-
-        protected override void OnHide()
-        {
         }
 
         protected override void OnDispose()
@@ -92,7 +90,7 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(Name);
+            GameSceneManager.Instance.UnloadScene(SceneName);
         }
         #endregion
     }

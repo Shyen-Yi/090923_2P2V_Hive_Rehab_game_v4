@@ -8,7 +8,8 @@ namespace com.hive.projectr
     public class TransitionCoreGameController : GameSceneControllerBase
     {
         #region Fields
-        public Coroutine animationCoroutine;
+        private float _progressFill;
+        private float _maxProgressWidth;
         #endregion
 
         #region Extra
@@ -20,18 +21,11 @@ namespace com.hive.projectr
         private enum ExtraImg
         {
             ProgressBar = 0,
-            SpaceShip = 1,
-        }
-
-        private enum ExtraSprite
-        {
-            SpaceshipInactive = 0,
-            SpaceshipActive = 1,
         }
 
         private enum ExtraInt
         {
-            DefaultSpeed = 0,
+            MaxFillTime = 0,
         }
 
         private enum ExtraRT
@@ -42,12 +36,8 @@ namespace com.hive.projectr
         private HiveButton _crossButton;
 
         private Image _progressBar;
-        private Image _spaceshipImg;
 
-        private Sprite _spaceshipInactive;
-        private Sprite _spaceshipActive;
-
-        private float _defaultSpeed = 1f;
+        private float _maxFillTime;
 
         private RectTransform _spaceshipRoot;
         #endregion
@@ -57,13 +47,6 @@ namespace com.hive.projectr
         {
             InitExtra();
             BindActions();
-
-            SetProgress(1.0f, 5.0f);
-
-            if (_spaceshipImg != null)
-            {
-                _spaceshipImg.sprite = _spaceshipInactive;
-            }
         }
 
         private void InitExtra()
@@ -71,22 +54,12 @@ namespace com.hive.projectr
             _crossButton = Config.ExtraButtons[(int)ExtraBtn.Cross];
 
             _progressBar = Config.ExtraImages[(int)ExtraImg.ProgressBar];
-            _spaceshipImg = Config.ExtraImages[(int)ExtraImg.SpaceShip];
 
-            _spaceshipInactive = Config.ExtraSprites[(int)ExtraSprite.SpaceshipInactive];
-            _spaceshipActive = Config.ExtraSprites[(int)ExtraSprite.SpaceshipActive];
-
-            _defaultSpeed = Config.ExtraInts[(int)ExtraInt.DefaultSpeed] / 1000f;
+            _maxFillTime = Config.ExtraInts[(int)ExtraInt.MaxFillTime] / 1000f;
 
             _spaceshipRoot = Config.ExtraRectTransforms[(int)ExtraRT.SpaceshipRoot];
-        }
 
-        protected override void OnShow(ISceneData data)
-        {
-        }
-
-        protected override void OnHide()
-        {
+            _maxProgressWidth = ((RectTransform)_spaceshipRoot.parent).rect.width;
         }
 
         protected override void OnDispose()
@@ -99,74 +72,51 @@ namespace com.hive.projectr
         private void BindActions()
         {
             _crossButton.onClick.AddListener(OnCrossButtonClick);
+
+            MonoBehaviourUtil.OnUpdate += Tick;
         }
 
         private void UnbindActions()
         {
             _crossButton.onClick.RemoveAllListeners();
+
+            MonoBehaviourUtil.OnUpdate -= Tick;
         }
         #endregion
 
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(Name);
-        }
-        #endregion
-
-        #region Content
-        public void SetProgress(float Progress)
-        {
-            SetProgress(Progress, _defaultSpeed);
+            GameSceneManager.Instance.UnloadScene(SceneName);
         }
 
-        public void SetProgress(float Progress, float Duration)
+        private void Tick()
         {
-            if (Progress < 0 || Progress > 1)
+            if (_progressFill > -.5f)
             {
-                LogHelper.LogWarning($"Invalid progress passed, excepted value is between 0 and 1. Got{Progress}. Clamping");
-                Progress = Mathf.Clamp01(Progress);
-            }
-            if (Progress != _progressBar.fillAmount)
-            {
-                float Speed = 1.0f / Duration;
-
-                if (animationCoroutine != null)
+                if (_progressFill < 1f)
                 {
-                    MonoBehaviourUtil.Instance.StopCoroutine(animationCoroutine);
+                    // fill amount
+                    _progressBar.fillAmount = _progressFill = _progressFill + 1 / _maxFillTime * Time.deltaTime;
+
+                    // marker pos
+                    var xPos = Mathf.Lerp(0, _maxProgressWidth, _progressFill);
+                    _spaceshipRoot.anchoredPosition = new Vector2(xPos, _spaceshipRoot.anchoredPosition.y);
                 }
+                else
+                {
+                    _progressBar.fillAmount = _progressFill = 1;
+                    _spaceshipRoot.anchoredPosition = new Vector2(_maxProgressWidth, _spaceshipRoot.anchoredPosition.y);
 
-                animationCoroutine = MonoBehaviourUtil.Instance.StartCoroutine(AnimateProgress(Progress, Speed));
+                    GameSceneManager.Instance.LoadScene(SceneNames.CoreGame, null, () =>
+                    {
+                        GameSceneManager.Instance.UnloadScene(SceneName);
+                    });
+
+                    // set to -1 to stop being affected by ticking
+                    _progressFill = -1;
+                }
             }
-        }
-
-        public IEnumerator AnimateProgress(float Progress, float Speed)
-        {
-            float time = 0;
-            float initialProgress = _progressBar.fillAmount;
-
-            _spaceshipImg.sprite = _spaceshipActive;
-
-            while (time < 1)
-            {
-                if (_progressBar == null)
-                    yield break;
-
-                _progressBar.fillAmount = Mathf.Lerp(initialProgress, Progress, time);
-                time += Time.deltaTime * Speed;
-
-                var xPos = Mathf.Lerp(0, ((RectTransform)_spaceshipRoot.parent).rect.width, _progressBar.fillAmount);
-                _spaceshipRoot.anchoredPosition = new Vector2(xPos, _spaceshipRoot.anchoredPosition.y);
-
-                yield return null;
-            }
-
-            _progressBar.fillAmount = Progress;
-
-            GameSceneManager.Instance.LoadScene(SceneNames.CoreGame, null, ()=>
-            {
-                GameSceneManager.Instance.UnloadScene(Name);
-            });
         }
         #endregion
     }

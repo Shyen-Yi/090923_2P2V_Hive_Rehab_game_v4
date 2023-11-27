@@ -24,15 +24,15 @@ namespace com.hive.projectr
     public class GameSceneData : IDisposable
     {
         public int index;
-        public string name;
-        public ISceneData data;
+        public string sceneName;
+        public ISceneData sceneData;
         public GameSceneControllerBase controller;
 
-        public GameSceneData(int index, string name, ISceneData data, GameSceneControllerBase controller)
+        public GameSceneData(int index, string sceneName, ISceneData sceneData, GameSceneControllerBase controller)
         {
             this.index = index;
-            this.name = name;
-            this.data = data;
+            this.sceneName = sceneName;
+            this.sceneData = sceneData;
             this.controller = controller;
         }
 
@@ -40,7 +40,7 @@ namespace com.hive.projectr
         {
             if (controller != null)
             {
-                controller.Hide();
+                controller.Hide(GameSceneHideState.Remove);
                 controller.Dispose();
             }
         }
@@ -55,8 +55,6 @@ namespace com.hive.projectr
         #region Lifecycle
         public void OnInit()
         {
-            Instance = this;
-
             _scenesToLoad = new Queue<GameSceneLoadingData>();
             _scenesLoading = new HashSet<string>();
             _sceneDataDict = new Dictionary<string, GameSceneData>();
@@ -79,30 +77,40 @@ namespace com.hive.projectr
         {
             if (Input.GetKeyDown(KeyCode.Backspace))
             {
-                TryUnloadLatestScene();
+                TryUnloadSceneOnTop();
             }
         }
         #endregion
 
-        private void TryUnloadLatestScene()
+        private GameSceneData GetSceneOnTop()
         {
-            var latestSceneIndex = 0;
-            var latestSceneName = string.Empty;
+            var topSceneIndex = int.MinValue;
+            GameSceneData topSceneData = null;
+
             foreach (var pair in _sceneDataDict)
             {
-                if (pair.Value.index > latestSceneIndex)
+                if (pair.Value.index > topSceneIndex)
                 {
-                    latestSceneName = pair.Key;
+                    topSceneData = pair.Value;
                 }
             }
-            if (!string.IsNullOrEmpty(latestSceneName))
+
+            return topSceneData;
+        }
+
+        private bool TryUnloadSceneOnTop()
+        {
+            var sceneOnTop = GetSceneOnTop();
+            if (sceneOnTop != null)
             {
-                var latestScene = SceneManager.GetSceneByName(latestSceneName);
+                var latestScene = SceneManager.GetSceneByName(sceneOnTop.sceneName);
                 if (latestScene.IsValid() && _sceneDataDict.Count > 1)
                 {
                     UnloadScene(latestScene.name);
                 }
             }
+
+            return false;
         }
 
         public bool IsLoading()
@@ -154,18 +162,33 @@ namespace com.hive.projectr
 
             var loadedScene = SceneManager.GetSceneByName(data.sceneName);
 
-            // dispose prev if existed
+            // dispose if scene already exists
             if (_sceneDataDict.TryGetValue(data.sceneName, out var loadedSceneData))
             {
                 loadedSceneData.Dispose();
                 _sceneDataDict.Remove(data.sceneName);
             }
 
+            // hide top
+            var sceneOnTop = GetSceneOnTop();
+            if (sceneOnTop != null)
+            {
+                sceneOnTop.controller.Hide(GameSceneHideState.Covered);
+            }
+
             // generate scene controller and init
-            var sceneControllerBase = Activator.CreateInstance(Type.GetType($"com.hive.projectr.{data.sceneName}Controller")) as GameSceneControllerBase;
+            var sceneControllerTypeName = $"com.hive.projectr.{data.sceneName}Controller";
+            var sceneControllerType = TypeUtil.GetType(sceneControllerTypeName);
+            if (sceneControllerType == null)
+            {
+                Logger.LogError($"{sceneControllerTypeName} not found");
+                return;
+            }
+
+            var sceneControllerBase = Activator.CreateInstance(sceneControllerType) as GameSceneControllerBase;
             var index = _sceneDataDict.Count;
             sceneControllerBase.Init(new GameSceneInitData(loadedScene, index));
-            sceneControllerBase.Show(data.sceneData);
+            sceneControllerBase.Show(data.sceneData, GameSceneShowState.New);
             _sceneDataDict[data.sceneName] = new GameSceneData(index, data.sceneName, data.sceneData, sceneControllerBase);
 
             // check loading queue
@@ -187,6 +210,18 @@ namespace com.hive.projectr
 
         private IEnumerator UnloadSceneRoutine(string sceneName, Action onComplete)
         {
+            if (_sceneDataDict.TryGetValue(sceneName, out var loadedSceneData))
+            {
+                loadedSceneData.Dispose();
+                _sceneDataDict.Remove(sceneName);
+            }
+
+            var sceneOnTop = GetSceneOnTop();
+            if (sceneOnTop != null)
+            {
+                sceneOnTop.controller.Show(sceneOnTop.sceneData, GameSceneShowState.Uncovered);
+            }
+
             var unloadOp = SceneManager.UnloadSceneAsync(sceneName);
             while (!unloadOp.isDone)
             {
@@ -199,11 +234,7 @@ namespace com.hive.projectr
 
         private void OnSceneUnloaded(string sceneName)
         {
-            if (_sceneDataDict.TryGetValue(sceneName, out var loadedSceneData))
-            {
-                loadedSceneData.Dispose();
-                _sceneDataDict.Remove(sceneName);
-            }
+
         }
     }
 }

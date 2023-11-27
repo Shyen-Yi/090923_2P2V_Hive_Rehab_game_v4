@@ -33,14 +33,6 @@ namespace com.hive.projectr
             _statsButton = Config.ExtraButtons[(int)ExtraBtn.Stats];
         }
 
-        protected override void OnShow(ISceneData data)
-        {
-        }
-
-        protected override void OnHide()
-        {
-        }
-
         protected override void OnDispose()
         {
             UnbindActions();
@@ -66,7 +58,7 @@ namespace com.hive.projectr
         #region Callback
         private void OnStartButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.TransitionCoreGame);
+            GameSceneManager.Instance.LoadScene(SceneNames.Calibration);
         }
 
         private void OnSettingsButtonClick()

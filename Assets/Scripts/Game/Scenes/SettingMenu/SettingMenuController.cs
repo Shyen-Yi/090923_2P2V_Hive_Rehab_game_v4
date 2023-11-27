@@ -74,13 +74,13 @@ namespace com.hive.projectr
             _goalInputField = Config.ExtraObjects[(int)ExtraObj.GoalInputField].GetComponent<TMP_InputField>();
         }
 
-        protected override void OnShow(ISceneData data)
+        protected override void OnShow(ISceneData data, GameSceneShowState showState)
         {
             var year = DateTime.Now.Year;
             var month = DateTime.Now.Month;
             var name = "";
-            var level = GeneralConfig.DefaultLevel;
-            var goal = GeneralConfig.DefaultGoal;
+            var level = GameGeneralConfig.GetData().DefaultLevel;
+            var goal = GameGeneralConfig.GetData().DefaultGoal;
 
             if (PlayerPrefs.HasKey(PlayerPrefsKey.SettingMenuStorage))
             {
@@ -104,10 +104,6 @@ namespace com.hive.projectr
 
             // goal
             RefreshGoal(goal);
-        }
-
-        protected override void OnHide()
-        {
         }
 
         protected override void OnDispose()
@@ -145,7 +141,7 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(Name);
+            GameSceneManager.Instance.UnloadScene(SceneName);
         }
 
         private void OnMailButtonClick()
@@ -160,13 +156,13 @@ namespace com.hive.projectr
 
         private void OnLevelUpButtonClick()
         {
-            var level = Mathf.Clamp(_level + 1, GeneralConfig.MinLevel, GeneralConfig.MaxLevel);
+            var level = Mathf.Clamp(_level + 1, GameGeneralConfig.GetData().MinLevel, GameGeneralConfig.GetData().MaxLevel);
             RefreshLevel(level);
         }
 
         private void OnLevelDownButtonClick()
         {
-            var level = Mathf.Clamp(_level - 1, GeneralConfig.MinLevel, GeneralConfig.MaxLevel);
+            var level = Mathf.Clamp(_level - 1, GameGeneralConfig.GetData().MinLevel, GameGeneralConfig.GetData().MaxLevel);
             RefreshLevel(level);
         }
 

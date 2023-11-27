@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu]
-public class GameManagerScriptableObject : ScriptableObject
+namespace com.hive.projectr
 {
-    public bool isGameRunning;   
+    [CreateAssetMenu]
+    public class GameManagerScriptableObject : GameSOBase
+    {
+        public bool isGameRunning;
+    }
 }

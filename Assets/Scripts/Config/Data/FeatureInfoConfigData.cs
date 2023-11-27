@@ -6,33 +6,67 @@ using System;
 namespace com.hive.projectr
 {
     
-	public class FeatureInfoConfig : GameConfigBase
+	public partial class FeatureInfoConfig : GameConfigBase
 	{
-		private static FeatureInfoConfigData _data;
+		private static FeatureInfoSO _so;
+		private static Dictionary<int, FeatureInfoConfigData> _dict;
 
 		public FeatureInfoConfig(FeatureInfoSO so)
 		{
-			_data = new FeatureInfoConfigData(so);
+			_so = so;
 		}
 
-		public static FeatureInfoSerializableDictionary FeatureInfoDict => _data.FeatureInfoDict;
-		public static String name => _data.name;
-		public static HideFlags hideFlags => _data.hideFlags;
+		public static FeatureInfoConfigData GetData(int id)
+		{
+			if (_dict.TryGetValue(id, out var data))
+			{
+				return data;
+			}
+			return null;
+		}
 
+		protected override void OnInit()
+		{
+			_dict = new Dictionary<int, FeatureInfoConfigData>();
+
+			for (var i = 0; i < _so.Items.Count; ++i)
+			{
+				var id = i + 1;
+				if (!_dict.ContainsKey(id))
+				{
+					_dict[id] = new FeatureInfoConfigData(_so.Items[i]);
+				}
+				else
+				{
+					Logger.LogError($"Duplicate id: {id} in FeatureInfoSO!");
+				}
+			}
+
+			PostInit();
+		}
+
+		protected override void OnDispose()
+		{
+			_dict.Clear();
+			_dict = null;
+			_so = null;
+
+			PostDispose();
+		}
 	}
 
     
-	public class FeatureInfoConfigData : GameConfigDataBase
+	public partial class FeatureInfoConfigData : GameConfigDataBase
 	{
-		private FeatureInfoSO _so;
+		private FeatureInfoSOItem _item;
 
-		public FeatureInfoSerializableDictionary FeatureInfoDict => _so.FeatureInfoDict;
-		public String name => _so.name;
-		public HideFlags hideFlags => _so.hideFlags;
+		public FeatureType Feature => _item.Feature;
+		public String Title => _item.Title;
+		public String Desc => _item.Desc;
 
-		public FeatureInfoConfigData(FeatureInfoSO so)
+		public FeatureInfoConfigData(FeatureInfoSOItem item)
 		{
-			_so = so;
+			_item = item;
 		}
 	}
 }

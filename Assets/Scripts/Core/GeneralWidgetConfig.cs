@@ -7,7 +7,7 @@ using UnityEngine.U2D;
 
 namespace com.hive.projectr
 {
-    public class GeneralWidgetConfig : MonoBehaviour
+    public class GeneralWidgetConfig : SimpleGridElement
     {
         [Header("Extra")]
         [SerializeField] private List<GeneralWidgetConfig> _extraWidgetConfigs;
@@ -25,6 +25,8 @@ namespace com.hive.projectr
         [SerializeField] private List<Camera> _extraCameras;
         [SerializeField] private List<Sprite> _extraSprites;
         [SerializeField] private List<TMP_ColorGradient> _extraColorGradients;
+        [SerializeField] private List<Animator> _extraAnimators;
+        [SerializeField] private List<Renderer> _extraRenderers;
 
         // extra
         public List<GeneralWidgetConfig> ExtraWidgetConfigs => _extraWidgetConfigs;
@@ -42,5 +44,7 @@ namespace com.hive.projectr
         public List<Camera> ExtraCameras => _extraCameras;
         public List<Sprite> ExtraSprites => _extraSprites;
         public List<TMP_ColorGradient> ExtraColorGradients => _extraColorGradients;
+        public List<Animator> ExtraAnimators => _extraAnimators;
+        public List<Renderer> ExtraRenderers => _extraRenderers;
     }
 }

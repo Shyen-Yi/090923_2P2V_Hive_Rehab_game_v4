@@ -342,6 +342,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1875603113}
   - component: {fileID: 1875603114}
+  - component: {fileID: 1875603115}
   m_Layer: 0
   m_Name: Root
   m_TagString: Untagged
@@ -377,6 +378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 332c4e1bc2a2c3a4e9cdd8fb13c1ae2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _canvasGroup: {fileID: 1875603115}
   _extraWidgetConfigs: []
   _extraRectTransforms: []
   _extraTextMeshPros:
@@ -395,3 +397,15 @@ MonoBehaviour:
   _extraCameras: []
   _extraSprites: []
   _extraColorGradients: []
+--- !u!225 &1875603115
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1875603112}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

@@ -9,6 +9,8 @@ namespace com.hive.projectr
         private GameSceneManager _sceneManager;
         private CameraManager _cameraManager;
         private ConfigDataManager _configManager;
+        private CSVManager _csvManager;
+        private InputManager _inputManager;
         private MonoBehaviourUtil _monoBehaviourUtil;
 
         private bool _isGameInitialized;
@@ -30,10 +32,16 @@ namespace com.hive.projectr
             _configManager = new ConfigDataManager();
             _configManager.OnInit();
 
+            _csvManager = new CSVManager();
+            _csvManager.OnInit();
+
+            _inputManager = new InputManager();
+            _inputManager.OnInit();
+
             _monoBehaviourUtil = FindObjectOfType<MonoBehaviourUtil>();
             if (_monoBehaviourUtil == null)
             {
-                LogHelper.LogError($"No MonoBehaviourUtil!");
+                Logger.LogError($"No MonoBehaviourUtil!");
             }
 
             if (!_isGameInitialized)
@@ -55,6 +63,12 @@ namespace com.hive.projectr
 
             _configManager.OnDispose();
             _configManager = null;
+
+            _csvManager.OnDispose();
+            _csvManager = null;
+
+            _inputManager.OnDispose();
+            _inputManager = null;
 
             _monoBehaviourUtil = null;
         }

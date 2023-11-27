@@ -20,15 +20,21 @@ namespace com.hive.projectr
         public override void OnPointerEnter(PointerEventData eventData)
         {
             base.OnPointerEnter(eventData);
-
-            image.sprite = spriteState.highlightedSprite;
+            
+            if (image != null)
+            {
+                image.sprite = spriteState.highlightedSprite;
+            }
         }
 
         public override void OnPointerExit(PointerEventData eventData)
         {
             base.OnPointerExit(eventData);
 
-            image.sprite = spriteState.disabledSprite;
+            if (image != null)
+            {
+                image.sprite = spriteState.disabledSprite;
+            }
         }
 
         public override void OnPointerDown(PointerEventData eventData)
@@ -52,7 +58,7 @@ namespace com.hive.projectr
             GameObject canvas = GameObject.Find("Canvas");
             if (canvas == null)
             {
-                LogHelper.LogError($"No Canvas can be found!");
+                Logger.LogError($"No Canvas can be found!");
                 return;
             }
 

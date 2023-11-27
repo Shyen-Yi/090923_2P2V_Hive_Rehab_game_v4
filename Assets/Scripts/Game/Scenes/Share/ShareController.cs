@@ -40,23 +40,22 @@ namespace com.hive.projectr
             _shareButton = Config.ExtraButtons[(int)ExtraBtn.Share];
         }
 
-        protected override void OnShow(ISceneData data)
+        protected override void OnShow(ISceneData data, GameSceneShowState showState)
         {
             if (data is FeatureInfoData pData)
             {
-                if (FeatureInfoConfig.FeatureInfoDict.TryGetValue(pData.type, out var info))
+                var infoDataList = FeatureInfoConfig.GetDataForFeature(pData.type);
+                if (infoDataList.Count > 0)
                 {
-                    _contentText.text = info.desc;
+                    var index = Random.Range(0, infoDataList.Count);
+                    var infoData = infoDataList[index];
+                    _contentText.text = infoData.Desc;
                 }
                 else
                 {
-                    LogHelper.LogError($"FeatureInfoType {pData.type} has no defined data in FeatureInfoConfigData!");
+                    Logger.LogError($"FeatureInfoType {pData.type} has no defined data in FeatureInfoConfigData!");
                 }
             }
-        }
-
-        protected override void OnHide()
-        {
         }
 
         protected override void OnDispose()
@@ -82,14 +81,14 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(Name);
+            GameSceneManager.Instance.UnloadScene(SceneName);
         }
 
         private void OnShareButtonClick()
         {
             GameSceneManager.Instance.LoadScene(SceneNames.ShareMenu, null, ()=>
             {
-                GameSceneManager.Instance.UnloadScene(Name);
+                GameSceneManager.Instance.UnloadScene(SceneName);
             });
         }
         #endregion

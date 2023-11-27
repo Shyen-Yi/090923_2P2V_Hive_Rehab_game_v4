@@ -39,7 +39,6 @@ namespace com.hive.projectr
 
         public void OnInit()
         {
-            Instance = this;
         }
 
         public void OnDispose()
@@ -82,7 +81,7 @@ namespace com.hive.projectr
                     return;
                 }
 
-                LogHelper.LogError($"Homeless camera! {cam.name}");
+                Logger.LogError($"Homeless camera! {cam.name}");
                 _camOwnerDict[HomelessCamId] = new List<Camera>() { cam };
             }
             else

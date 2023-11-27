@@ -403,6 +403,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1088419218}
   - component: {fileID: 1088419217}
+  - component: {fileID: 1088419219}
   m_Layer: 0
   m_Name: Root
   m_TagString: Untagged
@@ -422,6 +423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 332c4e1bc2a2c3a4e9cdd8fb13c1ae2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _canvasGroup: {fileID: 1088419219}
   _extraWidgetConfigs: []
   _extraRectTransforms: []
   _extraTextMeshPros: []
@@ -457,6 +459,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!225 &1088419219
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1088419216}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1403323726
 PrefabInstance:
   m_ObjectHideFlags: 0

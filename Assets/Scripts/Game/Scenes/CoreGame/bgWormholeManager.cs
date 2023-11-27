@@ -5,8 +5,6 @@ using Unity.Collections;
 
 public class bgWormholeManager : MonoBehaviour
 {
-    public GameManagerScriptableObject gameManager;
-     
     public SpriteRenderer bgWormhole;
     public Sprite bgState01;
     public Sprite bgState02;

@@ -21,11 +21,12 @@ namespace com.hive.projectr
             {
                 var so = allSO[i];
                 var soType = so.GetType();
-                var index = soType.Name.IndexOf("SO");
+                var soTypeName = soType.GetFriendlyName();
+                var index = soTypeName.IndexOf("SO");
                 if (index >= 0)
                 {
-                    var key = soType.Name.Remove(index);
-                    var config = Activator.CreateInstance(Type.GetType($"com.hive.projectr.{key}Config"), new object[] { so }) as GameConfigBase;
+                    var key = soTypeName.Remove(index);
+                    var config = Activator.CreateInstance(TypeUtil.GetType($"com.hive.projectr.{key}Config"), new object[] { so }) as GameConfigBase;
                     config.Init();
 
                     _dataDict[soType] = config;
