@@ -35,7 +35,7 @@ namespace com.hive.projectr
             _csvManager = new CSVManager();
             _csvManager.OnInit();
 
-            _inputManager = new InputManager();
+            _inputManager = new InputManager(); // after camera
             _inputManager.OnInit();
 
             _monoBehaviourUtil = FindObjectOfType<MonoBehaviourUtil>();
