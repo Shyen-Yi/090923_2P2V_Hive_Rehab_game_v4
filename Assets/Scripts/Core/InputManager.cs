@@ -42,18 +42,24 @@ namespace com.hive.projectr
         #endregion
 
         #region Public Instance
-        public void ShowCursor()
+        #endregion
+
+        #region Public Static
+        public static void SetCursorLockMode(CursorLockMode lockMode)
+        {
+            Cursor.lockState = lockMode;
+        }
+
+        public static void ShowCursor()
         {
             Cursor.visible = true;
         }
 
-        public void HideCursor()
+        public static void HideCursor()
         {
             Cursor.visible = false;
         }
-        #endregion
 
-        #region Public Static
         public static bool HasAnyKeyDown()
         {
             return Input.anyKeyDown;

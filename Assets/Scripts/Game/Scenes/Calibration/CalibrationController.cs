@@ -173,7 +173,7 @@ namespace com.hive.projectr
                 Start();
             }
 
-            InputManager.Instance.HideCursor();
+            InputManager.HideCursor();
         }
 
         protected override void OnHide(GameSceneHideState hideState)
@@ -185,7 +185,7 @@ namespace com.hive.projectr
                 Pause();
             }
 
-            InputManager.Instance.ShowCursor();
+            InputManager.ShowCursor();
         }
 
         protected override void OnDispose()
