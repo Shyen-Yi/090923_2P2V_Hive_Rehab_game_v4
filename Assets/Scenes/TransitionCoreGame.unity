@@ -1105,6 +1105,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 329723409}
     m_Modifications:
     - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
+      propertyPath: m_SpriteState.m_PressedSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 0634969213eac4a27a50a4d98d2a36d5, type: 3}
+    - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
       propertyPath: m_SpriteState.m_DisabledSprite
       value: 
       objectReference: {fileID: 21300000, guid: 25673e94d07ca4560ae8d83d184879c9, type: 3}

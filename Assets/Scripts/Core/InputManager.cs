@@ -12,7 +12,7 @@ namespace com.hive.projectr
         private Vector3 _lastCursorScreenPos;
         private float _idleDuration;
 
-        private static readonly float IdleDistanceThreshold = .01f;
+        private static readonly float IdleDistanceThreshold = 10f;
 
         #region Lifecycle
         public void OnInit()

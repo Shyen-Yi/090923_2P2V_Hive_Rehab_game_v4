@@ -46,7 +46,7 @@ namespace com.hive.projectr
 
             if (!_isGameInitialized)
             {
-                GameSceneManager.Instance.LoadScene(SceneNames.MainMenu, null, () =>
+                GameSceneManager.Instance.ShowScene(SceneNames.MainMenu, null, () =>
                 {
                     _isGameInitialized = true;
                 });

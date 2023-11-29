@@ -81,6 +81,7 @@ namespace com.hive.projectr
             TopRightCorner = 1,
             BottomRightCorner = 2,
             BottomLeftCorner = 3,
+            Arrow = 4,
         }
 
         private enum ExtraImg
@@ -102,6 +103,7 @@ namespace com.hive.projectr
         private LineDrawer _lineDrawer;
 
         private Dictionary<CalibrationStageType, RectTransform> _cornerDict;
+        private RectTransform _arrow;
 
         private Image _raycastBlock;
         #endregion
@@ -156,6 +158,7 @@ namespace com.hive.projectr
                 { CalibrationStageType.BottomRight , bottomRightCorner },
                 { CalibrationStageType.BottomLeft, bottomLeftCorner },
             };
+            _arrow = Config.ExtraRectTransforms[(int)ExtraRT.Arrow];
 
             _raycastBlock = Config.ExtraImages[(int)ExtraImg.RaycastBlock];
         }
@@ -164,13 +167,16 @@ namespace com.hive.projectr
         {
             base.OnShow(data, showState);
 
-            if (_status == CalibrationStatus.Paused)
+            if (showState == GameSceneShowState.New)
             {
-                Resume();
+                Start();
             }
             else
             {
-                Start();
+                if (_status == CalibrationStatus.Paused)
+                {
+                    Resume();
+                }
             }
 
             InputManager.HideCursor();
@@ -223,6 +229,12 @@ namespace com.hive.projectr
         #endregion
 
         #region Content
+        public void Restart()
+        {
+            Reset();
+            Start();
+        }
+
         private void Start()
         {
             _status = CalibrationStatus.Running;
@@ -272,6 +284,13 @@ namespace com.hive.projectr
             _spacecraftOffsetFromCursor = new Vector3(Screen.width / 2, Screen.height / 2, 0) - InputManager.Instance.CursorScreenPos;
         }
 
+        private Vector3 GetCenterScreenPos()
+        {
+            var topLeftScreenPos = RectTransformUtility.WorldToScreenPoint(CameraManager.Instance.UICamera, _cornerDict[CalibrationStageType.TopLeft].position);
+            var bottomRightScreenPos = RectTransformUtility.WorldToScreenPoint(CameraManager.Instance.UICamera, _cornerDict[CalibrationStageType.BottomRight].position);
+            return (topLeftScreenPos + bottomRightScreenPos) / 2;
+        }
+
         private void OnStageCompleted()
         {
             var currentStage = _stageDataList[_stageIndex];
@@ -284,8 +303,9 @@ namespace com.hive.projectr
             {
                 if (currentStage.Stage == CalibrationStageType.Center)
                 {
-                    var targetScreenPos = new Vector3(Screen.width / 2, Screen.height / 2, 0);
-                    var targetWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(targetScreenPos);
+                    // center of movement area (COULD BE the screen center)
+                    var centerScreenPos = GetCenterScreenPos();
+                    var targetWorldPos = CameraManager.Instance.UICamera.ScreenToWorldPoint(centerScreenPos);
                     markController.MoveToWorldPos(targetWorldPos);
                     CenterSpacecraft();
                 }
@@ -409,17 +429,44 @@ namespace com.hive.projectr
 
             _raycastBlock.enabled = false;
 
-            GameSceneManager.Instance.LoadScene(SceneNames.TransitionCoreGame, null, () =>
+            GameSceneManager.Instance.ShowScene(SceneNames.CalibrationEnding, null, ()=> 
             {
-                GameSceneManager.Instance.UnloadScene(SceneName);
+                GameSceneManager.Instance.HideScene(SceneName);
             });
+        }
+
+        private bool IsCurrentPositionMatchingStage()
+        {
+            if (_stageIndex >= 0 && _stageIndex < _stageDataList.Count)
+            {
+                var currentStage = _stageDataList[_stageIndex];
+                if (currentStage.Stage != CalibrationStageType.Center)
+                {
+                    var spacecraftScreenpos = GetSpacecraftScreenPos();
+                    var centerScreenPos = GetCenterScreenPos();
+
+                    switch (currentStage.Stage)
+                    {
+                        case CalibrationStageType.TopLeft:
+                            return spacecraftScreenpos.x < centerScreenPos.x && spacecraftScreenpos.y > centerScreenPos.y;
+                        case CalibrationStageType.TopRight:
+                            return spacecraftScreenpos.x > centerScreenPos.x && spacecraftScreenpos.y > centerScreenPos.y;
+                        case CalibrationStageType.BottomRight:
+                            return spacecraftScreenpos.x > centerScreenPos.x && spacecraftScreenpos.y < centerScreenPos.y;
+                        case CalibrationStageType.BottomLeft:
+                            return spacecraftScreenpos.x < centerScreenPos.x && spacecraftScreenpos.y < centerScreenPos.y;
+                    }
+                }
+            }
+
+            return true;
         }
         #endregion
 
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(SceneName);
+            GameSceneManager.Instance.GoBack();
         }
 
         private void OnRedoButtonClick()
@@ -430,12 +477,12 @@ namespace com.hive.projectr
 
         private void OnContactButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.ContactInfo);
+            GameSceneManager.Instance.ShowScene(SceneNames.ContactInfo);
         }
 
         private void OnQuestionButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Calibration));
+            GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Calibration));
         }
 
         private void Tick()
@@ -447,7 +494,52 @@ namespace com.hive.projectr
             _spacecraft.position = new Vector3(spacecraftWorldPos.x, spacecraftWorldPos.y, _spacecraft.position.z);
 
             var currentStageData = _stageDataList[_stageIndex];
-            var isHolding = InputManager.Instance.IdleDuration >= currentStageData.HoldingPreparationTime;
+            var currentStage = currentStageData.Stage;
+            var isHolding = InputManager.Instance.IdleDuration >= currentStageData.HoldingPreparationTime &&
+                IsCurrentPositionMatchingStage();
+
+            // arrow
+            if (currentStage != CalibrationStageType.TopLeft &&
+                currentStage != CalibrationStageType.TopRight &&
+                currentStage != CalibrationStageType.BottomRight &&
+                currentStage != CalibrationStageType.BottomLeft ||
+                isHolding)
+            {
+                _arrow.gameObject.SetActive(false);
+            }
+            else
+            {
+                _arrow.gameObject.SetActive(true);
+
+                var unitDirection = Vector3.zero;
+                switch (currentStage)
+                {
+                    case CalibrationStageType.TopLeft:
+                        unitDirection = new Vector2(-1, 1).normalized;
+                        break;
+                    case CalibrationStageType.TopRight:
+                        unitDirection = new Vector2(1, 1).normalized;
+                        break;
+                    case CalibrationStageType.BottomRight:
+                        unitDirection = new Vector2(1, -1).normalized;
+                        break;
+                    case CalibrationStageType.BottomLeft:
+                        unitDirection = new Vector2(-1, -1).normalized;
+                        break;
+                    default:
+                        Logger.LogError($"Invalid stage: {currentStage}");
+                        break;
+                }
+
+                var distance = CalibrationConfig.GetData().ArrowScreenDistanceFromCenter;
+                var arrowScreenPos = GetCenterScreenPos() + distance * unitDirection;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)_arrow.parent, arrowScreenPos, CameraManager.Instance.UICamera, out var localPos);
+                _arrow.anchoredPosition = localPos;
+
+                var targetScreenPos = GetCenterScreenPos() + distance * unitDirection * 2;
+                var targetWorldPos = CameraManager.Instance.UICamera.ScreenToWorldPoint(targetScreenPos);
+                _arrow.LookAt(targetWorldPos, Vector3.forward);
+            }
 
             if (Time.time >= _nextCanHoldTime && isHolding)
             {
@@ -476,62 +568,6 @@ namespace com.hive.projectr
             }
 
             return;
-
-
-            //if (!isCalibrated)
-            //{
-            //    if (isCalibrating)
-            //    {
-            //        calibrationTimer += Time.deltaTime;
-            //        if (calibrationTimer >= calibrationTime)
-            //        {
-            //            calibrationCorners[calibrationCornerIndex] = Input.mousePosition;
-            //            calibrationCornerIndex++;
-            //            if (calibrationCornerIndex >= 4)
-            //            {
-            //                // All corners are calibrated
-            //                isCalibrated = true;
-            //                isCalibrating = false;
-            //            }
-            //            else
-            //            {
-            //                calibrationTimer = 0f;
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        // Check if the player wants to calibrate
-            //        if (Input.GetMouseButtonDown(0))
-            //        {
-            //            isCalibrating = true;
-            //            calibrationTimer = 0f;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    // Calculate the calibrated screen dimensions
-            //    float minX = Mathf.Min(calibrationCorners[0].x, calibrationCorners[2].x);
-            //    float minY = Mathf.Min(calibrationCorners[1].y, calibrationCorners[3].y);
-            //    float maxX = Mathf.Max(calibrationCorners[0].x, calibrationCorners[2].x);
-            //    float maxY = Mathf.Max(calibrationCorners[1].y, calibrationCorners[3].y);
-
-            //    // Apply these dimensions to determine the allowed gameplay area
-            //    Rect allowedArea = new Rect(minX, minY, maxX - minX, maxY - minY);
-
-            //    // Check if the mouse is within the allowed gameplay area
-            //    Vector2 mousePosition = Input.mousePosition;
-            //    if (allowedArea.Contains(mousePosition))
-            //    {
-            //        // You can perform mouse-marking logic here if needed
-            //        if (Input.GetMouseButtonDown(0))
-            //        {
-            //            // Instantiate a mark at the mouse position
-            //            GameObject.Instantiate(_markPrefab, mousePosition, Quaternion.identity);
-            //        }
-            //    }
-            //}
         }
         #endregion
     }

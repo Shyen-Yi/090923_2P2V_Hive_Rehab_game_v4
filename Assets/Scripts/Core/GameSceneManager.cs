@@ -77,7 +77,7 @@ namespace com.hive.projectr
         {
             if (Input.GetKeyDown(KeyCode.Backspace))
             {
-                TryUnloadSceneOnTop();
+                TryHideSceneOnTop(true);
             }
         }
         #endregion
@@ -98,7 +98,7 @@ namespace com.hive.projectr
             return topSceneData;
         }
 
-        private bool TryUnloadSceneOnTop()
+        private bool TryHideSceneOnTop(bool showLastScene)
         {
             var sceneOnTop = GetSceneOnTop();
             if (sceneOnTop != null)
@@ -106,7 +106,7 @@ namespace com.hive.projectr
                 var latestScene = SceneManager.GetSceneByName(sceneOnTop.sceneName);
                 if (latestScene.IsValid() && _sceneDataDict.Count > 1)
                 {
-                    UnloadScene(latestScene.name);
+                    UnloadScene(latestScene.name, showLastScene);
                 }
             }
 
@@ -118,7 +118,27 @@ namespace com.hive.projectr
             return _scenesLoading.Count > 0;
         }
 
-        public void LoadScene(string sceneName, ISceneData data = null, Action onComplete = null)
+        public void ShowScene(string sceneName, ISceneData data = null, Action onComplete = null)
+        {
+            LoadScene(sceneName, data, onComplete);
+        }
+
+        public void HideScene(string sceneName, Action onComplete = null)
+        {
+            UnloadScene(sceneName, true, onComplete);
+        }
+
+        public GameSceneControllerBase GetLoadedSceneController(string sceneName)
+        {
+            if (_sceneDataDict.TryGetValue(sceneName, out var sceneData))
+            {
+                return sceneData.controller;
+            }
+
+            return null;
+        }
+
+        private void LoadScene(string sceneName, ISceneData data = null, Action onComplete = null)
         {
             var loadingData = new GameSceneLoadingData(sceneName, data, onComplete);
             _scenesToLoad.Enqueue(loadingData);
@@ -203,12 +223,12 @@ namespace com.hive.projectr
             }
         }
 
-        public void UnloadScene(string sceneName, Action onComplete = null)
+        private void UnloadScene(string sceneName, bool showLastScene = true, Action onComplete = null)
         {
-            MonoBehaviourUtil.Instance.StartCoroutine(UnloadSceneRoutine(sceneName, onComplete));
+            MonoBehaviourUtil.Instance.StartCoroutine(UnloadSceneRoutine(sceneName, showLastScene, onComplete));
         }
 
-        private IEnumerator UnloadSceneRoutine(string sceneName, Action onComplete)
+        private IEnumerator UnloadSceneRoutine(string sceneName, bool showLastScene, Action onComplete)
         {
             if (_sceneDataDict.TryGetValue(sceneName, out var loadedSceneData))
             {
@@ -216,10 +236,13 @@ namespace com.hive.projectr
                 _sceneDataDict.Remove(sceneName);
             }
 
-            var sceneOnTop = GetSceneOnTop();
-            if (sceneOnTop != null)
+            if (showLastScene)
             {
-                sceneOnTop.controller.Show(sceneOnTop.sceneData, GameSceneShowState.Uncovered);
+                var sceneOnTop = GetSceneOnTop();
+                if (sceneOnTop != null)
+                {
+                    sceneOnTop.controller.Show(sceneOnTop.sceneData, GameSceneShowState.Uncovered);
+                }
             }
 
             var unloadOp = SceneManager.UnloadSceneAsync(sceneName);
@@ -235,6 +258,58 @@ namespace com.hive.projectr
         private void OnSceneUnloaded(string sceneName)
         {
 
+        }
+
+        public void GoBack(Action onComplete = null)
+        {
+            GoBack(null, onComplete);
+        }
+
+        public void GoBack(string sceneName, Action onComplete = null)
+        {
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                var sceneOnTop = GetSceneOnTop();
+                if (sceneOnTop != null)
+                {
+                    UnloadScene(sceneOnTop.sceneName, true, onComplete);
+                }
+                else
+                {
+                    onComplete?.Invoke();
+                }
+            }
+            else
+            {
+                var allSceneData = new List<GameSceneData>(_sceneDataDict.Values);
+                allSceneData.Sort(CmpSceneData);
+
+                for (var i = allSceneData.Count - 1; i >= 0; --i)
+                {
+                    var sceneData = allSceneData[i];
+                    if (allSceneData[i].sceneName.Equals(sceneName))
+                    {
+                        sceneData.controller.Show(sceneData.sceneData, GameSceneShowState.Uncovered);
+
+                        var unloadCounter = allSceneData.Count - i;
+                        for (var j = allSceneData.Count - 1; j > i; --j)
+                        {
+                            var data = allSceneData[j];
+                            UnloadScene(data.sceneName, false);
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        private int CmpSceneData(GameSceneData a, GameSceneData b)
+        {
+            if (a == null || b == null)
+                return 0;
+
+            return a.index - b.index;
         }
     }
 }

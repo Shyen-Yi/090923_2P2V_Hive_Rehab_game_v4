@@ -141,17 +141,17 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(SceneName);
+            GameSceneManager.Instance.GoBack();
         }
 
         private void OnMailButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.ContactInfo);
+            GameSceneManager.Instance.ShowScene(SceneNames.ContactInfo);
         }
 
         private void OnQuestionButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Setting));
+            GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Setting));
         }
 
         private void OnLevelUpButtonClick()

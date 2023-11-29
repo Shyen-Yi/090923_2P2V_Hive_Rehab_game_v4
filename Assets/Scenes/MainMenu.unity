@@ -524,6 +524,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4100589694068275961, guid: d0b74bcd6be2a43febe3f0c2cdf3dcb2, type: 3}
+      propertyPath: m_SpriteState.m_PressedSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: f8c28f0e8a1e34348adc8c42a29d8fd0, type: 3}
+    - target: {fileID: 4100589694068275961, guid: d0b74bcd6be2a43febe3f0c2cdf3dcb2, type: 3}
       propertyPath: m_SpriteState.m_DisabledSprite
       value: 
       objectReference: {fileID: 21300000, guid: f6ff1180a5dbf4911997ab576e6290e1, type: 3}
@@ -996,6 +1000,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4100589694068275961, guid: d0b74bcd6be2a43febe3f0c2cdf3dcb2, type: 3}
+      propertyPath: m_SpriteState.m_PressedSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: d1427da8ab97248149676af02f6880f0, type: 3}
+    - target: {fileID: 4100589694068275961, guid: d0b74bcd6be2a43febe3f0c2cdf3dcb2, type: 3}
       propertyPath: m_SpriteState.m_DisabledSprite
       value: 
       objectReference: {fileID: 21300000, guid: 2552b657b8cc64072888bf749e9ef04c, type: 3}
@@ -1283,6 +1291,10 @@ PrefabInstance:
       propertyPath: normalImageContainer
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 4100589694068275961, guid: d0b74bcd6be2a43febe3f0c2cdf3dcb2, type: 3}
+      propertyPath: m_SpriteState.m_PressedSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c7e41ff541d9c41cdbb364bfad74bb21, type: 3}
     - target: {fileID: 4100589694068275961, guid: d0b74bcd6be2a43febe3f0c2cdf3dcb2, type: 3}
       propertyPath: m_SpriteState.m_DisabledSprite
       value: 

@@ -81,14 +81,14 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(SceneName);
+            GameSceneManager.Instance.GoBack();
         }
 
         private void OnShareButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.ShareMenu, null, ()=>
+            GameSceneManager.Instance.ShowScene(SceneNames.ShareMenu, null, ()=>
             {
-                GameSceneManager.Instance.UnloadScene(SceneName);
+                GameSceneManager.Instance.HideScene(SceneName);
             });
         }
         #endregion

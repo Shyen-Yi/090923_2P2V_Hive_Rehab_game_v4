@@ -1187,7 +1187,7 @@ MonoBehaviour:
     m_FadeDuration: 0.1
   m_SpriteState:
     m_HighlightedSprite: {fileID: 21300000, guid: a7a9243af54eb4b24b717ff0f51d4e14, type: 3}
-    m_PressedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 21300000, guid: a7a9243af54eb4b24b717ff0f51d4e14, type: 3}
     m_SelectedSprite: {fileID: 0}
     m_DisabledSprite: {fileID: 21300000, guid: 6ec92d3218aeb417882a677a78ffa17c, type: 3}
   m_AnimationTriggers:
@@ -2200,6 +2200,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1458104615}
     m_Modifications:
     - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
+      propertyPath: m_SpriteState.m_PressedSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 71c9f545894604aa795d1c65be8f56ca, type: 3}
+    - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
       propertyPath: m_SpriteState.m_DisabledSprite
       value: 
       objectReference: {fileID: 21300000, guid: c36295b53eaea460987d8aa23af324ee, type: 3}
@@ -2465,7 +2469,7 @@ MonoBehaviour:
     m_FadeDuration: 0.1
   m_SpriteState:
     m_HighlightedSprite: {fileID: 21300000, guid: a7a9243af54eb4b24b717ff0f51d4e14, type: 3}
-    m_PressedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 21300000, guid: a7a9243af54eb4b24b717ff0f51d4e14, type: 3}
     m_SelectedSprite: {fileID: 0}
     m_DisabledSprite: {fileID: 21300000, guid: 6ec92d3218aeb417882a677a78ffa17c, type: 3}
   m_AnimationTriggers:
@@ -2649,6 +2653,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1458104615}
     m_Modifications:
+    - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
+      propertyPath: m_SpriteState.m_PressedSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 0634969213eac4a27a50a4d98d2a36d5, type: 3}
     - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
       propertyPath: m_SpriteState.m_DisabledSprite
       value: 
@@ -3484,6 +3492,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1458104615}
     m_Modifications:
     - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
+      propertyPath: m_SpriteState.m_PressedSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c90027fc9e61f4c52a2e2eac903b8873, type: 3}
+    - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
       propertyPath: m_SpriteState.m_DisabledSprite
       value: 
       objectReference: {fileID: 21300000, guid: 29cf3abcaa8ef46449e07c155aed14bf, type: 3}
@@ -4185,6 +4197,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1458104615}
     m_Modifications:
+    - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
+      propertyPath: m_SpriteState.m_PressedSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 86ee7da1177114f548e7f458172517df, type: 3}
     - target: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
       propertyPath: m_SpriteState.m_DisabledSprite
       value: 

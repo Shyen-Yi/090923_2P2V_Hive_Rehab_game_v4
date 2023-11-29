@@ -49,7 +49,7 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(SceneName);
+            GameSceneManager.Instance.GoBack();
         }
         #endregion
     }
