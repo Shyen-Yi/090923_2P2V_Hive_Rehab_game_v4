@@ -16,11 +16,14 @@ namespace com.hive.projectr
         public static readonly Vector3 DefaultScale = Vector3.zero;
 
         private Vector3 _initialScale = DefaultScale;
+        private bool _isPointerOnTop;
 
         public override void OnPointerEnter(PointerEventData eventData)
         {
+            _isPointerOnTop = true;
+
             base.OnPointerEnter(eventData);
-            
+
             if (image != null)
             {
                 image.sprite = spriteState.highlightedSprite;
@@ -29,6 +32,8 @@ namespace com.hive.projectr
 
         public override void OnPointerExit(PointerEventData eventData)
         {
+            _isPointerOnTop = false;
+
             base.OnPointerExit(eventData);
 
             if (image != null)
@@ -43,12 +48,29 @@ namespace com.hive.projectr
 
             _initialScale = transform.localScale;
             transform.localScale = _initialScale * PressedSize;
+            
+            if (image != null)
+            {
+                image.sprite = spriteState.pressedSprite;
+            }
         }
 
         public override void OnPointerUp(PointerEventData eventData)
         {
             base.OnPointerUp(eventData);
             transform.localScale = _initialScale;
+
+            if (image != null)
+            {
+                if (_isPointerOnTop)
+                {
+                    image.sprite = spriteState.highlightedSprite;
+                }
+                else
+                {
+                    image.sprite = spriteState.disabledSprite;
+                }
+            }
         }
 
 #if UNITY_EDITOR

@@ -17,17 +17,21 @@ namespace com.hive.projectr
     {
         
 		[SerializeField] private CalibrationStageType stage;
-		[SerializeField] private String instruction;
 		[SerializeField] private Int32 sortingId;
+		[SerializeField] private String instruction;
+		[SerializeField] private String instructionWhenHolding;
 		[SerializeField] private Int32 maxHoldingCheckCount;
 		[SerializeField] private Single eachHoldingCheckDuration;
+		[SerializeField] private Single holdingPreparationTime;
 		[SerializeField] private Single cooldownTime;
 
 		public CalibrationStageType Stage => stage;
-		public String Instruction => instruction;
 		public Int32 SortingId => sortingId;
+		public String Instruction => instruction;
+		public String InstructionWhenHolding => instructionWhenHolding;
 		public Int32 MaxHoldingCheckCount => maxHoldingCheckCount;
 		public Single EachHoldingCheckDuration => eachHoldingCheckDuration;
+		public Single HoldingPreparationTime => holdingPreparationTime;
 		public Single CooldownTime => cooldownTime;
     }
 }

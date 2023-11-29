@@ -186,22 +186,22 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(SceneName);
+            GameSceneManager.Instance.GoBack();
         }
 
         private void OnShareButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.Share);
+            GameSceneManager.Instance.ShowScene(SceneNames.Share);
         }
 
         private void OnContactButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.ContactInfo);
+            GameSceneManager.Instance.ShowScene(SceneNames.ContactInfo);
         }
 
         private void OnQuestionButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Stats));
+            GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Stats));
         }
 
         private void OnPrevMonthButtonClick()

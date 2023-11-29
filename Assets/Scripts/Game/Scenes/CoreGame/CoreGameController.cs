@@ -22,12 +22,12 @@ namespace com.hive.projectr
 
         protected override void OnShow(ISceneData data, GameSceneShowState showState)
         {
-            Cursor.visible = false;
+            InputManager.HideCursor();
         }
 
         protected override void OnHide(GameSceneHideState hideState)
         {
-            Cursor.visible = true;
+            InputManager.ShowCursor();
         }
 
         protected override void OnDispose()

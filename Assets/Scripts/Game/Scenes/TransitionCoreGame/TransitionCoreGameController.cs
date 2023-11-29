@@ -87,7 +87,7 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
-            GameSceneManager.Instance.UnloadScene(SceneName);
+            GameSceneManager.Instance.GoBack();
         }
 
         private void Tick()
@@ -108,9 +108,9 @@ namespace com.hive.projectr
                     _progressBar.fillAmount = _progressFill = 1;
                     _spaceshipRoot.anchoredPosition = new Vector2(_maxProgressWidth, _spaceshipRoot.anchoredPosition.y);
 
-                    GameSceneManager.Instance.LoadScene(SceneNames.CoreGame, null, () =>
+                    GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, null, () =>
                     {
-                        GameSceneManager.Instance.UnloadScene(SceneName);
+                        GameSceneManager.Instance.HideScene(SceneName);
                     });
 
                     // set to -1 to stop being affected by ticking

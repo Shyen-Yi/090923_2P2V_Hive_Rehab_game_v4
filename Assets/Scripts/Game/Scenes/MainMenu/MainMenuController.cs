@@ -58,17 +58,17 @@ namespace com.hive.projectr
         #region Callback
         private void OnStartButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.Calibration);
+            GameSceneManager.Instance.ShowScene(SceneNames.Calibration);
         }
 
         private void OnSettingsButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.SettingMenu);
+            GameSceneManager.Instance.ShowScene(SceneNames.SettingMenu);
         }
 
         private void OnStatsButtonClick()
         {
-            GameSceneManager.Instance.LoadScene(SceneNames.StatsMenu);
+            GameSceneManager.Instance.ShowScene(SceneNames.StatsMenu);
         }
         #endregion
     }

@@ -61,10 +61,12 @@ namespace com.hive.projectr
 		private CalibrationStageSOItem _item;
 
 		public CalibrationStageType Stage => _item.Stage;
-		public String Instruction => _item.Instruction;
 		public Int32 SortingId => _item.SortingId;
+		public String Instruction => _item.Instruction;
+		public String InstructionWhenHolding => _item.InstructionWhenHolding;
 		public Int32 MaxHoldingCheckCount => _item.MaxHoldingCheckCount;
 		public Single EachHoldingCheckDuration => _item.EachHoldingCheckDuration;
+		public Single HoldingPreparationTime => _item.HoldingPreparationTime;
 		public Single CooldownTime => _item.CooldownTime;
 
 		public CalibrationStageConfigData(CalibrationStageSOItem item)
