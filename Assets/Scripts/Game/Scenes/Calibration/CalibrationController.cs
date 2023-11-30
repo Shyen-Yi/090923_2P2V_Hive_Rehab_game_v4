@@ -28,13 +28,6 @@ namespace com.hive.projectr
     public class CalibrationController : GameSceneControllerBase
     {
         #region Fields
-        private Vector2[] calibrationCorners = new Vector2[4]; // To store the calibrated corners
-        private int calibrationCornerIndex = 0;
-        private bool isCalibrating = false;
-        private float calibrationTime = 3f; // Time required to hold a corner for calibration
-        private float calibrationTimer = 0f;
-        private bool isCalibrated = false;
-
         private int _stageIndex;
         private CalibrationStatus _status;
         private List<CalibrationStageConfigData> _stageDataList;
@@ -42,6 +35,7 @@ namespace com.hive.projectr
         private Coroutine _endCoroutine;
         private float _holdingTime;
         private float _nextCanHoldTime;
+        private float _stageElapsedTime;
         private Vector3 _spacecraftOffsetFromCursor;
         #endregion
 
@@ -237,29 +231,36 @@ namespace com.hive.projectr
 
         private void Start()
         {
-            _status = CalibrationStatus.Running;
+            UpdateStatus(CalibrationStatus.Running);
             _nextCanHoldTime = Time.time;
             _spacecraft.gameObject.SetActive(true);
         }
 
         private void Resume()
         {
-            _status = CalibrationStatus.Running;
+            UpdateStatus(CalibrationStatus.Running);
         }
 
         private void Pause()
         {
-            _status = CalibrationStatus.Paused;
+            UpdateStatus(CalibrationStatus.Paused);
+        }
+
+        private void UpdateStatus(CalibrationStatus status)
+        {
+            _status = status;
         }
 
         private void Reset()
         {
             _resultDict.Clear();
             _stageIndex = 0;
-            _status = CalibrationStatus.NotStarted;
+            UpdateStatus(CalibrationStatus.NotStarted);
             _instructionText.text = "";
             _raycastBlock.enabled = false;
             _spacecraftOffsetFromCursor = Vector3.zero;
+            _holdingTime = 0;
+            _stageElapsedTime = 0;
 
             foreach (var markContorller in _markDict.Values)
             {
@@ -295,6 +296,7 @@ namespace com.hive.projectr
         {
             var currentStage = _stageDataList[_stageIndex];
             _holdingTime = 0;
+            _stageElapsedTime = 0;
 
             _nextCanHoldTime = Time.time + currentStage.CooldownTime;
 
@@ -336,7 +338,7 @@ namespace com.hive.projectr
 
         private IEnumerator EndRoutine()
         {
-            _status = CalibrationStatus.Ended;
+            UpdateStatus(CalibrationStatus.Ended);
             _spacecraft.gameObject.SetActive(false);
             _marker.Deactivate();
             _lineDrawer.Activate();
@@ -490,6 +492,15 @@ namespace com.hive.projectr
             if (_status != CalibrationStatus.Running)
                 return;
 
+            _stageElapsedTime += Time.deltaTime;
+            if (_stageElapsedTime > CalibrationConfig.GetData().StageErrorProtectionTriggerTime)
+            {
+                _stageElapsedTime = 0;
+                GameSceneManager.Instance.ShowScene(SceneNames.CalibrationErrorProtection);
+                Pause();
+                return;
+            }
+
             var spacecraftWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(GetSpacecraftScreenPos());
             _spacecraft.position = new Vector3(spacecraftWorldPos.x, spacecraftWorldPos.y, _spacecraft.position.z);
 
@@ -531,14 +542,13 @@ namespace com.hive.projectr
                         break;
                 }
 
-                var distance = CalibrationConfig.GetData().ArrowScreenDistanceFromCenter;
-                var arrowScreenPos = GetCenterScreenPos() + distance * unitDirection;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)_arrow.parent, arrowScreenPos, CameraManager.Instance.UICamera, out var localPos);
-                _arrow.anchoredPosition = localPos;
+                var worldDistance = CalibrationConfig.GetData().ArrowWorldDistanceFromCenter;
+                var worldPos = CameraManager.Instance.UICamera.ScreenToWorldPoint(GetCenterScreenPos());
+                var targetWorldPos = new Vector3(worldPos.x, worldPos.y) + worldDistance * unitDirection;
+                _arrow.position = new Vector3(targetWorldPos.x, targetWorldPos.y, _arrow.position.z);
 
-                var targetScreenPos = GetCenterScreenPos() + distance * unitDirection * 2;
-                var targetWorldPos = CameraManager.Instance.UICamera.ScreenToWorldPoint(targetScreenPos);
-                _arrow.LookAt(targetWorldPos, Vector3.forward);
+                var lookAtWorldPos = new Vector3(worldPos.x, worldPos.y) + worldDistance * unitDirection * 2;
+                _arrow.LookAt(lookAtWorldPos, Vector3.forward);
             }
 
             if (Time.time >= _nextCanHoldTime && isHolding)

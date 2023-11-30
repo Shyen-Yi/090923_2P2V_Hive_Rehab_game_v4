@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: CalibrationConfig
   m_EditorClassIdentifier: 
   _items:
-  - arrowScreenDistanceFromCenter: 120
+  - arrowWorldDistanceFromCenter: 1
+    stageErrorProtectionTriggerTime: 30
