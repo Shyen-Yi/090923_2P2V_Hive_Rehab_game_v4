@@ -18,5 +18,6 @@ namespace com.hive.projectr
         public static string Confirm = "Confirm";
         public static string Calibration = "Calibration";
         public static string CalibrationEnding = "CalibrationEnding";
+        public static string CalibrationErrorProtection = "CalibrationErrorProtection";
     }
 }

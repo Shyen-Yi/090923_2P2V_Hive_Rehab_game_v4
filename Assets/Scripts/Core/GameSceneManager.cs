@@ -155,6 +155,10 @@ namespace com.hive.projectr
                 {
                     MonoBehaviourUtil.Instance.StartCoroutine(LoadSceneRoutine(nextSceneLoadingData));
                 }
+                else
+                {
+                    Logger.LogError($"{currentScene.name} is already loaded and still valid!");
+                }
             }
         }
 

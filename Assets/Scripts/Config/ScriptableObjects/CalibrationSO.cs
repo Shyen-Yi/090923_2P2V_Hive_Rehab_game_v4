@@ -16,8 +16,10 @@ namespace com.hive.projectr
     public class CalibrationSOItem
     {
         
-		[SerializeField] private Single arrowScreenDistanceFromCenter;
+		[SerializeField] private Single arrowWorldDistanceFromCenter;
+		[SerializeField] private Single stageErrorProtectionTriggerTime;
 
-		public Single ArrowScreenDistanceFromCenter => arrowScreenDistanceFromCenter;
+		public Single ArrowWorldDistanceFromCenter => arrowWorldDistanceFromCenter;
+		public Single StageErrorProtectionTriggerTime => stageErrorProtectionTriggerTime;
     }
 }

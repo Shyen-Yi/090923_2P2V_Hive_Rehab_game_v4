@@ -60,7 +60,8 @@ namespace com.hive.projectr
 	{
 		private CalibrationSOItem _item;
 
-		public Single ArrowScreenDistanceFromCenter => _item.ArrowScreenDistanceFromCenter;
+		public Single ArrowWorldDistanceFromCenter => _item.ArrowWorldDistanceFromCenter;
+		public Single StageErrorProtectionTriggerTime => _item.StageErrorProtectionTriggerTime;
 
 		public CalibrationConfigData(CalibrationSOItem item)
 		{
