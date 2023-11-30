@@ -239,7 +239,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3205014640723885534, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
       propertyPath: m_Name
-      value: GeneralWindowSubPanelBG
+      value: Panel - Exit
+      objectReference: {fileID: 0}
+    - target: {fileID: 3205014640723885534, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8327762530413410758, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
       propertyPath: m_Pivot.x
@@ -338,6 +342,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3205014640723885534, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
       insertIndex: -1
       addedObject: {fileID: 329723411}
+    - targetCorrespondingSourceObject: {fileID: 3205014640723885534, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 329723412}
   m_SourcePrefab: {fileID: 100100000, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
 --- !u!224 &329723409 stripped
 RectTransform:
@@ -369,6 +376,50 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &329723412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 329723410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a507a65561772ed4eacd12674e42fab9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 0
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 21300000, guid: 0634969213eac4a27a50a4d98d2a36d5, type: 3}
+    m_PressedSprite: {fileID: 21300000, guid: 0634969213eac4a27a50a4d98d2a36d5, type: 3}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 21300000, guid: 25673e94d07ca4560ae8d83d184879c9, type: 3}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1554176660}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &562758747
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,10 +757,10 @@ MonoBehaviour:
   - {fileID: 1472455292}
   _extraTextMeshPros: []
   _extraButtons:
-  - {fileID: 1554176660}
+  - {fileID: 329723412}
   _extraObjects: []
   _extraGameObjects: []
-  _extraInts: b80b0000
+  _extraInts: 
   _extraCanvasGroups: []
   _extraImages:
   - {fileID: 2101848327}
@@ -1208,7 +1259,8 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 25673e94d07ca4560ae8d83d184879c9, type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1220,13 +1272,13 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &1554176660 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
+  m_CorrespondingSourceObject: {fileID: 7463405895935107300, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
   m_PrefabInstance: {fileID: 1554176658}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a507a65561772ed4eacd12674e42fab9, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1561881815
@@ -1532,7 +1584,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 252164847936415143, guid: 3cb51a6cc987b7f4aa12e1d801d7feb9, type: 3}
       propertyPath: m_Name
-      value: GeneralWindowPanelBG
+      value: Panel - Main
       objectReference: {fileID: 0}
     - target: {fileID: 252164847936415143, guid: 3cb51a6cc987b7f4aa12e1d801d7feb9, type: 3}
       propertyPath: m_IsActive
@@ -1750,7 +1802,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3205014640723885534, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
       propertyPath: m_Name
-      value: GeneralWindowSubPanelBG (1)
+      value: Panel - Content
       objectReference: {fileID: 0}
     - target: {fileID: 3205014640723885534, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
       propertyPath: m_IsActive

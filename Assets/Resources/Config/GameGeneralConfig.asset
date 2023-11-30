@@ -19,3 +19,4 @@ MonoBehaviour:
     defaultGoal: 80
     minGoal: 50
     maxGoal: 100
+    coreGameTransitionSec: 3

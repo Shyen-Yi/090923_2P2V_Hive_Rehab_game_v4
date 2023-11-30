@@ -23,11 +23,6 @@ namespace com.hive.projectr
             ProgressBar = 0,
         }
 
-        private enum ExtraInt
-        {
-            MaxFillTime = 0,
-        }
-
         private enum ExtraRT
         {
             SpaceshipRoot = 0,
@@ -36,8 +31,6 @@ namespace com.hive.projectr
         private HiveButton _crossButton;
 
         private Image _progressBar;
-
-        private float _maxFillTime;
 
         private RectTransform _spaceshipRoot;
         #endregion
@@ -54,8 +47,6 @@ namespace com.hive.projectr
             _crossButton = Config.ExtraButtons[(int)ExtraBtn.Cross];
 
             _progressBar = Config.ExtraImages[(int)ExtraImg.ProgressBar];
-
-            _maxFillTime = Config.ExtraInts[(int)ExtraInt.MaxFillTime] / 1000f;
 
             _spaceshipRoot = Config.ExtraRectTransforms[(int)ExtraRT.SpaceshipRoot];
 
@@ -97,7 +88,8 @@ namespace com.hive.projectr
                 if (_progressFill < 1f)
                 {
                     // fill amount
-                    _progressBar.fillAmount = _progressFill = _progressFill + 1 / _maxFillTime * Time.deltaTime;
+                    var maxFillTime = GameGeneralConfig.GetData().CoreGameTransitionSec;
+                    _progressBar.fillAmount = _progressFill = _progressFill + 1 / maxFillTime * Time.deltaTime;
 
                     // marker pos
                     var xPos = Mathf.Lerp(0, _maxProgressWidth, _progressFill);

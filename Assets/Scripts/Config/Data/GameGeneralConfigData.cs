@@ -66,6 +66,7 @@ namespace com.hive.projectr
 		public Int32 DefaultGoal => _item.DefaultGoal;
 		public Int32 MinGoal => _item.MinGoal;
 		public Int32 MaxGoal => _item.MaxGoal;
+		public Single CoreGameTransitionSec => _item.CoreGameTransitionSec;
 
 		public GameGeneralConfigData(GameGeneralSOItem item)
 		{

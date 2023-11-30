@@ -7,6 +7,12 @@ namespace com.hive.projectr
     public class CoreGameController : GameSceneControllerBase
     {
         #region Extra
+        private enum ExtraConfig
+        {
+            Net = 0,
+        }
+
+        private NetController _netController;
         #endregion
 
         #region Lifecycle
@@ -18,6 +24,8 @@ namespace com.hive.projectr
 
         private void InitExtra()
         {
+            var netConfig = Config.ExtraWidgetConfigs[(int)ExtraConfig.Net];
+            _netController = new NetController(netConfig);
         }
 
         protected override void OnShow(ISceneData data, GameSceneShowState showState)
