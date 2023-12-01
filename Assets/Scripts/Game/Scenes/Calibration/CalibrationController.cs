@@ -453,7 +453,7 @@ namespace com.hive.projectr
                 actualCornersWorldPos[corner.Key] = worldPos;
             }
 
-            GameSceneManager.Instance.ShowScene(SceneNames.CalibrationEnding, new CalibrationEndingData(new CoreGameData(playerCornersWorldPos, actualCornersWorldPos, GetCenterScreenPos(), _spacecraftScreenOffsetFromCursor)), ()=> 
+            GameSceneManager.Instance.ShowScene(SceneNames.CalibrationEnding, new CalibrationEndingData(new CoreGameData(playerCornersWorldPos, actualCornersWorldPos, GetCenterScreenPos())), ()=> 
             {
                 GameSceneManager.Instance.HideScene(SceneName);
             });

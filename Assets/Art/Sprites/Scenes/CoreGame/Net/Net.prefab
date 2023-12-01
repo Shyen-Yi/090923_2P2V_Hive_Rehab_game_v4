@@ -453,7 +453,7 @@ Transform:
   - {fileID: 6358405078773706806}
   - {fileID: 5387182812380083688}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3391659836117267102
 MonoBehaviour:
@@ -482,7 +482,8 @@ MonoBehaviour:
   _extraCameras: []
   _extraSprites: []
   _extraColorGradients: []
-  _extraAnimators: []
+  _extraAnimators:
+  - {fileID: 6548183788337178578}
   _extraRenderers: []
 --- !u!95 &6548183788337178578
 Animator:
