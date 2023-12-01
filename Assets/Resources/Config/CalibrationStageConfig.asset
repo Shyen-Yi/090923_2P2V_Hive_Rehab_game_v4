@@ -19,7 +19,7 @@ MonoBehaviour:
     instructionWhenHolding: Calibrating Center...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
-    holdingPreparationTime: 1.5
+    holdingPreparationTime: 2
     cooldownTime: 2
   - stage: 1
     sortingId: 2
@@ -27,7 +27,7 @@ MonoBehaviour:
     instructionWhenHolding: Calibrating Top Left Corner...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
-    holdingPreparationTime: 1.5
+    holdingPreparationTime: 2
     cooldownTime: 2
   - stage: 2
     sortingId: 3
@@ -35,7 +35,7 @@ MonoBehaviour:
     instructionWhenHolding: Calibrating Top Right Corner...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
-    holdingPreparationTime: 1.5
+    holdingPreparationTime: 2
     cooldownTime: 2
   - stage: 3
     sortingId: 4
@@ -43,7 +43,7 @@ MonoBehaviour:
     instructionWhenHolding: Calibrating BottomRight Corner...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
-    holdingPreparationTime: 1.5
+    holdingPreparationTime: 2
     cooldownTime: 2
   - stage: 4
     sortingId: 5
@@ -51,5 +51,5 @@ MonoBehaviour:
     instructionWhenHolding: Calibrating Bottom Left Corner...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
-    holdingPreparationTime: 1.5
+    holdingPreparationTime: 2
     cooldownTime: 2

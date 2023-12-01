@@ -7,12 +7,6 @@ namespace com.hive.projectr
     public class InputManager : SingletonBase<InputManager>, ICoreManager
     {
         public Vector3 CursorScreenPos => Input.mousePosition;
-        public float IdleDuration => _idleDuration;
-
-        private Vector3 _lastCursorScreenPos;
-        private float _idleDuration;
-
-        private static readonly float IdleDistanceThreshold = 10f;
 
         #region Lifecycle
         public void OnInit()
@@ -27,17 +21,6 @@ namespace com.hive.projectr
 
         private void Tick()
         {
-            var deltaCursorScreenPos = CursorScreenPos - _lastCursorScreenPos;
-            _lastCursorScreenPos = CursorScreenPos;
-
-            if (deltaCursorScreenPos.sqrMagnitude < IdleDistanceThreshold)
-            {
-                _idleDuration += Time.deltaTime;
-            }
-            else
-            {
-                _idleDuration = 0;
-            }
         }
         #endregion
 

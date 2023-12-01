@@ -5,11 +5,22 @@ using UnityEngine.UI;
 
 namespace com.hive.projectr
 {
+    public struct TransitionCoreGameData : ISceneData
+    {
+        public CoreGameData coreGameData;
+
+        public TransitionCoreGameData(CoreGameData coreGameData)
+        {
+            this.coreGameData = coreGameData;
+        }
+    }
+
     public class TransitionCoreGameController : GameSceneControllerBase
     {
         #region Fields
         private float _progressFill;
         private float _maxProgressWidth;
+        private CoreGameData _coreGameData;
         #endregion
 
         #region Extra
@@ -51,6 +62,14 @@ namespace com.hive.projectr
             _spaceshipRoot = Config.ExtraRectTransforms[(int)ExtraRT.SpaceshipRoot];
 
             _maxProgressWidth = ((RectTransform)_spaceshipRoot.parent).rect.width;
+        }
+
+        protected override void OnShow(ISceneData data, GameSceneShowState showState)
+        {
+            if (data is TransitionCoreGameData pData)
+            {
+                _coreGameData = pData.coreGameData;
+            }
         }
 
         protected override void OnDispose()
@@ -100,7 +119,7 @@ namespace com.hive.projectr
                     _progressBar.fillAmount = _progressFill = 1;
                     _spaceshipRoot.anchoredPosition = new Vector2(_maxProgressWidth, _spaceshipRoot.anchoredPosition.y);
 
-                    GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, null, () =>
+                    GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
                     {
                         GameSceneManager.Instance.HideScene(SceneName);
                     });

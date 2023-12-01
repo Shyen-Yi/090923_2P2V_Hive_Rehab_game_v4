@@ -4,8 +4,22 @@ using UnityEngine;
 
 namespace com.hive.projectr
 {
+    public struct CalibrationEndingData : ISceneData
+    {
+        public CoreGameData coreGameData;
+
+        public CalibrationEndingData(CoreGameData coreGameData)
+        {
+            this.coreGameData = coreGameData;
+        }
+    }
+
     public class CalibrationEndingController : GameSceneControllerBase
     {
+        #region Fields
+        private CoreGameData _coreGameData;
+        #endregion
+
         #region Extra
         private HiveButton _exitButton;
         private HiveButton _redoButton;
@@ -33,6 +47,14 @@ namespace com.hive.projectr
             _exitButton = Config.ExtraButtons[(int)ExtraBtn.Exit];
             _redoButton = Config.ExtraButtons[(int)ExtraBtn.Redo];
             _playButton = Config.ExtraButtons[(int)ExtraBtn.Play];
+        }
+
+        protected override void OnShow(ISceneData data, GameSceneShowState showState)
+        {
+            if (data is CalibrationEndingData pData)
+            {
+                _coreGameData = pData.coreGameData;
+            }
         }
 
         protected override void OnDispose()
@@ -75,7 +97,7 @@ namespace com.hive.projectr
 
         private void OnPlayButtonClick()
         {
-            GameSceneManager.Instance.ShowScene(SceneNames.TransitionCoreGame, null, () =>
+            GameSceneManager.Instance.ShowScene(SceneNames.TransitionCoreGame, new TransitionCoreGameData(_coreGameData), () =>
             {
                 GameSceneManager.Instance.HideScene(SceneName);
             });
