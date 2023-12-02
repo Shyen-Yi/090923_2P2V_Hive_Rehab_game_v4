@@ -439,21 +439,27 @@ namespace com.hive.projectr
 
             _raycastBlock.enabled = false;
 
-            var playerCornersWorldPos = new Dictionary<CalibrationStageType, Vector3>();
-            foreach (var result in _resultDict)
+            var scaleFactor = 1f;
+            var centerScreenPos = GetCenterScreenPos();
+            foreach (var section in _cornerDict.Keys)
             {
-                playerCornersWorldPos[result.Key] = result.Value.worldPos;
+                if (_cornerDict.TryGetValue(section, out var actualCorner) &&
+                    _resultDict.TryGetValue(section, out var result))
+                {
+                    var actualCornerScreenPos = RectTransformUtility.WorldToScreenPoint(CameraManager.Instance.UICamera, actualCorner.position);
+
+                    var playerCornerWorldPos = result.worldPos;
+                    var playerCornerScreenPos = CameraManager.Instance.MainCamera.WorldToScreenPoint(playerCornerWorldPos);
+
+                    actualCornerScreenPos = new Vector2(actualCornerScreenPos.x - centerScreenPos.x, actualCornerScreenPos.y - centerScreenPos.y);
+                    playerCornerScreenPos = new Vector2(playerCornerScreenPos.x - centerScreenPos.x, playerCornerScreenPos.y - centerScreenPos.y);
+
+                    var scaleVector = new Vector2(actualCornerScreenPos.x / playerCornerScreenPos.x, actualCornerScreenPos.y / playerCornerScreenPos.y);
+                    scaleFactor = Mathf.Max(scaleFactor, scaleVector.x, scaleVector.y);
+                }
             }
 
-            var actualCornersWorldPos = new Dictionary<CalibrationStageType, Vector3>();
-            foreach (var corner in _cornerDict)
-            {
-                var screenPos = RectTransformUtility.WorldToScreenPoint(CameraManager.Instance.UICamera, corner.Value.position);
-                var worldPos = CameraManager.Instance.UICamera.ScreenToWorldPoint(screenPos);
-                actualCornersWorldPos[corner.Key] = worldPos;
-            }
-
-            GameSceneManager.Instance.ShowScene(SceneNames.CalibrationEnding, new CalibrationEndingData(new CoreGameData(playerCornersWorldPos, actualCornersWorldPos, GetCenterScreenPos())), ()=> 
+            GameSceneManager.Instance.ShowScene(SceneNames.CalibrationEnding, new CalibrationEndingData(new CoreGameData(scaleFactor, GetCenterScreenPos())), ()=> 
             {
                 GameSceneManager.Instance.HideScene(SceneName);
             });
