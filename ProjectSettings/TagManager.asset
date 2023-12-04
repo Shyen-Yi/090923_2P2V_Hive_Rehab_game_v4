@@ -10,6 +10,8 @@ TagManager:
   - MiddlePlante
   - UICamera
   - EventSystem
+  - VacuumAir
+  - VacuumBase
   layers:
   - Default
   - TransparentFX

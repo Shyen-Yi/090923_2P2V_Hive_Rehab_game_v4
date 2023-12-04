@@ -180,6 +180,7 @@ namespace com.hive.projectr
             }
 
             InputManager.HideCursor();
+            InputManager.SetCursorLockMode(CursorLockMode.None);
         }
 
         protected override void OnHide(GameSceneHideState hideState)
@@ -192,6 +193,7 @@ namespace com.hive.projectr
             }
 
             InputManager.ShowCursor();
+            InputManager.SetCursorLockMode(CursorLockMode.Confined);
         }
 
         protected override void OnDispose()
