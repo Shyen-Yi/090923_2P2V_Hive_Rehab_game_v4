@@ -20,19 +20,20 @@ namespace com.hive.projectr
 
         private void OnEnable()
         {
-            var scaleX = _initScale.x;
+            var scaleX = 1f;
             if (_scaleWithWidth && _refScreenWidth > 0)
             {
-                scaleX *= (float)Screen.width / _refScreenWidth;
+                scaleX = _initScale.x * (float)Screen.width / _refScreenWidth;
             }
 
-            var scaleY = _initScale.y;
             if (_scaleWithHeight)
             {
-                scaleY *= (float)Screen.height / _refScreenHeight;
+                scaleX = _initScale.x * (float)Screen.height / _refScreenHeight;
             }
 
-            transform.localScale = new Vector3(scaleX, scaleY, transform.localScale.z);
+            Logger.LogError($"Screen.width: {Screen.width} | Screen.height: {Screen.height} | _refScreenWidth: {_refScreenWidth} | _refScreenHeight: {_refScreenHeight} | _initScale: {_initScale} | afterScale: {new Vector2(scaleX, _initScale.x)}");
+
+            transform.localScale = new Vector3(scaleX, _initScale.y, transform.localScale.z);
         }
     }
 }
