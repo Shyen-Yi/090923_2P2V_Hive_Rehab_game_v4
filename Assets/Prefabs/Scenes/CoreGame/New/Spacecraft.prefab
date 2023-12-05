@@ -63,9 +63,7 @@ MonoBehaviour:
   _extraCameras: []
   _extraSprites: []
   _extraColorGradients: []
-  _extraAnimators:
-  - {fileID: 2706544248504016545}
-  - {fileID: 4557668588930872882}
+  _extraAnimators: []
   _extraRenderers:
   - {fileID: 6789543199157750486}
   - {fileID: 4969380624133317189}
@@ -434,11 +432,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
---- !u!95 &2706544248504016545 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 7870495633492597126, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
-  m_PrefabInstance: {fileID: 5239390280224048935}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4620894416431432178 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 618887944498366165, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
@@ -526,11 +519,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
---- !u!95 &4557668588930872882 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 7870495633492597126, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
-  m_PrefabInstance: {fileID: 5942932345332494260}
-  m_PrefabAsset: {fileID: 0}
 --- !u!212 &4969380624133317189 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 1625588506897419761, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}

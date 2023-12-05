@@ -104,6 +104,7 @@ namespace com.hive.projectr
 
             var vacuumContainer = Config.ExtraObjects[(int)ExtraObj.VacuumContainer];
             var vacuumConfigs = vacuumContainer.GetComponentsInChildren<VacuumConfig>();
+            _vacuumControllers = new Dictionary<VacuumType, VacuumController>();
             foreach (var vacuumConfig in vacuumConfigs)
             {
                 if (!_vacuumControllers.ContainsKey(vacuumConfig.Type))
@@ -169,7 +170,44 @@ namespace com.hive.projectr
         #region Callback
         private void Tick()
         {
+            if (_state != CoreGameState.Running)
+                return;
+
             SpacecraftMovementTick();
+
+            // debug
+            if (InputManager.GetKeyDown(KeyCode.UpArrow))
+            {
+                _vacuumControllers[VacuumType.Top].Activate();
+            }
+            else if (InputManager.GetKeyUp(KeyCode.UpArrow))
+            {
+                _vacuumControllers[VacuumType.Top].Deactivate();
+            }
+            else if (InputManager.GetKeyDown(KeyCode.LeftArrow))
+            {
+                _vacuumControllers[VacuumType.Left].Activate();
+            }
+            else if(InputManager.GetKeyUp(KeyCode.LeftArrow))
+            {
+                _vacuumControllers[VacuumType.Left].Deactivate();
+            }
+            else if (InputManager.GetKeyDown(KeyCode.RightArrow))
+            {
+                _vacuumControllers[VacuumType.Right].Activate();
+            }
+            else if (InputManager.GetKeyUp(KeyCode.RightArrow))
+            {
+                _vacuumControllers[VacuumType.Right].Deactivate();
+            }
+            else if (InputManager.GetKeyDown(KeyCode.DownArrow))
+            {
+                _vacuumControllers[VacuumType.Bottom].Activate();
+            }
+            else if (InputManager.GetKeyUp(KeyCode.DownArrow))
+            {
+                _vacuumControllers[VacuumType.Bottom].Deactivate();
+            }
         }
 
         private void SpacecraftMovementTick()
@@ -211,59 +249,70 @@ namespace com.hive.projectr
                 controller.Deactivate();
             }
 
+            _spacecraftController.Deactivate();
             CenterSpacecraft();
         }
 
         private void Start()
         {
-            MonoBehaviourUtil.Instance.StartCoroutine(StartRoutine());
+            _spacecraftController.Activate();
+
+            if (_state == CoreGameState.NotStarted)
+            {
+                MonoBehaviourUtil.Instance.StartCoroutine(StartRoutine());
+            }
+            else if (_state == CoreGameState.Paused)
+            {
+                UpdateState(CoreGameState.Running);
+            }
         }
 
         private IEnumerator StartRoutine()
         {
             UpdateState(CoreGameState.StartCountdown);
 
-            var name = "CountNum";
+            var countNumAnimStateName = "CountNum";
             var duration = 0f;
             foreach (var clip in _countdownAnimator.runtimeAnimatorController.animationClips)
             {
-                if (clip.name.Equals(name))
+                if (clip.name.Equals(countNumAnimStateName))
                 {
                     duration = clip.length;
                     break;
                 }
             }
 
-            var num = CoreGameConfig.GetData().StartCountdownSec;
-            var elapsedTime = 0f;
+            var num = CoreGameConfig.GetData().StartCountdownSec + 1;
+            var currentNum = num;
             _countdownText.text = $"{num}";
             _countdownAnimator.SetTrigger(CountdownTriggerHash);
 
             while (num > 0)
             {
-                elapsedTime += Time.deltaTime;
-
-                if (elapsedTime >= duration)
+                if (!_countdownAnimator.GetCurrentAnimatorStateInfo(0).IsName(countNumAnimStateName) &&
+                    num == currentNum)
                 {
-                    elapsedTime = 0;
                     --num;
+                }
 
-                    if (num > 0)
-                    {
-                        _countdownText.text = $"{num}";
-                        _countdownAnimator.SetTrigger(CountdownTriggerHash);
-                    }
+                if (num > 0 && currentNum != num)
+                {
+                    currentNum = num;
+                    _countdownText.text = $"{currentNum}";
+                    _countdownAnimator.SetTrigger(CountdownTriggerHash);
                 }
 
                 yield return null;
             }
 
+            CenterSpacecraft();
             UpdateState(CoreGameState.Running);
         }
 
         private void UpdateState(CoreGameState state)
         {
             _state = state;
+            Logger.LogError($"UpdateState: {state}");
         }
 
         private Vector3 GetSpacecraftScreenPosRaw()

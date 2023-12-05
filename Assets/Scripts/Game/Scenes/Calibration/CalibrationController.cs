@@ -553,7 +553,8 @@ namespace com.hive.projectr
             var deltaCursorScreenPos = InputManager.Instance.CursorScreenPos - _lastCursorScreenPos;
             _lastCursorScreenPos = InputManager.Instance.CursorScreenPos;
 
-            if (deltaCursorScreenPos.sqrMagnitude < CalibrationConfig.GetData().HoldingMaxScreenOffset)
+            if (IsCurrentPositionMatchingStage() &&
+                deltaCursorScreenPos.sqrMagnitude < CalibrationConfig.GetData().HoldingMaxScreenOffset)
             {
                 _idleDuration += Time.deltaTime;
             }
@@ -590,7 +591,6 @@ namespace com.hive.projectr
             var currentStageData = _stageDataList[_stageIndex];
             var currentStage = currentStageData.Stage;
             var isHolding = _idleDuration >= currentStageData.HoldingPreparationTime &&
-                IsCurrentPositionMatchingStage() &&
                 Time.time >= _nextCanHoldTime;
             if (_isHolding && Vector3.Magnitude(_holdingStartScreenPos - GetSpacecraftScreenPos()) > CalibrationConfig.GetData().HoldingMaxScreenOffset)
             {

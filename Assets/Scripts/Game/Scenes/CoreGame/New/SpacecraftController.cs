@@ -7,12 +7,6 @@ namespace com.hive.projectr
     public class SpacecraftController
     {
         #region Extra
-        private enum ExtraAnimator
-        {
-            FireLeft = 0,
-            FireRight = 1,
-        }
-
         private enum ExtraRenderer
         {
             FireLeft = 0,
@@ -21,9 +15,6 @@ namespace com.hive.projectr
             Moving = 3,
             Capturing = 4,
         }
-
-        private Animator _fireLeftAnimator;
-        private Animator _fireRightAnimator;
 
         private SpriteRenderer _fireLeftRenderer;
         private SpriteRenderer _fireRightRenderer;
@@ -44,8 +35,6 @@ namespace com.hive.projectr
         private static readonly float CapturingValIncreaseSec = .3f;
         private static readonly float CapturingValDecreaseSec = .3f;
 
-        private static readonly int SpeedFloatHash = Animator.StringToHash("Speed");
-
         public SpacecraftController(GeneralWidgetConfig config)
         {
             _config = config;
@@ -61,9 +50,6 @@ namespace com.hive.projectr
 
         private void InitExtra()
         {
-            _fireLeftAnimator = _config.ExtraAnimators[(int)ExtraAnimator.FireLeft];
-            _fireRightAnimator = _config.ExtraAnimators[(int)ExtraAnimator.FireRight];
-
             _fireLeftRenderer = (SpriteRenderer)_config.ExtraRenderers[(int)ExtraRenderer.FireLeft];
             _fireRightRenderer = (SpriteRenderer)_config.ExtraRenderers[(int)ExtraRenderer.FireRight];
             _idleRenderer = (SpriteRenderer)_config.ExtraRenderers[(int)ExtraRenderer.Idle];

@@ -67,6 +67,21 @@ namespace com.hive.projectr
         {
             return Input.GetMouseButton(button);
         }
+
+        public static bool GetKeyDown(KeyCode keyCode)
+        {
+            return Input.GetKeyDown(keyCode);
+        }
+
+        public static bool GetKeyUp(KeyCode keyCode)
+        {
+            return Input.GetKeyUp(keyCode);
+        }
+
+        public static bool GetKey(KeyCode keyCode)
+        {
+            return Input.GetKey(keyCode);
+        }
         #endregion
     }
 }

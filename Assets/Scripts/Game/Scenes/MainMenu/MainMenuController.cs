@@ -58,7 +58,14 @@ namespace com.hive.projectr
         #region Callback
         private void OnStartButtonClick()
         {
-            GameSceneManager.Instance.ShowScene(SceneNames.Calibration);
+            if (DebugConfig.GetData().EnableCalibration) 
+            { 
+                GameSceneManager.Instance.ShowScene(SceneNames.Calibration);
+            }
+            else
+            {
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, new CoreGameData(1, new Vector3(Screen.width / 2, Screen.height / 2)));
+            }
         }
 
         private void OnSettingsButtonClick()
