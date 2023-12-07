@@ -64,7 +64,12 @@ namespace com.hive.projectr
             }
             else
             {
-                GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, new CoreGameData(1, new Vector3(Screen.width / 2, Screen.height / 2)));
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, new CoreGameData(
+                    new Vector3(0, 0),
+                    new Vector3(Screen.width, Screen.height),
+                    new Vector3(Screen.width / 2, Screen.height / 2), 
+                    1, 
+                    1));
             }
         }
 

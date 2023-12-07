@@ -4,36 +4,48 @@ using UnityEngine;
 
 namespace com.hive.projectr
 {
+    public enum ScaleWithScreenType
+    {
+        Top = 0,
+        Bottom = 1,
+        Left = 2,
+        Right = 3,
+    }
+
     public class ScaleWithScreen : MonoBehaviour
     {
-        [SerializeField] private int _refScreenWidth;
-        [SerializeField] private int _refScreenHeight;
-        [SerializeField] private bool _scaleWithWidth;
-        [SerializeField] private bool _scaleWithHeight;
-
-        private Vector3 _initScale;
+        private SpriteRenderer[] _spriteRenderers;
 
         private void Awake()
         {
-            _initScale = transform.localScale;
+            _spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         }
 
-        private void OnEnable()
+        private void Update()
         {
-            var scaleX = 1f;
-            if (_scaleWithWidth && _refScreenWidth > 0)
+            for (var i = 0; i < _spriteRenderers.Length; ++i)
             {
-                scaleX = _initScale.x * (float)Screen.width / _refScreenWidth;
+                var spriteRenderer = _spriteRenderers[i];
+
+                // Get the texture size of the sprite
+                float textureWidth = spriteRenderer.sprite.texture.width;
+                float pixelsPerUnit = spriteRenderer.sprite.pixelsPerUnit;
+
+                // Calculate the size of the sprite in world units
+                float spriteSizeInUnits = textureWidth / pixelsPerUnit;
+
+                // Calculate the width of the screen in world units
+                float worldScreenHeight = Camera.main.orthographicSize * 2f;
+                float worldScreenWidth = worldScreenHeight / Screen.height * Screen.width;
+
+                // Calculate the scale factor required to stretch the sprite to match the screen width
+                float scaleFactor = worldScreenWidth / spriteSizeInUnits;
+
+                // Apply this scale factor to the sprite's local scale
+                transform.localScale = new Vector3(scaleFactor, transform.localScale.y, transform.localScale.z);
+
+                Debug.LogError($"textureWidth: {textureWidth} | spriteSizeInUnits: {spriteSizeInUnits} | worldScreenHeight: {worldScreenHeight} | worldScreenWidth: {worldScreenWidth} | scaleFactor: {scaleFactor}");
             }
-
-            if (_scaleWithHeight)
-            {
-                scaleX = _initScale.x * (float)Screen.height / _refScreenHeight;
-            }
-
-            Logger.LogError($"Screen.width: {Screen.width} | Screen.height: {Screen.height} | _refScreenWidth: {_refScreenWidth} | _refScreenHeight: {_refScreenHeight} | _initScale: {_initScale} | afterScale: {new Vector2(scaleX, _initScale.x)}");
-
-            transform.localScale = new Vector3(scaleX, _initScale.y, transform.localScale.z);
         }
     }
 }

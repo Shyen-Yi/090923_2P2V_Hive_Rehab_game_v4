@@ -12,6 +12,7 @@ TagManager:
   - EventSystem
   - VacuumAir
   - VacuumBase
+  - Spacecraft
   layers:
   - Default
   - TransparentFX

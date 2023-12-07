@@ -4,26 +4,18 @@ using UnityEngine;
 
 namespace com.hive.projectr
 {
+    public struct SpacecraftData
+    {
+        public float size;
+        public SpacecraftData(float size)
+        {
+            this.size = size;
+        }
+    }
+
     public class SpacecraftController
     {
-        #region Extra
-        private enum ExtraRenderer
-        {
-            FireLeft = 0,
-            FireRight = 1,
-            Idle = 2,
-            Moving = 3,
-            Capturing = 4,
-        }
-
-        private SpriteRenderer _fireLeftRenderer;
-        private SpriteRenderer _fireRightRenderer;
-        private SpriteRenderer _idleRenderer;
-        private SpriteRenderer _movingRenderer;
-        private SpriteRenderer _capturingRenderer;
-        #endregion
-
-        private GeneralWidgetConfig _config;
+        private SpacecraftConfig _config;
         private bool _isMoving;
         private bool _isCapturing;
         private bool _isActive;
@@ -35,10 +27,9 @@ namespace com.hive.projectr
         private static readonly float CapturingValIncreaseSec = .3f;
         private static readonly float CapturingValDecreaseSec = .3f;
 
-        public SpacecraftController(GeneralWidgetConfig config)
+        public SpacecraftController(SpacecraftConfig config)
         {
             _config = config;
-            InitExtra();
 
             MonoBehaviourUtil.OnUpdate += Tick;
         }
@@ -48,17 +39,10 @@ namespace com.hive.projectr
             MonoBehaviourUtil.OnUpdate -= Tick;
         }
 
-        private void InitExtra()
+        public void Activate(SpacecraftData data)
         {
-            _fireLeftRenderer = (SpriteRenderer)_config.ExtraRenderers[(int)ExtraRenderer.FireLeft];
-            _fireRightRenderer = (SpriteRenderer)_config.ExtraRenderers[(int)ExtraRenderer.FireRight];
-            _idleRenderer = (SpriteRenderer)_config.ExtraRenderers[(int)ExtraRenderer.Idle];
-            _movingRenderer = (SpriteRenderer)_config.ExtraRenderers[(int)ExtraRenderer.Moving];
-            _capturingRenderer = (SpriteRenderer)_config.ExtraRenderers[(int)ExtraRenderer.Capturing];
-        }
+            _config.transform.localScale = Vector3.one * data.size;
 
-        public void Activate()
-        {
             _config.gameObject.SetActive(true);
             _isActive = true;
         }
@@ -77,6 +61,11 @@ namespace com.hive.projectr
             _movingVal = 0;
             _capturingVal = 0;
             SetCapturing(false);
+        }
+
+        public float GetWorldSpaceCaptureRadius()
+        {
+            return _config.CircleCollider.radius * _config.transform.lossyScale.x;
         }
 
         public Vector3 GetWorldPos()
@@ -119,17 +108,17 @@ namespace com.hive.projectr
 
         private void PostTick()
         {
-            var color = _fireLeftRenderer.color;
-            _fireLeftRenderer.color = _fireRightRenderer.color = new Color(color.r, color.g, color.b, _movingVal);
+            var color = _config.FireLeftRenderer.color;
+            _config.FireLeftRenderer.color = _config.FireRightRenderer.color = new Color(color.r, color.g, color.b, _movingVal);
 
-            var idleColor = _idleRenderer.color;
-            _idleRenderer.color = new Color(idleColor.r, idleColor.g, idleColor.b, 1 - _movingVal);
+            var idleColor = _config.IdleRenderer.color;
+            _config.IdleRenderer.color = new Color(idleColor.r, idleColor.g, idleColor.b, 1 - _movingVal);
 
-            var movingColor = _movingRenderer.color;
-            _movingRenderer.color = new Color(movingColor.r, movingColor.g, movingColor.b, _movingVal);
+            var movingColor = _config.MovingRenderer.color;
+            _config.MovingRenderer.color = new Color(movingColor.r, movingColor.g, movingColor.b, _movingVal);
 
-            var capturingColor = _capturingRenderer.color;
-            _capturingRenderer.color = new Color(capturingColor.r, capturingColor.g, capturingColor.b, _capturingVal);
+            var capturingColor = _config.CapturingRenderer.color;
+            _config.CapturingRenderer.color = new Color(capturingColor.r, capturingColor.g, capturingColor.b, _capturingVal);
         }
     }
 }

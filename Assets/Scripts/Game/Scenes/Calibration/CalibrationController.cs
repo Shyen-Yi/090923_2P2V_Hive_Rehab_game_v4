@@ -135,7 +135,7 @@ namespace com.hive.projectr
             };
             var markerConfig = Config.ExtraWidgetConfigs[(int)ExtraConfig.Marker];
             _marker = new CalibrationMarkerController(markerConfig);
-            var spacecraftConfig = Config.ExtraWidgetConfigs[(int)ExtraConfig.Spacecraft];
+            var spacecraftConfig = (SpacecraftConfig)Config.ExtraWidgetConfigs[(int)ExtraConfig.Spacecraft];
             _spacecraftController = new SpacecraftController(spacecraftConfig);
 
             _crossButton = Config.ExtraButtons[(int)ExtraBtn.Cross];
@@ -243,7 +243,9 @@ namespace com.hive.projectr
         {
             UpdateStatus(CalibrationStatus.Running);
             _nextCanHoldTime = Time.time;
-            _spacecraftController.Activate();
+
+            var minLevelData = CoreGameLevelConfig.GetLevelData(CoreGameLevelConfig.MinLevel);
+            _spacecraftController.Activate(new SpacecraftData(minLevelData.SpacecraftSize));
         }
 
         private void Resume()
@@ -461,7 +463,12 @@ namespace com.hive.projectr
                 }
             }
 
-            GameSceneManager.Instance.ShowScene(SceneNames.CalibrationEnding, new CalibrationEndingData(new CoreGameData(scaleFactor, GetCenterScreenPos())), ()=> 
+            GameSceneManager.Instance.ShowScene(SceneNames.CalibrationEnding, new CalibrationEndingData(new CoreGameData(
+                bottomLeftScreenPos,
+                topRightScreenPos,
+                centerScreenPos,
+                scaleFactor, 
+                1)), ()=> 
             {
                 GameSceneManager.Instance.HideScene(SceneName);
             });
@@ -516,7 +523,9 @@ namespace com.hive.projectr
         {
             _holdingTime = 0;
             _marker.Deactivate();
-            _spacecraftController.Activate();
+
+            var minLevelData = CoreGameLevelConfig.GetLevelData(CoreGameLevelConfig.MinLevel);
+            _spacecraftController.Activate(new SpacecraftData(minLevelData.SpacecraftSize));
 
             if (_stageIndex >= 0 && _stageIndex < _stageDataList.Count)
             {
