@@ -87,6 +87,7 @@ namespace com.hive.projectr
         private enum ExtraImg
         {
             ProgressBar = 0,
+            AsteroidProgress = 1,
         }
 
         private enum ExtraRT
@@ -111,6 +112,7 @@ namespace com.hive.projectr
         private Animator _countdownAnimator;
 
         private Image _progressBar;
+        private Image _asteroidProgress;
 
         private RectTransform _spacecraftRoot;
 
@@ -150,6 +152,7 @@ namespace com.hive.projectr
             _countdownAnimator = Config.ExtraAnimators[(int)ExtraAnimator.Countdown];
 
             _progressBar = Config.ExtraImages[(int)ExtraImg.ProgressBar];
+            _asteroidProgress = Config.ExtraImages[(int)ExtraImg.AsteroidProgress];
 
             _spacecraftRoot = Config.ExtraRectTransforms[(int)ExtraRT.SpacecraftRoot];
             _maxProgressWidth = ((RectTransform)_spacecraftRoot.parent).rect.width;
@@ -225,6 +228,7 @@ namespace com.hive.projectr
                 SpawnAsteroid();
             }
 
+            AsteroidProgressTick();
             SpacecraftMovementTick();
 
             // debug
@@ -295,6 +299,8 @@ namespace com.hive.projectr
 
             _nextAsteroidSpawnTime = Time.time + _levelConfigData.AsteroidSpawnGapSec;
 
+            _asteroidProgress.fillAmount = 0;
+
             _spacecraftController.SetCapturing(false);
 
             foreach (var controller in _vacuumControllers.Values)
@@ -322,7 +328,7 @@ namespace com.hive.projectr
 
             UpdateState(CoreGameState.Finished);
 
-            yield return new WaitForSeconds(_levelConfigData.AsteroidSpawnGapSec * 2);
+            yield return new WaitForSeconds(_levelConfigData.AsteroidSpawnGapSec);
 
             var isPassed = _collectedAsteroidCount >= _levelConfigData.NumOfAsteroidCollectedToPass;
             if (isPassed)
@@ -348,6 +354,19 @@ namespace com.hive.projectr
             if (_activeAsteroids.TryGetValue(id, out var controller))
             {
                 controller.Stop(() => PutAsteroidBack(controller));
+            }
+        }
+
+        private void AsteroidProgressTick()
+        {
+            var activeAsteroids = new List<AsteroidController>(_activeAsteroids.Values);
+            if (activeAsteroids.Count > 0)
+            {
+                _asteroidProgress.fillAmount = activeAsteroids[0].GetLifetimeProgress();
+            }
+            else
+            {
+                _asteroidProgress.fillAmount = 0;
             }
         }
 

@@ -41,7 +41,7 @@ MonoBehaviour:
       m_PreInfinity: 0
       m_PostInfinity: 0
       m_RotationOrder: 0
-    asteroidSpawnGapSec: 1
+    asteroidSpawnGapSec: 2
     vacuumSize: 1
     spacecraftSize: 1
     maxAsteroidCount: 10

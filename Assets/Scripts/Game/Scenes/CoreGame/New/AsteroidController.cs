@@ -138,6 +138,11 @@ namespace com.hive.projectr
                 return;
         }
 
+        public float GetLifetimeProgress()
+        {
+            return Mathf.Clamp01((_totalLifetime - _remainingLifetime) / _totalLifetime);
+        }
+
         private bool IsCaptured()
         {
             return _capturingOwner != null;
@@ -194,7 +199,7 @@ namespace com.hive.projectr
 
             // check lifetime first
             _remainingLifetime -= Time.deltaTime;
-            var lifetimeProgress = Mathf.Clamp01((_totalLifetime - _remainingLifetime) / _totalLifetime);
+            var lifetimeProgress = GetLifetimeProgress();
             _config.Renderer.color = new Color(1, 1 - lifetimeProgress, 1 - lifetimeProgress, 1);
 
             if (_remainingLifetime < 0)

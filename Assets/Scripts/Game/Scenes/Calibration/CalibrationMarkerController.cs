@@ -65,15 +65,15 @@ namespace com.hive.projectr
             {
                 var pCircle = (CalibrationMarkerCircle)circle;
                 fill = Mathf.Clamp01(fill);
-                SetRadialFill(GetRenderer(pCircle).material, fill);
+                ShaderUtil.SetRadialFill(GetRenderer(pCircle).material, fill);
             }
         }
 
         public void ResetAllCircles()
         {
-            SetRadialFill(GetRenderer(CalibrationMarkerCircle.Circle1).material, 0);
-            SetRadialFill(GetRenderer(CalibrationMarkerCircle.Circle2).material, 0);
-            SetRadialFill(GetRenderer(CalibrationMarkerCircle.Circle3).material, 0);
+            ShaderUtil.SetRadialFill(GetRenderer(CalibrationMarkerCircle.Circle1).material, 0);
+            ShaderUtil.SetRadialFill(GetRenderer(CalibrationMarkerCircle.Circle2).material, 0);
+            ShaderUtil.SetRadialFill(GetRenderer(CalibrationMarkerCircle.Circle3).material, 0);
         }
 
         private SpriteRenderer GetRenderer(CalibrationMarkerCircle circle)
@@ -89,11 +89,6 @@ namespace com.hive.projectr
                 default:
                     return null;
             }
-        }
-
-        private void SetRadialFill(Material mat, float fill)
-        {
-            mat.SetFloat("_Arc2", 360 - 360 * fill);
         }
     }
 }
