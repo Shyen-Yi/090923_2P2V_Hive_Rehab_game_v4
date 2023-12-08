@@ -65,8 +65,11 @@ namespace com.hive.projectr
 		public Single AsteroidSize => _item.AsteroidSize;
 		public Single AsteroidLifeTime => _item.AsteroidLifeTime;
 		public AnimationCurve AsteroidMovement => _item.AsteroidMovement;
+		public Single AsteroidSpawnGapSec => _item.AsteroidSpawnGapSec;
 		public Single VacuumSize => _item.VacuumSize;
 		public Single SpacecraftSize => _item.SpacecraftSize;
+		public Int32 MaxAsteroidCount => _item.MaxAsteroidCount;
+		public Int32 NumOfAsteroidCollectedToPass => _item.NumOfAsteroidCollectedToPass;
 
 		public CoreGameLevelConfigData(CoreGameLevelSOItem item)
 		{

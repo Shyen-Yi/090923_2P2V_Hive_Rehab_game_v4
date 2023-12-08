@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _items:
   - level: 1
-    asteroidSpeed: 0.1
+    asteroidSpeed: 4
     asteroidSize: 1
-    asteroidLifeTime: 10
+    asteroidLifeTime: 15
     asteroidMovement:
       serializedVersion: 2
       m_Curve:
@@ -41,5 +41,8 @@ MonoBehaviour:
       m_PreInfinity: 0
       m_PostInfinity: 0
       m_RotationOrder: 0
+    asteroidSpawnGapSec: 1
     vacuumSize: 1
     spacecraftSize: 1
+    maxAsteroidCount: 10
+    numOfAsteroidCollectedToPass: 8

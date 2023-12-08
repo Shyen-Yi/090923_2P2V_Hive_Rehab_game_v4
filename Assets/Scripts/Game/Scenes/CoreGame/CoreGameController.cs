@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
+using Random = UnityEngine.Random;
 
 namespace com.hive.projectr
 {
@@ -29,7 +31,7 @@ namespace com.hive.projectr
         private enum CoreGameState
         {
             NotStarted,
-            StartCountdown,
+            Countdown,
             Running,
             Paused,
             Finished
@@ -39,13 +41,15 @@ namespace com.hive.projectr
         private Vector3 _bottomLeftScreenPos;
         private Vector3 _topRightScreenPos;
         private float _spacecraftMovementScale;
-        private int _level;
         private Vector3 _centerScreenPos;
         private Vector3 _spacecraftScreenOffsetFromCursor;
         private Vector3 _spacecraftScreenPos;
         private CoreGameState _state;
         private float _progressFill;
         private float _maxProgressWidth;
+        private CoreGameLevelConfigData _levelConfigData;
+        private int _endedAsteroidCount;
+        private float _nextAsteroidSpawnTime;
 
         private static readonly int CountdownTriggerHash = Animator.StringToHash("Count");
         #endregion
@@ -157,13 +161,17 @@ namespace com.hive.projectr
                 _topRightScreenPos = pData.topRightScreenPos;
                 _spacecraftMovementScale = pData.spacecraftMovementScale;
                 _centerScreenPos = pData.centerScreenPos;
-                _level = pData.level;
+                _levelConfigData = CoreGameLevelConfig.GetLevelData(pData.level);
             }
 
             if (showState == GameSceneShowState.New)
             {
                 Reset();
                 Start();
+            }
+            else
+            {
+                Resume();
             }
 
             InputManager.HideCursor();
@@ -172,6 +180,11 @@ namespace com.hive.projectr
 
         protected override void OnHide(GameSceneHideState hideState)
         {
+            if (hideState == GameSceneHideState.Covered)
+            {
+                Pause();
+            }
+
             InputManager.ShowCursor();
             InputManager.SetCursorLockMode(CursorLockMode.Confined);
         }
@@ -181,6 +194,7 @@ namespace com.hive.projectr
             UnbindActions();
 
             _vacuumControllers.Clear();
+            _spacecraftController.Dispose();
         }
         #endregion
 
@@ -202,14 +216,14 @@ namespace com.hive.projectr
             if (_state != CoreGameState.Running)
                 return;
 
-            SpacecraftMovementTick();
-
-            // debug
-            if (InputManager.GetKeyDown(KeyCode.Space))
+            if (_activeAsteroids.Count < 1 && Time.time >= _nextAsteroidSpawnTime)
             {
                 SpawnAsteroid();
             }
 
+            SpacecraftMovementTick();
+
+            // debug
             if (InputManager.GetKeyDown(KeyCode.UpArrow))
             {
                 _vacuumControllers[VacuumType.Top].Activate();
@@ -246,27 +260,61 @@ namespace com.hive.projectr
 
         private void OnAsteroidEnterVacuumAir(int id)
         {
-            Logger.LogError($"OnAsteroidEnterVacuumAir");
-
-            DestroyAsteroid(id);
+            OnAsteroidEnded(id);
         }
 
         private void OnAsteroidLifetimeRunOut(int id)
         {
-            Logger.LogError($"OnAsteroidLifetimeRunOut");
+            OnAsteroidEnded(id);
+        }
 
-            DestroyAsteroid(id);
+        private void OnAsteroidSpawned()
+        {
+            _netController.PlaySpawnAnimation();
         }
 
         private void OnAsteroidCaptured(int id)
         {
-            Logger.LogError($"OnAsteroidCaptured");
+            _spacecraftController.SetCapturing(true);
+
+            // activate a random vacuum
+            var vacuumControllers = new List<VacuumController>(_vacuumControllers.Values);
+            var index = Random.Range(0, vacuumControllers.Count);
+            var activeController = vacuumControllers[index];
+            activeController.Activate();
+        }
+
+        private void OnAsteroidEnded(int id)
+        {
+            DestroyAsteroid(id);
+
+            _nextAsteroidSpawnTime = Time.time + _levelConfigData.AsteroidSpawnGapSec;
+
+            _spacecraftController.SetCapturing(false);
+
+            foreach (var controller in _vacuumControllers.Values)
+            {
+                controller.Deactivate();
+            }
+
+            ++_endedAsteroidCount;
+            RefreshProgress();
+
+            if (_endedAsteroidCount >= _levelConfigData.MaxAsteroidCount)
+            {
+                OnLevelEnded();
+            }
+        }
+
+        private void OnLevelEnded()
+        {
+            UpdateState(CoreGameState.Finished);
+
+            GameSceneManager.Instance.GoBack(SceneNames.MainMenu);
         }
 
         private void DestroyAsteroid(int id)
         {
-            Logger.LogError($"DestroyAsteroid");
-
             if (_activeAsteroids.TryGetValue(id, out var controller))
             {
                 controller.Stop(() => PutAsteroidBack(controller));
@@ -286,6 +334,13 @@ namespace com.hive.projectr
         #endregion
 
         #region Content
+        private void RefreshProgress()
+        {
+            var current = _endedAsteroidCount;
+            var max = _levelConfigData.MaxAsteroidCount;
+            SetProgressBar(Mathf.Clamp01((float)current / max));
+        }
+
         private void SetProgressBar(float fillAmount)
         {
             fillAmount = Mathf.Clamp01(fillAmount);
@@ -316,24 +371,42 @@ namespace com.hive.projectr
             CenterSpacecraft();
         }
 
+        private void Resume()
+        {
+            MonoBehaviourUtil.Instance.StartCoroutine(CountdownRoutine(() =>
+            {
+                UpdateState(CoreGameState.Running);
+            }));
+        }
+
+        private void Pause()
+        {
+            UpdateState(CoreGameState.Paused);
+        }
+
         private void Start()
         {
-            var levelConfigData = CoreGameLevelConfig.GetLevelData(_level);
-            _spacecraftController.Activate(new SpacecraftData(levelConfigData.SpacecraftSize));
-
             if (_state == CoreGameState.NotStarted)
             {
-                MonoBehaviourUtil.Instance.StartCoroutine(StartRoutine());
+                _spacecraftController.Deactivate();
+                MonoBehaviourUtil.Instance.StartCoroutine(CountdownRoutine(() =>
+                {
+                    _nextAsteroidSpawnTime = Time.time + _levelConfigData.AsteroidSpawnGapSec;
+                    _spacecraftController.Activate(new SpacecraftData(_levelConfigData.SpacecraftSize));
+                    CenterSpacecraft();
+                    UpdateState(CoreGameState.Running);
+                }));
             }
             else if (_state == CoreGameState.Paused)
             {
+                _spacecraftController.Activate(new SpacecraftData(_levelConfigData.SpacecraftSize));
                 UpdateState(CoreGameState.Running);
             }
         }
 
-        private IEnumerator StartRoutine()
+        private IEnumerator CountdownRoutine(Action onCountdownFinished)
         {
-            UpdateState(CoreGameState.StartCountdown);
+            UpdateState(CoreGameState.Countdown);
 
             var countNumAnimStateName = "CountNum";
             var duration = 0f;
@@ -369,8 +442,7 @@ namespace com.hive.projectr
                 yield return null;
             }
 
-            CenterSpacecraft();
-            UpdateState(CoreGameState.Running);
+            onCountdownFinished?.Invoke();
         }
 
         private void UpdateState(CoreGameState state)
@@ -410,38 +482,38 @@ namespace com.hive.projectr
             var spacecraftScreenPos = GetSpacecraftScreenPos();
             var spacecraftWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(spacecraftScreenPos);
             var spacecraftRadius = _spacecraftController.GetWorldSpaceCaptureRadius();
-            var startWorldPos = GetRandomPointOutsideCircle(spacecraftWorldPos, spacecraftRadius);
+            var startWorldPos = GetRandomWorldPointOutsideCircle(spacecraftWorldPos, spacecraftRadius);
             var startScreenPos = CameraManager.Instance.MainCamera.WorldToScreenPoint(startWorldPos);
-            var startDirection = (_centerScreenPos - startScreenPos).normalized;
-            var levelConfigData = CoreGameLevelConfig.GetLevelData(_level);
+
+            var startDirection = (_centerScreenPos - startScreenPos);
 
             var id = controller.Id;
-            controller.Start(new AsteroidData(startWorldPos, startDirection, levelConfigData.AsteroidSpeed, levelConfigData.AsteroidSize, levelConfigData.AsteroidLifeTime, levelConfigData.AsteroidMovement, OnAsteroidEnterVacuumAir, OnAsteroidLifetimeRunOut, OnAsteroidCaptured));
+            controller.Start(new AsteroidData(startWorldPos, startDirection, _levelConfigData.AsteroidSpeed, _levelConfigData.AsteroidSize, _levelConfigData.AsteroidLifeTime, _levelConfigData.AsteroidMovement, OnAsteroidEnterVacuumAir, OnAsteroidLifetimeRunOut, OnAsteroidCaptured));
 
-            _netController.PlaySpawnAnimation();
+            OnAsteroidSpawned();
         }
 
-        private Vector2 GetRandomPointOutsideCircle(Vector2 circlePosition, float radius)
+        private Vector3 GetRandomWorldPointOutsideCircle(Vector3 circleWorldPos, float radius)
         {
             var cam = CameraManager.Instance.MainCamera;
-            var randomPoint = Vector2.zero;
+            var randomPoint = Vector3.zero;
             var sqrRadius = radius * radius;
 
             do
             {
                 // Convert screen edges to world space
-                var bottomLeftWorldPos = cam.ScreenToWorldPoint(_bottomLeftScreenPos);
-                var topRightWorldPos = cam.ScreenToWorldPoint(_topRightScreenPos);
+                var bottomLeftWorldPos = cam.ScreenToWorldPoint(_bottomLeftScreenPos) + new Vector3(2, 2);
+                var topRightWorldPos = cam.ScreenToWorldPoint(_topRightScreenPos) + new Vector3(-2, -2);
                 float minX = bottomLeftWorldPos.x;
                 float maxX = topRightWorldPos.x;
                 float minY = bottomLeftWorldPos.y;
                 float maxY = topRightWorldPos.y;
 
                 // Generate a random point within screen bounds
-                randomPoint = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
+                randomPoint = new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY));
 
                 // Check if the point is outside the circle's radius
-            } while ((randomPoint - circlePosition).sqrMagnitude <= sqrRadius);
+            } while ((randomPoint - circleWorldPos).sqrMagnitude <= sqrRadius);
 
             return randomPoint;
         }
@@ -455,12 +527,13 @@ namespace com.hive.projectr
                 var asteroidGO = GameObject.Instantiate(_asteroidPrefab, _asteroidContainer);
                 var config = asteroidGO.GetComponent<AsteroidConfig>();
                 controller = new AsteroidController(config);
-                _activeAsteroids[controller.Id] = controller;
             }
             else
             {
                 controller = _inactiveAsteroids.Pop();
             }
+            
+            _activeAsteroids[controller.Id] = controller;
 
             controller.Activate();
             return controller;
@@ -468,6 +541,12 @@ namespace com.hive.projectr
 
         private void PutAsteroidBack(AsteroidController controller)
         {
+            if (controller == null)
+            {
+                Logger.LogError($"Null AsteroidController!");
+                return;
+            }
+
             _activeAsteroids.Remove(controller.Id);
             _inactiveAsteroids.Push(controller);
             controller.Deactivate();

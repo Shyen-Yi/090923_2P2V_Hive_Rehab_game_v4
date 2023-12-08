@@ -21,15 +21,21 @@ namespace com.hive.projectr
 		[SerializeField] private Single asteroidSize;
 		[SerializeField] private Single asteroidLifeTime;
 		[SerializeField] private AnimationCurve asteroidMovement;
+		[SerializeField] private Single asteroidSpawnGapSec;
 		[SerializeField] private Single vacuumSize;
 		[SerializeField] private Single spacecraftSize;
+		[SerializeField] private Int32 maxAsteroidCount;
+		[SerializeField] private Int32 numOfAsteroidCollectedToPass;
 
 		public Int32 Level => level;
 		public Single AsteroidSpeed => asteroidSpeed;
 		public Single AsteroidSize => asteroidSize;
 		public Single AsteroidLifeTime => asteroidLifeTime;
 		public AnimationCurve AsteroidMovement => asteroidMovement;
+		public Single AsteroidSpawnGapSec => asteroidSpawnGapSec;
 		public Single VacuumSize => vacuumSize;
 		public Single SpacecraftSize => spacecraftSize;
+		public Int32 MaxAsteroidCount => maxAsteroidCount;
+		public Int32 NumOfAsteroidCollectedToPass => numOfAsteroidCollectedToPass;
     }
 }

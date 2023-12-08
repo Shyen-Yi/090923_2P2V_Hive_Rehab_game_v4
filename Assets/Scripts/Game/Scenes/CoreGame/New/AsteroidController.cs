@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Unity.VisualScripting.FullSerializer;
 
 namespace com.hive.projectr
 {
@@ -70,7 +71,10 @@ namespace com.hive.projectr
 
             _config.transform.position = data.startWorldPos;
             _config.transform.localScale = Vector3.one * data.size;
-            _config.Rigidbody2D.velocity = data.startDirection * data.speed;
+            _config.Rigidbody2D.velocity = data.startDirection.normalized * data.speed;
+
+            _config.RotationRoot.localScale = Vector3.one;
+            _config.Renderer.color = Color.white;
 
             _isRunning = true;
         }
@@ -82,6 +86,8 @@ namespace com.hive.projectr
                 Logger.LogError($"Asteroid is not running! Id: {Id}");
                 return;
             }
+
+            _isRunning = false;
 
             Reset();
 
@@ -108,13 +114,10 @@ namespace com.hive.projectr
 
             _config.RotationRoot.rotation = Quaternion.identity;
             Reset();
-
-            Logger.LogError($"Asteroid Activate");
         }
 
         private void Reset()
         {
-            _isRunning = false;
             _config.Rigidbody2D.velocity = Vector2.zero;
             _capturingOwner = null;
         }
@@ -127,36 +130,17 @@ namespace com.hive.projectr
             MonoBehaviourUtil.OnUpdate -= Tick;
 
             _config.gameObject.SetActive(false);
-
-            Logger.LogError($"Asteroid Deactivate");
         }
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (!_isRunning)
                 return;
+        }
 
-            if (collision.gameObject.CompareTag(TagNames.VacuumBase))
-            {
-                // reflect
-                if (collision.gameObject.TryGetComponent<VacuumBaseConfig>(out var baseConfig))
-                {
-                    switch (baseConfig.VacuumRootConfig.Type)
-                    {
-                        case VacuumType.Top:
-                        case VacuumType.Bottom:
-                            _config.Rigidbody2D.velocity = new Vector2(_config.Rigidbody2D.velocity.x, -_config.Rigidbody2D.velocity.y);
-                            break;
-                        case VacuumType.Left:
-                        case VacuumType.Right:
-                            _config.Rigidbody2D.velocity = new Vector2(-_config.Rigidbody2D.velocity.x, _config.Rigidbody2D.velocity.y);
-                            break;
-                        default:
-                            Logger.LogError($"Undefined type: {baseConfig.VacuumRootConfig.Type}");
-                            break;
-                    }
-                }
-            }
+        private bool IsCaptured()
+        {
+            return _capturingOwner != null;
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -164,7 +148,7 @@ namespace com.hive.projectr
             if (!_isRunning)
                 return;
 
-            if (collision.gameObject.CompareTag(TagNames.VacuumAir))
+            if (collision.gameObject.CompareTag(TagNames.VacuumAir) && IsCaptured())
             {
                 _onEnterVacuumAir?.Invoke(Id);
             }
@@ -175,6 +159,32 @@ namespace com.hive.projectr
                 _config.Rigidbody2D.velocity = Vector2.zero;
                 _onCaptured?.Invoke(Id);
             }
+            else if (collision.gameObject.CompareTag(TagNames.VacuumBase))
+            {
+                // reflect
+                if (collision.gameObject.TryGetComponent<VacuumBaseConfig>(out var baseConfig))
+                {
+                    var velocity = _config.Rigidbody2D.velocity;
+                    switch (baseConfig.VacuumRootConfig.Type)
+                    {
+                        case VacuumType.Top:
+                        case VacuumType.Bottom:
+                            velocity = new Vector2(velocity.x, -velocity.y);
+                            break;
+                        case VacuumType.Left:
+                        case VacuumType.Right:
+                            velocity = new Vector2(-velocity.x, velocity.y);
+                            break;
+                        default:
+                            Logger.LogError($"Undefined type: {baseConfig.VacuumRootConfig.Type}");
+                            break;
+                    }
+
+                    var energyLossFactor = 1f;
+                    velocity *= energyLossFactor;
+                    _config.Rigidbody2D.velocity = velocity;
+                }
+            }
         }
 
         private void Tick()
@@ -184,7 +194,8 @@ namespace com.hive.projectr
 
             // check lifetime first
             _remainingLifetime -= Time.deltaTime;
-            _config.Renderer.color = new Color(1, 0, 0, Mathf.Clamp01(_remainingLifetime / _totalLifetime));
+            var lifetimeProgress = Mathf.Clamp01((_totalLifetime - _remainingLifetime) / _totalLifetime);
+            _config.Renderer.color = new Color(1, 1 - lifetimeProgress, 1 - lifetimeProgress, 1);
 
             if (_remainingLifetime < 0)
             {
@@ -193,7 +204,7 @@ namespace com.hive.projectr
             }
 
             // held by/following owner
-            if (_capturingOwner != null)
+            if (IsCaptured())
             {
                 _config.transform.position = _capturingOwner.position + _offsetFromOwner;
                 return;
@@ -203,7 +214,8 @@ namespace com.hive.projectr
             var coreGameData = CoreGameConfig.GetData();
             if (coreGameData != null)
             {
-                _config.RotationRoot.Rotate(Vector3.forward, coreGameData.AsteroidSpinRoundPerSec / 360f * Time.deltaTime);
+                var degree = (coreGameData.AsteroidSpinRoundPerSec * 360f * Time.deltaTime) % 360;
+                _config.RotationRoot.Rotate(Vector3.forward, degree);
             }
         }
     }

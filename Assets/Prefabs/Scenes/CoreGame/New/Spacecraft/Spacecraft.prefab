@@ -68,7 +68,7 @@ Transform:
   m_Children:
   - {fileID: 9002677642253324520}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &7908119414170719479
 Rigidbody2D:
@@ -131,7 +131,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 3.5
+  m_Radius: 0.6
 --- !u!114 &4848676714573968689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,6 +166,7 @@ MonoBehaviour:
   _idleRenderer: {fileID: 5494086009216041963}
   _movingRenderer: {fileID: 8428536739494566637}
   _capturingRenderer: {fileID: 4019229440383256152}
+  _circleCollider: {fileID: 330901730393352816}
 --- !u!1 &2437649809475790862
 GameObject:
   m_ObjectHideFlags: 0
