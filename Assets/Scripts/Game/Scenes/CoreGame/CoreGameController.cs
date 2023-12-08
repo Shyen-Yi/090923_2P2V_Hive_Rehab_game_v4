@@ -70,6 +70,7 @@ namespace com.hive.projectr
         {
             VacuumContainer = 0,
             AsteroidContainer = 1,
+            RaycastBlocker = 2,
         }
 
         private enum ExtraTMP
@@ -102,6 +103,7 @@ namespace com.hive.projectr
 
         private Dictionary<VacuumType, VacuumController> _vacuumControllers;
         private Transform _asteroidContainer;
+        private Transform _raycastBlocker;
 
         private TMP_Text _countdownText;
 
@@ -140,6 +142,7 @@ namespace com.hive.projectr
                 }
             }
             _asteroidContainer = Config.ExtraObjects[(int)ExtraObj.AsteroidContainer];
+            _raycastBlocker = Config.ExtraObjects[(int)ExtraObj.RaycastBlocker];
 
             _countdownText = Config.ExtraTextMeshPros[(int)ExtraTMP.Countdown];
 
@@ -308,9 +311,20 @@ namespace com.hive.projectr
 
         private void OnLevelEnded()
         {
+            MonoBehaviourUtil.Instance.StartCoroutine(LevelEndRoutine());
+        }
+
+        private IEnumerator LevelEndRoutine()
+        {
+            _raycastBlocker.gameObject.SetActive(true);
+
             UpdateState(CoreGameState.Finished);
 
+            yield return new WaitForSeconds(_levelConfigData.AsteroidSpawnGapSec * 2);
+
             GameSceneManager.Instance.GoBack(SceneNames.MainMenu);
+
+            _raycastBlocker.gameObject.SetActive(false);
         }
 
         private void DestroyAsteroid(int id)

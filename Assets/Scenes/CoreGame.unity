@@ -375,6 +375,7 @@ MonoBehaviour:
   _extraObjects:
   - {fileID: 353221579}
   - {fileID: 45509456}
+  - {fileID: 1192850993}
   _extraGameObjects:
   - {fileID: 714799750586750850, guid: acf8c27fae65d1245b5e17bdfd3b7fd7, type: 3}
   _extraInts: 
@@ -1503,8 +1504,8 @@ RectTransform:
   m_Children:
   - {fileID: 119808035}
   - {fileID: 1399121704}
-  - {fileID: 1192850993}
   - {fileID: 1774021687}
+  - {fileID: 1192850993}
   m_Father: {fileID: 278460371}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

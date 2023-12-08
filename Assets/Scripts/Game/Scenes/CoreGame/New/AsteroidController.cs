@@ -199,7 +199,7 @@ namespace com.hive.projectr
 
             if (_remainingLifetime < 0)
             {
-                Stop(()=>_onLifetimeRunOut?.Invoke(Id));
+                _onLifetimeRunOut?.Invoke(Id);
                 return;
             }
 

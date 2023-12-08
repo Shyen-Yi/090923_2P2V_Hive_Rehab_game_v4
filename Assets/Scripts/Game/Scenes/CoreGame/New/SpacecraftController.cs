@@ -31,6 +31,8 @@ namespace com.hive.projectr
         {
             _config = config;
 
+            RefreshTick();
+
             MonoBehaviourUtil.OnUpdate += Tick;
         }
 
@@ -103,10 +105,10 @@ namespace com.hive.projectr
             var capturingVal = Mathf.Clamp01(_capturingVal + capturingDirection / capturingRate * Time.deltaTime);
             _capturingVal = capturingVal;
 
-            PostTick();
+            RefreshTick();
         }
 
-        private void PostTick()
+        private void RefreshTick()
         {
             var color = _config.FireLeftRenderer.color;
             _config.FireLeftRenderer.color = _config.FireRightRenderer.color = new Color(color.r, color.g, color.b, _movingVal);
