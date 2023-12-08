@@ -16,7 +16,7 @@ MonoBehaviour:
   - level: 1
     asteroidSpeed: 4
     asteroidSize: 1
-    asteroidLifeTime: 15
+    asteroidLifeTime: 10
     asteroidMovement:
       serializedVersion: 2
       m_Curve:

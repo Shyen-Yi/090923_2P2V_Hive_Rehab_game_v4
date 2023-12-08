@@ -49,6 +49,7 @@ namespace com.hive.projectr
         private float _maxProgressWidth;
         private CoreGameLevelConfigData _levelConfigData;
         private int _endedAsteroidCount;
+        private int _collectedAsteroidCount;
         private float _nextAsteroidSpawnTime;
 
         private static readonly int CountdownTriggerHash = Animator.StringToHash("Count");
@@ -263,6 +264,7 @@ namespace com.hive.projectr
 
         private void OnAsteroidEnterVacuumAir(int id)
         {
+            ++_collectedAsteroidCount;
             OnAsteroidEnded(id);
         }
 
@@ -322,7 +324,21 @@ namespace com.hive.projectr
 
             yield return new WaitForSeconds(_levelConfigData.AsteroidSpawnGapSec * 2);
 
-            GameSceneManager.Instance.GoBack(SceneNames.MainMenu);
+            var isPassed = _collectedAsteroidCount >= _levelConfigData.NumOfAsteroidCollectedToPass;
+            if (isPassed)
+            {
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGameLevelPassed, new CoreGameLevelPassedData(new CoreGameData(_bottomLeftScreenPos, _topRightScreenPos, _centerScreenPos, _spacecraftMovementScale, _levelConfigData.Level)), ()=>
+                {
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
+            else
+            {
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGameLevelFailed, new CoreGameData(_bottomLeftScreenPos, _topRightScreenPos, _centerScreenPos, _spacecraftMovementScale, _levelConfigData.Level), ()=> 
+                { 
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
 
             _raycastBlocker.gameObject.SetActive(false);
         }

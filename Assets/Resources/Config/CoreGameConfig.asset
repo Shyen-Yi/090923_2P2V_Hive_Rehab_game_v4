@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CoreGameConfig
   m_EditorClassIdentifier: 
   _items:
-  - asteroidSpinRoundPerSec: 0.5
+  - asteroidSpinRoundPerSec: 0.7
     startCountdownSec: 3

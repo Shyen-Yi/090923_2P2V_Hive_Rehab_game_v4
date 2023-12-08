@@ -19,5 +19,7 @@ namespace com.hive.projectr
         public static string Calibration = "Calibration";
         public static string CalibrationEnding = "CalibrationEnding";
         public static string CalibrationErrorProtection = "CalibrationErrorProtection";
+        public static string CoreGameLevelPassed = "CoreGameLevelPassed";
+        public static string CoreGameLevelFailed = "CoreGameLevelFailed";
     }
 }
