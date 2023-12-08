@@ -7,5 +7,6 @@ namespace com.hive.projectr
 		Share,
 		Stats,
 		Calibration,
+		CoreGameLevelPassed,
 	}
 }

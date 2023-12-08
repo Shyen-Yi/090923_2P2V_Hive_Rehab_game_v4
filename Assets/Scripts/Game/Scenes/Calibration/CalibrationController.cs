@@ -36,7 +36,12 @@ namespace com.hive.projectr
         private float _holdingTime;
         private float _nextCanHoldTime;
         private float _stageElapsedTime;
-        private Vector3 _spacecraftOffsetFromCursor;
+        private Vector3 _spacecraftScreenOffsetFromCursor;
+        private Vector3 _holdingStartScreenPos;
+        private bool _isHolding;
+        private Vector3 _spacecraftScreenPos;
+        private Vector3 _lastCursorScreenPos;
+        private float _idleDuration;
         #endregion
 
         #region Extra
@@ -48,6 +53,7 @@ namespace com.hive.projectr
             BottomLeftMark = 3,
             CenterMark = 4,
             Marker = 5,
+            Spacecraft = 6,
         }
 
         private enum ExtraBtn
@@ -65,8 +71,7 @@ namespace com.hive.projectr
 
         private enum ExtraObj
         {
-            Spacecraft = 0,
-            LineDrawer = 1,
+            LineDrawer = 0,
         }
 
         private enum ExtraRT
@@ -85,6 +90,7 @@ namespace com.hive.projectr
         
         private Dictionary<CalibrationStageType, CalibrationMarkController> _markDict;
         private CalibrationMarkerController _marker;
+        private SpacecraftController _spacecraftController;
 
         private HiveButton _crossButton;
         private HiveButton _redoButton;
@@ -93,7 +99,6 @@ namespace com.hive.projectr
 
         private TMP_Text _instructionText;
 
-        private Transform _spacecraft;
         private LineDrawer _lineDrawer;
 
         private Dictionary<CalibrationStageType, RectTransform> _cornerDict;
@@ -130,6 +135,8 @@ namespace com.hive.projectr
             };
             var markerConfig = Config.ExtraWidgetConfigs[(int)ExtraConfig.Marker];
             _marker = new CalibrationMarkerController(markerConfig);
+            var spacecraftConfig = (SpacecraftConfig)Config.ExtraWidgetConfigs[(int)ExtraConfig.Spacecraft];
+            _spacecraftController = new SpacecraftController(spacecraftConfig);
 
             _crossButton = Config.ExtraButtons[(int)ExtraBtn.Cross];
             _redoButton = Config.ExtraButtons[(int)ExtraBtn.Redo];
@@ -138,7 +145,6 @@ namespace com.hive.projectr
 
             _instructionText = Config.ExtraTextMeshPros[(int)ExtraTMP.Instruction];
 
-            _spacecraft = Config.ExtraObjects[(int)ExtraObj.Spacecraft];
             _lineDrawer = Config.ExtraObjects[(int)ExtraObj.LineDrawer].GetComponent<LineDrawer>();
             _lineDrawer.Deactivate();
 
@@ -174,6 +180,7 @@ namespace com.hive.projectr
             }
 
             InputManager.HideCursor();
+            InputManager.SetCursorLockMode(CursorLockMode.None);
         }
 
         protected override void OnHide(GameSceneHideState hideState)
@@ -186,11 +193,14 @@ namespace com.hive.projectr
             }
 
             InputManager.ShowCursor();
+            InputManager.SetCursorLockMode(CursorLockMode.Confined);
         }
 
         protected override void OnDispose()
         {
             UnbindActions();
+
+            _spacecraftController.Dispose();
 
             if (_endCoroutine != null)
             {
@@ -233,7 +243,9 @@ namespace com.hive.projectr
         {
             UpdateStatus(CalibrationStatus.Running);
             _nextCanHoldTime = Time.time;
-            _spacecraft.gameObject.SetActive(true);
+
+            var minLevelData = CoreGameLevelConfig.GetLevelData(CoreGameLevelConfig.MinLevel);
+            _spacecraftController.Activate(new SpacecraftData(minLevelData.SpacecraftSize));
         }
 
         private void Resume()
@@ -256,17 +268,16 @@ namespace com.hive.projectr
             _resultDict.Clear();
             _stageIndex = 0;
             UpdateStatus(CalibrationStatus.NotStarted);
-            _instructionText.text = "";
             _raycastBlock.enabled = false;
-            _spacecraftOffsetFromCursor = Vector3.zero;
-            _holdingTime = 0;
+            _spacecraftScreenOffsetFromCursor = Vector3.zero;
             _stageElapsedTime = 0;
 
             foreach (var markContorller in _markDict.Values)
             {
                 markContorller.Deactivate();
             }
-            _marker.Deactivate();
+
+            StopHolding();
         }
 
         private void End()
@@ -282,7 +293,7 @@ namespace com.hive.projectr
 
         private void CenterSpacecraft()
         {
-            _spacecraftOffsetFromCursor = new Vector3(Screen.width / 2, Screen.height / 2, 0) - InputManager.Instance.CursorScreenPos;
+            _spacecraftScreenOffsetFromCursor = GetCenterScreenPos() - InputManager.Instance.CursorScreenPos;
         }
 
         private Vector3 GetCenterScreenPos()
@@ -294,16 +305,16 @@ namespace com.hive.projectr
 
         private void OnStageCompleted()
         {
-            var currentStage = _stageDataList[_stageIndex];
+            var currentStageData = _stageDataList[_stageIndex];
             _holdingTime = 0;
             _stageElapsedTime = 0;
 
-            _nextCanHoldTime = Time.time + currentStage.CooldownTime;
+            _nextCanHoldTime = Time.time + currentStageData.CooldownTime;
 
             // mark
-            if (_markDict.TryGetValue(currentStage.Stage, out var markController))
+            if (_markDict.TryGetValue(currentStageData.Stage, out var markController))
             {
-                if (currentStage.Stage == CalibrationStageType.Center)
+                if (currentStageData.Stage == CalibrationStageType.Center)
                 {
                     // center of movement area (COULD BE the screen center)
                     var centerScreenPos = GetCenterScreenPos();
@@ -316,6 +327,7 @@ namespace com.hive.projectr
                     var targetScreenPos = GetSpacecraftScreenPos();
                     var targetWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(targetScreenPos);
                     markController.MoveToWorldPos(targetWorldPos);
+                    _resultDict[currentStageData.Stage] = new CalibrationStageResult(targetWorldPos);
                 }
 
                 markController.Activate();
@@ -333,13 +345,13 @@ namespace com.hive.projectr
 
         private Vector3 GetSpacecraftScreenPos()
         {
-            return InputManager.Instance.CursorScreenPos + _spacecraftOffsetFromCursor;
+            return InputManager.Instance.CursorScreenPos + _spacecraftScreenOffsetFromCursor;
         }
 
         private IEnumerator EndRoutine()
         {
             UpdateStatus(CalibrationStatus.Ended);
-            _spacecraft.gameObject.SetActive(false);
+            _spacecraftController.Deactivate();
             _marker.Deactivate();
             _lineDrawer.Activate();
             _instructionText.text = "";
@@ -431,7 +443,32 @@ namespace com.hive.projectr
 
             _raycastBlock.enabled = false;
 
-            GameSceneManager.Instance.ShowScene(SceneNames.CalibrationEnding, null, ()=> 
+            var scaleFactor = 1f;
+            var centerScreenPos = GetCenterScreenPos();
+            foreach (var section in _cornerDict.Keys)
+            {
+                if (_cornerDict.TryGetValue(section, out var actualCorner) &&
+                    _resultDict.TryGetValue(section, out var result))
+                {
+                    var actualCornerScreenPos = RectTransformUtility.WorldToScreenPoint(CameraManager.Instance.UICamera, actualCorner.position);
+
+                    var playerCornerWorldPos = result.worldPos;
+                    var playerCornerScreenPos = CameraManager.Instance.MainCamera.WorldToScreenPoint(playerCornerWorldPos);
+
+                    actualCornerScreenPos = new Vector2(actualCornerScreenPos.x - centerScreenPos.x, actualCornerScreenPos.y - centerScreenPos.y);
+                    playerCornerScreenPos = new Vector2(playerCornerScreenPos.x - centerScreenPos.x, playerCornerScreenPos.y - centerScreenPos.y);
+
+                    var scaleVector = new Vector2(actualCornerScreenPos.x / playerCornerScreenPos.x, actualCornerScreenPos.y / playerCornerScreenPos.y);
+                    scaleFactor = Mathf.Max(scaleFactor, scaleVector.x, scaleVector.y);
+                }
+            }
+
+            GameSceneManager.Instance.ShowScene(SceneNames.CalibrationEnding, new CalibrationEndingData(new CoreGameData(
+                bottomLeftScreenPos,
+                topRightScreenPos,
+                centerScreenPos,
+                scaleFactor, 
+                1)), ()=> 
             {
                 GameSceneManager.Instance.HideScene(SceneName);
             });
@@ -441,13 +478,13 @@ namespace com.hive.projectr
         {
             if (_stageIndex >= 0 && _stageIndex < _stageDataList.Count)
             {
-                var currentStage = _stageDataList[_stageIndex];
-                if (currentStage.Stage != CalibrationStageType.Center)
+                var currentStageData = _stageDataList[_stageIndex];
+                if (currentStageData.Stage != CalibrationStageType.Center)
                 {
                     var spacecraftScreenpos = GetSpacecraftScreenPos();
                     var centerScreenPos = GetCenterScreenPos();
 
-                    switch (currentStage.Stage)
+                    switch (currentStageData.Stage)
                     {
                         case CalibrationStageType.TopLeft:
                             return spacecraftScreenpos.x < centerScreenPos.x && spacecraftScreenpos.y > centerScreenPos.y;
@@ -462,6 +499,39 @@ namespace com.hive.projectr
             }
 
             return true;
+        }
+
+        private void StartHolding()
+        {
+            var spacecraftScreenPos = GetSpacecraftScreenPos();
+            var spacecraftWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(spacecraftScreenPos);
+            _holdingStartScreenPos = spacecraftScreenPos;
+
+            _marker.Activate();
+            _marker.SetWorldPosition(spacecraftWorldPos);
+
+            _spacecraftController.Deactivate();
+
+            if (_stageIndex >= 0 && _stageIndex < _stageDataList.Count)
+            {
+                var currentStageData = _stageDataList[_stageIndex];
+                _instructionText.text = currentStageData.InstructionWhenHolding;
+            }
+        }
+
+        private void StopHolding()
+        {
+            _holdingTime = 0;
+            _marker.Deactivate();
+
+            var minLevelData = CoreGameLevelConfig.GetLevelData(CoreGameLevelConfig.MinLevel);
+            _spacecraftController.Activate(new SpacecraftData(minLevelData.SpacecraftSize));
+
+            if (_stageIndex >= 0 && _stageIndex < _stageDataList.Count)
+            {
+                var currentStageData = _stageDataList[_stageIndex];
+                _instructionText.text = currentStageData.Instruction;
+            }
         }
         #endregion
 
@@ -487,13 +557,31 @@ namespace com.hive.projectr
             GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Calibration));
         }
 
+        private void IdleTick()
+        {
+            var deltaCursorScreenPos = InputManager.Instance.CursorScreenPos - _lastCursorScreenPos;
+            _lastCursorScreenPos = InputManager.Instance.CursorScreenPos;
+
+            if (IsCurrentPositionMatchingStage() &&
+                deltaCursorScreenPos.sqrMagnitude < CalibrationConfig.GetData().HoldingMaxScreenOffset)
+            {
+                _idleDuration += Time.deltaTime;
+            }
+            else
+            {
+                _idleDuration = 0;
+            }
+        }
+
         private void Tick()
         {
             if (_status != CalibrationStatus.Running)
                 return;
 
+            IdleTick();
+
             _stageElapsedTime += Time.deltaTime;
-            if (_stageElapsedTime > CalibrationConfig.GetData().StageErrorProtectionTriggerTime)
+            if (_stageElapsedTime > CalibrationConfig.GetData().StageErrorProtectionTriggerTime && !_isHolding)
             {
                 _stageElapsedTime = 0;
                 GameSceneManager.Instance.ShowScene(SceneNames.CalibrationErrorProtection);
@@ -501,20 +589,40 @@ namespace com.hive.projectr
                 return;
             }
 
-            var spacecraftWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(GetSpacecraftScreenPos());
-            _spacecraft.position = new Vector3(spacecraftWorldPos.x, spacecraftWorldPos.y, _spacecraft.position.z);
+            var spacecraftScreenPos = GetSpacecraftScreenPos();
+            var spacecraftSpeed = (_spacecraftScreenPos - spacecraftScreenPos).sqrMagnitude / Time.deltaTime;
+            _spacecraftScreenPos = spacecraftScreenPos;
+            _spacecraftController.SetMoving(spacecraftSpeed > .1f);
+
+            var spacecraftWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(spacecraftScreenPos);
+            _spacecraftController.SetWorldPos(new Vector3(spacecraftWorldPos.x, spacecraftWorldPos.y, _spacecraftController.GetWorldPos().z));
 
             var currentStageData = _stageDataList[_stageIndex];
             var currentStage = currentStageData.Stage;
-            var isHolding = InputManager.Instance.IdleDuration >= currentStageData.HoldingPreparationTime &&
-                IsCurrentPositionMatchingStage();
+            var isHolding = _idleDuration >= currentStageData.HoldingPreparationTime &&
+                Time.time >= _nextCanHoldTime;
+            if (_isHolding && Vector3.Magnitude(_holdingStartScreenPos - GetSpacecraftScreenPos()) > CalibrationConfig.GetData().HoldingMaxScreenOffset)
+            {
+                isHolding = false;
+                _nextCanHoldTime = Time.time + currentStageData.HoldingPreparationTime; // holding interrupted, need cooldown
+            }
+
+            if (!_isHolding && isHolding)
+            {
+                StartHolding();
+            }
+            else if (_isHolding && !isHolding)
+            {
+                StopHolding();
+            }
+            _isHolding = isHolding;
 
             // arrow
             if (currentStage != CalibrationStageType.TopLeft &&
                 currentStage != CalibrationStageType.TopRight &&
                 currentStage != CalibrationStageType.BottomRight &&
                 currentStage != CalibrationStageType.BottomLeft ||
-                isHolding)
+                _isHolding)
             {
                 _arrow.gameObject.SetActive(false);
             }
@@ -551,30 +659,18 @@ namespace com.hive.projectr
                 _arrow.LookAt(lookAtWorldPos, Vector3.forward);
             }
 
-            if (Time.time >= _nextCanHoldTime && isHolding)
+            if (_isHolding)
             {
-                _marker.Activate();
-                _spacecraft.gameObject.SetActive(false);
-                _marker.SetWorldPosition(spacecraftWorldPos);
                 _holdingTime += Time.deltaTime;
-                _instructionText.text = currentStageData.InstructionWhenHolding;
 
                 var heldCircleCount = (int)(_holdingTime / currentStageData.EachHoldingCheckDuration);
                 var heldCircleFill = (_holdingTime % currentStageData.EachHoldingCheckDuration) / currentStageData.EachHoldingCheckDuration;
-
                 _marker.SetCircleFill(heldCircleCount + 1, heldCircleFill);
 
                 if (heldCircleCount >= currentStageData.MaxHoldingCheckCount)
                 {
                     OnStageCompleted();
                 }
-            }
-            else
-            {
-                _marker.Deactivate();
-                _spacecraft.gameObject.SetActive(true);
-                _holdingTime = 0;
-                _instructionText.text = currentStageData.Instruction;
             }
 
             return;

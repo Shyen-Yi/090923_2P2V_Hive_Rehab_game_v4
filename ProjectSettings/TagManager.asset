@@ -10,6 +10,9 @@ TagManager:
   - MiddlePlante
   - UICamera
   - EventSystem
+  - VacuumAir
+  - VacuumBase
+  - Spacecraft
   layers:
   - Default
   - TransparentFX
@@ -49,6 +52,9 @@ TagManager:
     locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Midground
+    uniqueID: 2326667259
     locked: 0
   - name: Foreground
     uniqueID: 2281726795

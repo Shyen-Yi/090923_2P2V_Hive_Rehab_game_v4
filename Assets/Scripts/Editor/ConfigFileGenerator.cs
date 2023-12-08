@@ -11,28 +11,31 @@ namespace com.hive.projectr
 {
     public enum ConfigHeaderType
     {
-        Enum,
-        Int16,
-        Int32,
-        Int64,
-        Boolean,
-        String,
-        DateTime,
-        Char,
-        Single,
-        Double,
-        Decimal,
-        Byte,
-        SByte,
-        UInt16,
-        UInt32,
-        UInt64,
+        Enum = 0,
+        Int16 = 1,
+        Int32 = 2,
+        Int64 = 3,
+        Boolean = 4,
+        String = 5,
+        DateTime = 6,
+        Char = 7,
+        Single = 8,
+        Double = 9,
+        Decimal = 10,
+        Byte = 11,
+        SByte = 12,
+        UInt16 = 13,
+        UInt32 = 14,
+        UInt64 = 15,
+        AnimationCurve = 16,
+        Vector2Int = 17,
     }
 
     public enum ConfigHeaderTypeNamespace
     {
         System,
         ProjectR,
+        UnityEngine,
     }
 
     [Serializable]
@@ -352,7 +355,6 @@ namespace com.hive.projectr
                 var headerProp = headersProp.GetArrayElementAtIndex(i);
                 var headerType = (ConfigHeaderType)headerProp.FindPropertyRelative("type").enumValueFlag;
 
-                var typeNamespace = GetNamespace((ConfigHeaderTypeNamespace)headerProp.FindPropertyRelative("typeNamespace").enumValueFlag);
                 var typeName = headerType == ConfigHeaderType.Enum
                     ? headerProp.FindPropertyRelative("enumTypeName").stringValue
                     : headerType.ToString();
@@ -396,6 +398,8 @@ namespace com.hive.projectr
                     return "System";
                 case ConfigHeaderTypeNamespace.ProjectR:
                     return "com.hive.projectr";
+                case ConfigHeaderTypeNamespace.UnityEngine:
+                    return "UnityEngine";
                 default:
                     Logger.LogError($"Undefined ConfigHeaderTypeNamespace {type}");
                     return "System";
@@ -408,6 +412,8 @@ namespace com.hive.projectr
                 return ConfigHeaderTypeNamespace.System;
             if (nameSpace == "com.hive.projectr")
                 return ConfigHeaderTypeNamespace.ProjectR;
+            if (nameSpace == "UnityEngine")
+                return ConfigHeaderTypeNamespace.UnityEngine;
 
             Logger.LogError($"Undefined namespace: {nameSpace}");
             return ConfigHeaderTypeNamespace.System;

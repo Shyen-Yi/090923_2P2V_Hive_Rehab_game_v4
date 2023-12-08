@@ -22,6 +22,7 @@ namespace com.hive.projectr
 		[SerializeField] private Int32 defaultGoal;
 		[SerializeField] private Int32 minGoal;
 		[SerializeField] private Int32 maxGoal;
+		[SerializeField] private Single coreGameTransitionSec;
 
 		public Int32 DefaultLevel => defaultLevel;
 		public Int32 MinLevel => minLevel;
@@ -29,5 +30,6 @@ namespace com.hive.projectr
 		public Int32 DefaultGoal => defaultGoal;
 		public Int32 MinGoal => minGoal;
 		public Int32 MaxGoal => maxGoal;
+		public Single CoreGameTransitionSec => coreGameTransitionSec;
     }
 }

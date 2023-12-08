@@ -5,11 +5,22 @@ using UnityEngine.UI;
 
 namespace com.hive.projectr
 {
+    public struct TransitionCoreGameData : ISceneData
+    {
+        public CoreGameData coreGameData;
+
+        public TransitionCoreGameData(CoreGameData coreGameData)
+        {
+            this.coreGameData = coreGameData;
+        }
+    }
+
     public class TransitionCoreGameController : GameSceneControllerBase
     {
         #region Fields
         private float _progressFill;
         private float _maxProgressWidth;
+        private CoreGameData _coreGameData;
         #endregion
 
         #region Extra
@@ -23,11 +34,6 @@ namespace com.hive.projectr
             ProgressBar = 0,
         }
 
-        private enum ExtraInt
-        {
-            MaxFillTime = 0,
-        }
-
         private enum ExtraRT
         {
             SpaceshipRoot = 0,
@@ -36,8 +42,6 @@ namespace com.hive.projectr
         private HiveButton _crossButton;
 
         private Image _progressBar;
-
-        private float _maxFillTime;
 
         private RectTransform _spaceshipRoot;
         #endregion
@@ -55,11 +59,17 @@ namespace com.hive.projectr
 
             _progressBar = Config.ExtraImages[(int)ExtraImg.ProgressBar];
 
-            _maxFillTime = Config.ExtraInts[(int)ExtraInt.MaxFillTime] / 1000f;
-
             _spaceshipRoot = Config.ExtraRectTransforms[(int)ExtraRT.SpaceshipRoot];
 
             _maxProgressWidth = ((RectTransform)_spaceshipRoot.parent).rect.width;
+        }
+
+        protected override void OnShow(ISceneData data, GameSceneShowState showState)
+        {
+            if (data is TransitionCoreGameData pData)
+            {
+                _coreGameData = pData.coreGameData;
+            }
         }
 
         protected override void OnDispose()
@@ -97,7 +107,8 @@ namespace com.hive.projectr
                 if (_progressFill < 1f)
                 {
                     // fill amount
-                    _progressBar.fillAmount = _progressFill = _progressFill + 1 / _maxFillTime * Time.deltaTime;
+                    var maxFillTime = GameGeneralConfig.GetData().CoreGameTransitionSec;
+                    _progressBar.fillAmount = _progressFill = _progressFill + 1 / maxFillTime * Time.deltaTime;
 
                     // marker pos
                     var xPos = Mathf.Lerp(0, _maxProgressWidth, _progressFill);
@@ -108,7 +119,7 @@ namespace com.hive.projectr
                     _progressBar.fillAmount = _progressFill = 1;
                     _spaceshipRoot.anchoredPosition = new Vector2(_maxProgressWidth, _spaceshipRoot.anchoredPosition.y);
 
-                    GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, null, () =>
+                    GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
                     {
                         GameSceneManager.Instance.HideScene(SceneName);
                     });
