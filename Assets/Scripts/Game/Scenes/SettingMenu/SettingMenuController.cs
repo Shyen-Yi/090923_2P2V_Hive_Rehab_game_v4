@@ -14,6 +14,7 @@ namespace com.hive.projectr
         private int _year = -1;
         private int _month = -1;
         private int _goal = -1;
+        private string _goalInputCache = string.Empty;
         private string _name = string.Empty;
         #endregion
 
@@ -78,20 +79,9 @@ namespace com.hive.projectr
         {
             var year = DateTime.Now.Year;
             var month = DateTime.Now.Month;
-            var name = "";
-            var level = GameGeneralConfig.GetData().DefaultLevel;
-            var goal = GameGeneralConfig.GetData().DefaultGoal;
-
-            if (PlayerPrefs.HasKey(PlayerPrefsKey.SettingMenuStorage))
-            {
-                var storage = JsonConvert.DeserializeObject<SettingMenuStorage>(PlayerPrefs.GetString(PlayerPrefsKey.SettingMenuStorage));
-                if (storage != null)
-                {
-                    name = storage.name;
-                    level = storage.level;
-                    goal = storage.goal;
-                }
-            }
+            var name = SettingManager.Instance.DisplayName;
+            var level = SettingManager.Instance.Level;
+            var goal = SettingManager.Instance.DailyBlock;
 
             // calendar date
             RefreshCalendarDate(year, month);
@@ -122,6 +112,7 @@ namespace com.hive.projectr
             _levelDownButton.onClick.AddListener(OnLevelDownButtonClick);
 
             _nameInputField.onEndEdit.AddListener(OnNameEndEdit);
+            _goalInputField.onSelect.AddListener(OnGoalSelect);
             _goalInputField.onEndEdit.AddListener(OnGoalEndEdit);
         }
 
@@ -134,6 +125,7 @@ namespace com.hive.projectr
             _levelDownButton.onClick.RemoveAllListeners();
 
             _nameInputField.onEndEdit.RemoveAllListeners();
+            _goalInputField.onSelect.RemoveAllListeners();
             _goalInputField.onEndEdit.RemoveAllListeners();
         }
         #endregion
@@ -156,39 +148,51 @@ namespace com.hive.projectr
 
         private void OnLevelUpButtonClick()
         {
-            var level = Mathf.Clamp(_level + 1, GameGeneralConfig.GetData().MinLevel, GameGeneralConfig.GetData().MaxLevel);
+            var level = Mathf.Clamp(_level + 1, CoreGameLevelConfig.MinLevel, CoreGameLevelConfig.MaxLevel);
             RefreshLevel(level);
         }
 
         private void OnLevelDownButtonClick()
         {
-            var level = Mathf.Clamp(_level - 1, GameGeneralConfig.GetData().MinLevel, GameGeneralConfig.GetData().MaxLevel);
+            var level = Mathf.Clamp(_level - 1, CoreGameLevelConfig.MinLevel, CoreGameLevelConfig.MaxLevel);
             RefreshLevel(level);
         }
 
-        private void OnNameEndEdit(string txt)
+        private void OnNameEndEdit(string displayName)
         {
-            SaveStorage();
+            SettingManager.Instance.UpdateDisplayName(displayName, true);
+        }
+
+        private void OnGoalSelect(string txt)
+        {
+            _goalInputCache = txt;
         }
 
         private void OnGoalEndEdit(string txt)
         {
-            SaveStorage();
+            if (int.TryParse(txt, out var dailyBlock))
+            {
+                dailyBlock = Mathf.Clamp(dailyBlock, GameGeneralConfig.GetData().MinGoal, GameGeneralConfig.GetData().MaxGoal);
+
+                SettingManager.Instance.UpdateDailyBlock(dailyBlock, true);
+
+                _goalInputField.text = $"{dailyBlock}";
+            }
+            else
+            {
+                _goalInputField.text = _goalInputCache;
+            }
+
+            _goalInputCache = null;
         }
 
-        private void OnLevelUpdate()
+        private void OnLevelUpdate(int level)
         {
-            SaveStorage();
+            SettingManager.Instance.UpdateLevel(level, true);
         }
         #endregion
 
         #region Content
-        private void SaveStorage()
-        {
-            var storage = new SettingMenuStorage(_name, _level, _goal);
-            PlayerPrefs.SetString(PlayerPrefsKey.SettingMenuStorage, JsonConvert.SerializeObject(storage));
-        }
-
         private void RefreshCalendarDate(int year, int month)
         {
             if (_year != year || _month != month)
@@ -217,7 +221,7 @@ namespace com.hive.projectr
                 _level = level;
                 _levelText.text = $"{_level}";
 
-                OnLevelUpdate();
+                OnLevelUpdate(level);
             }
         }
 
@@ -231,27 +235,4 @@ namespace com.hive.projectr
         }
         #endregion
     }
-
-    #region Storage
-    public class SettingMenuStorage
-    {
-        public string name;
-        public int level;
-        public int goal;
-
-        public SettingMenuStorage()
-        {
-            name = "";
-            level = 1;
-            goal = 1;
-        }
-
-        public SettingMenuStorage(string name, int level, int goal)
-        {
-            this.name = name;
-            this.level = level;
-            this.goal = goal;
-        }
-    }
-    #endregion
 }

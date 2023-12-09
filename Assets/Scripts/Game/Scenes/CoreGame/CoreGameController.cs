@@ -190,6 +190,11 @@ namespace com.hive.projectr
             if (hideState == GameSceneHideState.Covered)
             {
                 Pause();
+                CSVManager.Instance.PauseRecording();
+            }
+            else
+            {
+                CSVManager.Instance.StopRecording();
             }
 
             InputManager.ShowCursor();
@@ -444,12 +449,16 @@ namespace com.hive.projectr
                     _spacecraftController.Activate(new SpacecraftData(_levelConfigData.SpacecraftSize));
                     CenterSpacecraft();
                     UpdateState(CoreGameState.Running);
+
+                    CSVManager.Instance.StartRecording(_spacecraftController.Transform);
                 }));
             }
             else if (_state == CoreGameState.Paused)
             {
                 _spacecraftController.Activate(new SpacecraftData(_levelConfigData.SpacecraftSize));
                 UpdateState(CoreGameState.Running);
+
+                CSVManager.Instance.StartRecording(_spacecraftController.Transform);
             }
         }
 
