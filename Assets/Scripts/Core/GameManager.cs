@@ -11,6 +11,7 @@ namespace com.hive.projectr
         private ConfigDataManager _configManager;
         private CSVManager _csvManager;
         private InputManager _inputManager;
+        private SettingManager _settingManager;
         private MonoBehaviourUtil _monoBehaviourUtil;
 
         private bool _isGameInitialized;
@@ -37,6 +38,9 @@ namespace com.hive.projectr
 
             _inputManager = new InputManager(); // after camera
             _inputManager.OnInit();
+
+            _settingManager = new SettingManager();
+            _settingManager.OnInit();
 
             _monoBehaviourUtil = FindObjectOfType<MonoBehaviourUtil>();
             if (_monoBehaviourUtil == null)
@@ -69,6 +73,9 @@ namespace com.hive.projectr
 
             _inputManager.OnDispose();
             _inputManager = null;
+
+            _settingManager.OnDispose();
+            _settingManager = null;
 
             _monoBehaviourUtil = null;
         }

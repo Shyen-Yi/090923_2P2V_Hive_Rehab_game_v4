@@ -6,14 +6,11 @@ namespace com.hive.projectr
 {
     public class CSVManager : SingletonBase<CSVManager>, ICoreManager
     {
-        [SerializeField]
-        private Transform handObject; // Reference to the GameObject whose position we want to record
+        private Transform _handObj; // Reference to the GameObject whose position we want to record
+        private GameObject _asteroidObj = null; //Is Meteoroid correct? Sounds weird
 
-        private GameObject meteorObject = null; //Is Meteoroid correct? Sounds weird
-
-        private string filePath;
-        private StreamWriter csvWriter;
-        [SerializeField]
+        private string _filePath;
+        private StreamWriter _csvWriter;
         private float recordInterval = 0.1f; // Record position every 0.1 second
 
         private bool _isRecording;
@@ -35,7 +32,7 @@ namespace com.hive.projectr
         {
             if (_isRecording)
             {
-                if (handObject == null)
+                if (_handObj == null)
                 {
                     StopRecording();
                     return;
@@ -43,27 +40,27 @@ namespace com.hive.projectr
 
                 if (Time.time >= _nextWriteTime)
                 {
-                    meteorObject = GameObject.FindWithTag("Meteoroid");
+                    _asteroidObj = GameObject.FindWithTag("Asteroid");
 
-                    if (meteorObject == null)
+                    if (_asteroidObj == null)
                     {
                         // Record the current position and time with timestamp
                         string line = string.Format("{0:yyyy-MM-dd HH:mm:ss.fff},{1:F2},{2:F2}",
-                            System.DateTime.Now, handObject.position.x, handObject.position.y);
+                            System.DateTime.Now, _handObj.position.x, _handObj.position.y);
 
                         // Write the line to the CSV file
-                        csvWriter.WriteLine(line);
+                        _csvWriter.WriteLine(line);
                     }
                     else
                     {
                         // Handle the case where no object with the "Meteoroid" tag was found
                         // Debug.LogWarning("No object with the 'Meteoroid' tag was found.");
                         string line = string.Format("{0:yyyy-MM-dd HH:mm:ss.fff},{1:F2},{2:F2},{3:F2},{4:F2},",
-                            System.DateTime.Now, handObject.position.x, handObject.position.y,
-                                                 meteorObject.transform.position.x, meteorObject.transform.position.y);
+                            System.DateTime.Now, _handObj.position.x, _handObj.position.y,
+                                                 _asteroidObj.transform.position.x, _asteroidObj.transform.position.y);
 
                         // Write the line to the CSV file
-                        csvWriter.WriteLine(line);
+                        _csvWriter.WriteLine(line);
                     }
 
                     // Wait for the specified interval
@@ -72,8 +69,16 @@ namespace com.hive.projectr
             }
         }
 
-        public void StartRecording()
+        public void StartRecording(Transform handObj)
         {
+            _handObj = handObj;
+
+            if (_csvWriter != null)
+            {
+                _isRecording = true;
+                return;
+            }
+
             // Get the current date and time
             System.DateTime currentTime = System.DateTime.Now;
 
@@ -90,18 +95,24 @@ namespace com.hive.projectr
             }
 
             // Define the file path for the CSV file with the date and time in the name
-            filePath = folderPath + "movement_data_" + dateTimeString + ".csv";
+            _filePath = folderPath + "movement_data_" + dateTimeString + ".csv";
 
             // Create or overwrite the CSV file
-            csvWriter = new StreamWriter(filePath, false);
+            _csvWriter = new StreamWriter(_filePath, false);
 
             // Write headers to the CSV file
-            csvWriter.WriteLine("Time,CursorX,CursorY,MeteorX,MeteorY");
-            csvWriter.WriteLine(string.Format("{0:yyyy-MM-dd HH:mm:ss.fff},{1:F2},{2:F2},{3:F2},{4:F2}",
+            _csvWriter.WriteLine("Time,CursorX,CursorY,MeteorX,MeteorY");
+            _csvWriter.WriteLine(string.Format("{0:yyyy-MM-dd HH:mm:ss.fff},{1:F2},{2:F2},{3:F2},{4:F2}",
                  currentTime, 0, 0, 0, 0));
 
             // Start recording
             _isRecording = true;
+        }
+
+        public void PauseRecording()
+        {
+            _isRecording = false;
+            _csvWriter.WriteLine("######################## PAUSED ########################");
         }
 
         public void StopRecording()
@@ -109,10 +120,10 @@ namespace com.hive.projectr
             _isRecording = false;
 
             // Close the CSV file when recording is terminated
-            if (csvWriter != null)
+            if (_csvWriter != null)
             {
-                csvWriter.Close();
-                csvWriter = null;
+                _csvWriter.Close();
+                _csvWriter = null;
             }
         }
     }

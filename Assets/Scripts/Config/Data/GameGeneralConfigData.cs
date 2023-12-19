@@ -60,9 +60,6 @@ namespace com.hive.projectr
 	{
 		private GameGeneralSOItem _item;
 
-		public Int32 DefaultLevel => _item.DefaultLevel;
-		public Int32 MinLevel => _item.MinLevel;
-		public Int32 MaxLevel => _item.MaxLevel;
 		public Int32 DefaultGoal => _item.DefaultGoal;
 		public Int32 MinGoal => _item.MinGoal;
 		public Int32 MaxGoal => _item.MaxGoal;

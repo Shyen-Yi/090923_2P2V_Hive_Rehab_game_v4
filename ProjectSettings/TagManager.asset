@@ -13,6 +13,7 @@ TagManager:
   - VacuumAir
   - VacuumBase
   - Spacecraft
+  - Asteroid
   layers:
   - Default
   - TransparentFX
