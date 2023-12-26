@@ -12,6 +12,8 @@ namespace com.hive.projectr
         private CSVManager _csvManager;
         private InputManager _inputManager;
         private SettingManager _settingManager;
+        private LevelManager _levelManager;
+
         private MonoBehaviourUtil _monoBehaviourUtil;
 
         private bool _isGameInitialized;
@@ -41,6 +43,9 @@ namespace com.hive.projectr
 
             _settingManager = new SettingManager();
             _settingManager.OnInit();
+
+            _levelManager = new LevelManager();
+            _levelManager.OnInit();
 
             _monoBehaviourUtil = FindObjectOfType<MonoBehaviourUtil>();
             if (_monoBehaviourUtil == null)
@@ -76,6 +81,9 @@ namespace com.hive.projectr
 
             _settingManager.OnDispose();
             _settingManager = null;
+
+            _levelManager.OnDispose();
+            _levelManager = null;
 
             _monoBehaviourUtil = null;
         }

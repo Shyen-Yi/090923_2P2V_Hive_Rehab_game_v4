@@ -59,17 +59,24 @@ namespace com.hive.projectr
         private void OnStartButtonClick()
         {
             if (DebugConfig.GetData().EnableCalibration) 
-            { 
-                GameSceneManager.Instance.ShowScene(SceneNames.Calibration);
+            {
+                GameSceneManager.Instance.ShowScene(SceneNames.TransitionCalibration);
             }
             else
             {
                 GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, new CoreGameData(
                     new Vector3(0, 0),
                     new Vector3(Screen.width, Screen.height),
-                    new Vector3(Screen.width / 2, Screen.height / 2), 
-                    1, 
+                    new Vector3(Screen.width / 2, Screen.height / 2),
+                    1,
                     SettingManager.Instance.Level));
+
+                //GameSceneManager.Instance.ShowScene(SceneNames.TransitionCoreGame, new CoreGameData(
+                //    new Vector3(0, 0),
+                //    new Vector3(Screen.width, Screen.height),
+                //    new Vector3(Screen.width / 2, Screen.height / 2),
+                //    1,
+                //    SettingManager.Instance.Level));
             }
         }
 

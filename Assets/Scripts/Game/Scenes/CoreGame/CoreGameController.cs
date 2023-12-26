@@ -336,6 +336,9 @@ namespace com.hive.projectr
             yield return new WaitForSeconds(_levelConfigData.AsteroidSpawnGapSec);
 
             var isPassed = _collectedAsteroidCount >= _levelConfigData.NumOfAsteroidCollectedToPass;
+
+            LevelManager.Instance.OnLevelCompleted(_levelConfigData.Level, isPassed);
+
             if (isPassed)
             {
                 GameSceneManager.Instance.ShowScene(SceneNames.CoreGameLevelPassed, new CoreGameLevelPassedData(new CoreGameData(_bottomLeftScreenPos, _topRightScreenPos, _centerScreenPos, _spacecraftMovementScale, _levelConfigData.Level)), ()=>
@@ -345,7 +348,7 @@ namespace com.hive.projectr
             }
             else
             {
-                GameSceneManager.Instance.ShowScene(SceneNames.CoreGameLevelFailed, new CoreGameData(_bottomLeftScreenPos, _topRightScreenPos, _centerScreenPos, _spacecraftMovementScale, _levelConfigData.Level), ()=> 
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGameLevelFailed, new CoreGameLevelFailedData(new CoreGameData(_bottomLeftScreenPos, _topRightScreenPos, _centerScreenPos, _spacecraftMovementScale, _levelConfigData.Level)), ()=> 
                 { 
                     GameSceneManager.Instance.HideScene(SceneName);
                 });
@@ -460,6 +463,8 @@ namespace com.hive.projectr
 
                 CSVManager.Instance.StartRecording(_spacecraftController.Transform);
             }
+
+            LevelManager.Instance.OnLevelStarted(_levelConfigData.Level);
         }
 
         private IEnumerator CountdownRoutine(Action onCountdownFinished)

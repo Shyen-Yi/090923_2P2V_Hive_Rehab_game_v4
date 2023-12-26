@@ -52,6 +52,8 @@ namespace com.hive.projectr
         private HashSet<string> _scenesLoading;
         private Dictionary<string, GameSceneData> _sceneDataDict;
 
+        private static int LoadedSceneId = 0;
+
         #region Lifecycle
         public void OnInit()
         {
@@ -91,6 +93,7 @@ namespace com.hive.projectr
             {
                 if (pair.Value.index > topSceneIndex)
                 {
+                    topSceneIndex = pair.Value.index;
                     topSceneData = pair.Value;
                 }
             }
@@ -210,10 +213,11 @@ namespace com.hive.projectr
             }
 
             var sceneControllerBase = Activator.CreateInstance(sceneControllerType) as GameSceneControllerBase;
-            var index = _sceneDataDict.Count;
-            sceneControllerBase.Init(new GameSceneInitData(loadedScene, index));
+            var id = ++LoadedSceneId;
+            sceneControllerBase.Init(new GameSceneInitData(loadedScene, id));
             sceneControllerBase.Show(data.sceneData, GameSceneShowState.New);
-            _sceneDataDict[data.sceneName] = new GameSceneData(index, data.sceneName, data.sceneData, sceneControllerBase);
+
+            _sceneDataDict[data.sceneName] = new GameSceneData(id, data.sceneName, data.sceneData, sceneControllerBase);
 
             // check loading queue
             while (_scenesToLoad.Count > 0)

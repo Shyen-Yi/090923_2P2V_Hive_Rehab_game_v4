@@ -20,10 +20,14 @@ namespace com.hive.projectr
 		[SerializeField] private Int32 minGoal;
 		[SerializeField] private Int32 maxGoal;
 		[SerializeField] private Single coreGameTransitionSec;
+		[SerializeField] private Single calibrationTransitionSec;
+		[SerializeField] private Int32 passingStreakToNextLevel;
 
 		public Int32 DefaultGoal => defaultGoal;
 		public Int32 MinGoal => minGoal;
 		public Int32 MaxGoal => maxGoal;
 		public Single CoreGameTransitionSec => coreGameTransitionSec;
+		public Single CalibrationTransitionSec => calibrationTransitionSec;
+		public Int32 PassingStreakToNextLevel => passingStreakToNextLevel;
     }
 }

@@ -478,7 +478,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Warm Up
+  m_text: Calibration
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 688c9948b3a9743d1a90be4e4a6a1238, type: 2}
   m_sharedMaterial: {fileID: 6033241020593286764, guid: 688c9948b3a9743d1a90be4e4a6a1238, type: 2}
@@ -628,8 +628,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Try to reach your hand as far as possible.f sad sad asasdioa jais fuhff
-    suf hsaiou hsi fhoifs fhofioihf ifh if '
+  m_text: Follow the instructions to reach your hand as far as possible.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
   m_sharedMaterial: {fileID: 2164040, guid: 5302535af1044152a457ed104f1f4b91, type: 2}

@@ -828,7 +828,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 15, y: 0}
   m_SizeDelta: {x: 700, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &921478783
@@ -1104,7 +1104,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8327762530413410758, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 760
       objectReference: {fileID: 0}
     - target: {fileID: 8327762530413410758, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
       propertyPath: m_SizeDelta.y
@@ -1140,7 +1140,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8327762530413410758, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 8327762530413410758, guid: 6cb780af63f61534ba4ce2de77d8cf96, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -1336,7 +1336,7 @@ PrefabInstance:
     - target: {fileID: 7463405895935107300, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: c895423974b504e9294da715093cfe2b, type: 3}
+      objectReference: {fileID: 21300000, guid: 28b0fe4edb7c380448331df717eaea9a, type: 3}
     m_RemovedComponents:
     - {fileID: -2631185847326900083, guid: c49b89fc255bc3546a6b538e89e7e118, type: 3}
     m_RemovedGameObjects: []
@@ -1417,7 +1417,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: AGAIN!
+  m_text: PLAY
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 688c9948b3a9743d1a90be4e4a6a1238, type: 2}
   m_sharedMaterial: {fileID: 6033241020593286764, guid: 688c9948b3a9743d1a90be4e4a6a1238, type: 2}
@@ -1845,10 +1845,10 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 21300000, guid: 4b13f633ed77a469d96d33bcc8b46594, type: 3}
-    m_PressedSprite: {fileID: 21300000, guid: 4b13f633ed77a469d96d33bcc8b46594, type: 3}
+    m_HighlightedSprite: {fileID: 21300000, guid: 274579b1a842abb4eb038fb9cc0f1956, type: 3}
+    m_PressedSprite: {fileID: 21300000, guid: 274579b1a842abb4eb038fb9cc0f1956, type: 3}
     m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 21300000, guid: c895423974b504e9294da715093cfe2b, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: 28b0fe4edb7c380448331df717eaea9a, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -2043,6 +2043,7 @@ MonoBehaviour:
   _extraSprites: []
   _extraColorGradients: []
   _extraAnimators: []
+  _extraRenderers: []
 --- !u!1 &1900371663
 GameObject:
   m_ObjectHideFlags: 0
