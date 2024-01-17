@@ -74,7 +74,7 @@ namespace com.hive.projectr
             foreach (var canvas in canvases)
             {
                 canvas.worldCamera = CameraManager.Instance.UICamera;
-                canvas.sortingOrder += Index * 10000;
+                canvas.sortingOrder += Index * 100;
             }
 
             OnInit();

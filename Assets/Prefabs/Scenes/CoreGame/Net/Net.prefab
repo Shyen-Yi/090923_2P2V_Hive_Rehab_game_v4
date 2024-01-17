@@ -473,7 +473,7 @@ MonoBehaviour:
   _extraButtons: []
   _extraObjects: []
   _extraGameObjects: []
-  _extraInts: 
+  _extraInts: 96000000
   _extraCanvasGroups: []
   _extraImages: []
   _extraSpriteAtlases: []

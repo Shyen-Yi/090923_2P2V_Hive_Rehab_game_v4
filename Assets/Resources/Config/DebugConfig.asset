@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: DebugConfig
   m_EditorClassIdentifier: 
   _items:
-  - enableCalibration: 0
+  - enableCalibration: 1

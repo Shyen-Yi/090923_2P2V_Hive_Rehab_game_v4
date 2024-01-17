@@ -21,5 +21,6 @@ namespace com.hive.projectr
         public static string CalibrationErrorProtection = "CalibrationErrorProtection";
         public static string CoreGameLevelPassed = "CoreGameLevelPassed";
         public static string CoreGameLevelFailed = "CoreGameLevelFailed";
+        public static string TransitionCalibration = "TransitionCalibration";
     }
 }

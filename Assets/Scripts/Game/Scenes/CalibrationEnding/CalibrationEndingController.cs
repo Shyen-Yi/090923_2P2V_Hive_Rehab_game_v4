@@ -97,10 +97,15 @@ namespace com.hive.projectr
 
         private void OnPlayButtonClick()
         {
-            GameSceneManager.Instance.ShowScene(SceneNames.TransitionCoreGame, new TransitionCoreGameData(_coreGameData), () =>
+            GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
             {
                 GameSceneManager.Instance.HideScene(SceneName);
             });
+
+            //GameSceneManager.Instance.ShowScene(SceneNames.TransitionCoreGame, new TransitionCoreGameData(_coreGameData), () =>
+            //{
+            //    GameSceneManager.Instance.HideScene(SceneName);
+            //});
         }
         #endregion
     }

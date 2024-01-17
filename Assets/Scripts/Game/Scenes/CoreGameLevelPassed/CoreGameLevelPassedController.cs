@@ -21,8 +21,9 @@ namespace com.hive.projectr
         private enum ExtraBtn
         {
             Exit = 0,
-            Replay = 1,
+            Play = 1,
             NextLevel = 2,
+            Replay = 3,
         }
 
         private enum ExtraTMP
@@ -31,8 +32,9 @@ namespace com.hive.projectr
         }
 
         private HiveButton _exitButton;
-        private HiveButton _replayButton;
+        private HiveButton _playButton;
         private HiveButton _nextLevelButton;
+        private HiveButton _replayButton;
 
         private TMP_Text _contentText;
         #endregion
@@ -51,8 +53,9 @@ namespace com.hive.projectr
         private void InitExtra()
         {
             _exitButton = Config.ExtraButtons[(int)ExtraBtn.Exit];
-            _replayButton = Config.ExtraButtons[(int)ExtraBtn.Replay];
+            _playButton = Config.ExtraButtons[(int)ExtraBtn.Play];
             _nextLevelButton = Config.ExtraButtons[(int)ExtraBtn.NextLevel];
+            _replayButton = Config.ExtraButtons[(int)ExtraBtn.Replay];
 
             _contentText = Config.ExtraTextMeshPros[(int)ExtraTMP.Content];
         }
@@ -64,7 +67,27 @@ namespace com.hive.projectr
                 _coreGameData = pData.coreGameData;
             }
 
-            _nextLevelButton.gameObject.SetActive(_coreGameData.level < CoreGameLevelConfig.MaxLevel);
+            if (_coreGameData.level < CoreGameLevelConfig.MaxLevel)
+            {
+                _replayButton.gameObject.SetActive(false);
+
+                if (LevelManager.Instance.LatestLevelPassedStreak < GameGeneralConfig.GetData().PassingStreakToNextLevel)
+                {
+                    _playButton.gameObject.SetActive(true);
+                    _nextLevelButton.gameObject.SetActive(false);
+                }
+                else
+                {
+                    _playButton.gameObject.SetActive(false);
+                    _nextLevelButton.gameObject.SetActive(true);
+                }
+            }
+            else
+            {
+                _replayButton.gameObject.SetActive(true);
+                _playButton.gameObject.SetActive(false);
+                _nextLevelButton.gameObject.SetActive(false);
+            }
 
             var feautureInfoList = FeatureInfoConfig.GetDataForFeature(FeatureType.CoreGameLevelPassed);
             if (feautureInfoList.Count > 0)
@@ -87,15 +110,17 @@ namespace com.hive.projectr
         private void BindActions()
         {
             _exitButton.onClick.AddListener(OnExitButtonClick);
-            _replayButton.onClick.AddListener(OnReplayButtonClick);
+            _playButton.onClick.AddListener(OnPlayButtonClick);
             _nextLevelButton.onClick.AddListener(OnNextLevelButtonClick);
+            _replayButton.onClick.AddListener(OnReplayButtonClick);
         }
         
         private void UnbindActions()
         {
             _exitButton.onClick.RemoveAllListeners();
-            _replayButton.onClick.RemoveAllListeners();
+            _playButton.onClick.RemoveAllListeners();
             _nextLevelButton.onClick.RemoveAllListeners();
+            _replayButton.onClick.RemoveAllListeners();
         }
         #endregion
 
@@ -103,6 +128,14 @@ namespace com.hive.projectr
         private void OnExitButtonClick()
         {
             GameSceneManager.Instance.GoBack(SceneNames.MainMenu);
+        }
+
+        private void OnPlayButtonClick()
+        {
+            GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
+            {
+                GameSceneManager.Instance.HideScene(SceneName);
+            });
         }
 
         private void OnReplayButtonClick()
