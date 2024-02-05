@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _items:
   - asteroidSpinRoundPerSec: 0.7
-    startCountdownSec: 3
+    startCountdownSec: 5
