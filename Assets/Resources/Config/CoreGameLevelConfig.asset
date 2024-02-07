@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _items:
   - level: 1
-    asteroidSpeed: 6
-    asteroidSize: 1
+    asteroidSpeed: 10
+    asteroidSize: 10
     asteroidLifeTime: 5
     asteroidMovement:
       serializedVersion: 2
@@ -44,11 +44,11 @@ MonoBehaviour:
     asteroidSpawnGapSec: 2
     vacuumSize: 1
     spacecraftSize: 1
-    maxAsteroidCount: 10
-    numOfAsteroidCollectedToPass: 8
+    maxAsteroidCount: 5
+    numOfAsteroidCollectedToPass: 1
   - level: 2
-    asteroidSpeed: 6
-    asteroidSize: 1
+    asteroidSpeed: 5
+    asteroidSize: 5
     asteroidLifeTime: 5
     asteroidMovement:
       serializedVersion: 2
@@ -77,8 +77,8 @@ MonoBehaviour:
     asteroidSpawnGapSec: 2
     vacuumSize: 1
     spacecraftSize: 1
-    maxAsteroidCount: 10
-    numOfAsteroidCollectedToPass: 8
+    maxAsteroidCount: 5
+    numOfAsteroidCollectedToPass: 1
   - level: 3
     asteroidSpeed: 6
     asteroidSize: 1
@@ -111,7 +111,7 @@ MonoBehaviour:
     vacuumSize: 1
     spacecraftSize: 1
     maxAsteroidCount: 10
-    numOfAsteroidCollectedToPass: 8
+    numOfAsteroidCollectedToPass: 1
   - level: 4
     asteroidSpeed: 6
     asteroidSize: 1
@@ -144,7 +144,7 @@ MonoBehaviour:
     vacuumSize: 1
     spacecraftSize: 1
     maxAsteroidCount: 10
-    numOfAsteroidCollectedToPass: 8
+    numOfAsteroidCollectedToPass: 1
   - level: 5
     asteroidSpeed: 4
     asteroidSize: 1
@@ -276,7 +276,7 @@ MonoBehaviour:
     vacuumSize: 1
     spacecraftSize: 1
     maxAsteroidCount: 10
-    numOfAsteroidCollectedToPass: 8
+    numOfAsteroidCollectedToPass: 1
   - level: 9
     asteroidSpeed: 6
     asteroidSize: 1
@@ -309,7 +309,7 @@ MonoBehaviour:
     vacuumSize: 1
     spacecraftSize: 1
     maxAsteroidCount: 10
-    numOfAsteroidCollectedToPass: 8
+    numOfAsteroidCollectedToPass: 1
   - level: 10
     asteroidSpeed: 6
     asteroidSize: 1
@@ -342,4 +342,4 @@ MonoBehaviour:
     vacuumSize: 1
     spacecraftSize: 1
     maxAsteroidCount: 10
-    numOfAsteroidCollectedToPass: 8
+    numOfAsteroidCollectedToPass: 1
