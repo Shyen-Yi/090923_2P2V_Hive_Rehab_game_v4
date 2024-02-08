@@ -38,19 +38,9 @@ namespace com.hive.projectr
             _config.AirConfig.Animator.SetBool(AirIsActiveBoolHash, false);
         }
 
-        public void SetScale(float scale)
+        public void SetAirSize(float scale)
         {
-            switch (_config.Type)
-            {
-                case VacuumType.Top:
-                case VacuumType.Bottom:
-                    _config.transform.localScale = new Vector3(_initScale.x * scale, _initScale.y, _initScale.z);
-                    break;
-                case VacuumType.Left:
-                case VacuumType.Right:
-                    _config.transform.localScale = new Vector3(_initScale.x, _initScale.y * scale, _initScale.z);
-                    break;
-            }
+            _config.AirConfig.transform.localScale = new Vector3(_initScale.x * scale, _initScale.y, _initScale.z);
         }
     }
 }

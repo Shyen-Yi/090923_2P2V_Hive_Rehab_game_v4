@@ -423,7 +423,7 @@ namespace com.hive.projectr
             foreach (var controller in _vacuumControllers.Values)
             {
                 controller.Deactivate();
-                controller.SetScale(_levelConfigData.VacuumSize);
+                controller.SetAirSize(_levelConfigData.VacuumSize);
             }
 
             _spacecraftController.Deactivate();
