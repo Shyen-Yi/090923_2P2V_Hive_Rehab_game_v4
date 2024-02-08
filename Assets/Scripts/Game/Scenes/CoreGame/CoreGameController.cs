@@ -419,9 +419,11 @@ namespace com.hive.projectr
         {
             UpdateState(CoreGameState.NotStarted);
 
+            // vacuums
             foreach (var controller in _vacuumControllers.Values)
             {
                 controller.Deactivate();
+                controller.SetScale(_levelConfigData.VacuumSize);
             }
 
             _spacecraftController.Deactivate();
