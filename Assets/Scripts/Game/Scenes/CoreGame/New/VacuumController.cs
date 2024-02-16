@@ -40,7 +40,7 @@ namespace com.hive.projectr
 
         public void SetAirSize(float scale)
         {
-            _config.AirConfig.transform.localScale = new Vector3(_initScale.x * scale, _initScale.y, _initScale.z);
+            _config.transform.localScale = new Vector3(_initScale.x * scale, _initScale.y, _initScale.z);
         }
     }
 }
