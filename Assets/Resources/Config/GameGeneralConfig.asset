@@ -16,6 +16,6 @@ MonoBehaviour:
   - defaultGoal: 80
     minGoal: 50
     maxGoal: 100
-    coreGameTransitionSec: 5
+    coreGameTransitionSec: 2
     calibrationTransitionSec: 5
-    passingStreakToNextLevel: 2
+    passingStreakToNextLevel: 1
