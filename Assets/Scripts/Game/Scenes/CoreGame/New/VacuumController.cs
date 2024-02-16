@@ -19,7 +19,7 @@ namespace com.hive.projectr
         {
             _config = config;
 
-            _initScale = _config.transform.localScale;
+            _initScale = _config.VisualScalableRoot.localScale;
         }
 
         public void Activate()
@@ -40,7 +40,7 @@ namespace com.hive.projectr
 
         public void SetAirSize(float scale)
         {
-            _config.transform.localScale = new Vector3(_initScale.x * scale, _initScale.y, _initScale.z);
+            _config.VisualScalableRoot.localScale = new Vector3(_initScale.x * scale, _initScale.y, _initScale.z);
         }
     }
 }

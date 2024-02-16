@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _items:
   - level: 1
-    asteroidSpeed: 10
-    asteroidSize: 10
-    asteroidLifeTime: 5
+    asteroidSpeed: 3
+    asteroidSize: 1.2
+    asteroidLifeTime: 8
     asteroidMovement:
       serializedVersion: 2
       m_Curve:
@@ -45,11 +45,11 @@ MonoBehaviour:
     vacuumSize: 1
     spacecraftSize: 1
     maxAsteroidCount: 5
-    numOfAsteroidCollectedToPass: 1
+    numOfAsteroidCollectedToPass: 4
   - level: 2
     asteroidSpeed: 5
-    asteroidSize: 5
-    asteroidLifeTime: 5
+    asteroidSize: 1
+    asteroidLifeTime: 6
     asteroidMovement:
       serializedVersion: 2
       m_Curve:
@@ -75,14 +75,14 @@ MonoBehaviour:
       m_PostInfinity: 0
       m_RotationOrder: 0
     asteroidSpawnGapSec: 2
-    vacuumSize: 1
-    spacecraftSize: 1
+    vacuumSize: 0.5
+    spacecraftSize: 0.8
     maxAsteroidCount: 5
-    numOfAsteroidCollectedToPass: 1
+    numOfAsteroidCollectedToPass: 4
   - level: 3
-    asteroidSpeed: 6
-    asteroidSize: 1
-    asteroidLifeTime: 5
+    asteroidSpeed: 7
+    asteroidSize: 0.8
+    asteroidLifeTime: 4
     asteroidMovement:
       serializedVersion: 2
       m_Curve:
@@ -108,14 +108,14 @@ MonoBehaviour:
       m_PostInfinity: 0
       m_RotationOrder: 0
     asteroidSpawnGapSec: 2
-    vacuumSize: 1
-    spacecraftSize: 1
+    vacuumSize: 0.3
+    spacecraftSize: 0.75
     maxAsteroidCount: 10
-    numOfAsteroidCollectedToPass: 1
+    numOfAsteroidCollectedToPass: 8
   - level: 4
-    asteroidSpeed: 6
-    asteroidSize: 1
-    asteroidLifeTime: 5
+    asteroidSpeed: 10
+    asteroidSize: 0.4
+    asteroidLifeTime: 3
     asteroidMovement:
       serializedVersion: 2
       m_Curve:
@@ -141,10 +141,10 @@ MonoBehaviour:
       m_PostInfinity: 0
       m_RotationOrder: 0
     asteroidSpawnGapSec: 2
-    vacuumSize: 1
-    spacecraftSize: 1
+    vacuumSize: 0.1
+    spacecraftSize: 0.5
     maxAsteroidCount: 10
-    numOfAsteroidCollectedToPass: 1
+    numOfAsteroidCollectedToPass: 8
   - level: 5
     asteroidSpeed: 4
     asteroidSize: 1
