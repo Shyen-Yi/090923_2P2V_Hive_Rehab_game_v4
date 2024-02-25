@@ -18,8 +18,10 @@ namespace com.hive.projectr
         
 		[SerializeField] private Single asteroidSpinRoundPerSec;
 		[SerializeField] private Int32 startCountdownSec;
+		[SerializeField] private Int32 infoTextUpdateSec;
 
 		public Single AsteroidSpinRoundPerSec => asteroidSpinRoundPerSec;
 		public Int32 StartCountdownSec => startCountdownSec;
+		public Int32 InfoTextUpdateSec => infoTextUpdateSec;
     }
 }

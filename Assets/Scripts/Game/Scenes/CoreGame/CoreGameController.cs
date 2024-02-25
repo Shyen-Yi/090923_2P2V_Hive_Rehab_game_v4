@@ -51,6 +51,8 @@ namespace com.hive.projectr
         private int _endedAsteroidCount;
         private int _collectedAsteroidCount;
         private float _nextAsteroidSpawnTime;
+        private float _levelRunningTime;
+        private string _currentInfo;
 
         private static readonly int CountdownTriggerHash = Animator.StringToHash("Count");
         #endregion
@@ -77,6 +79,7 @@ namespace com.hive.projectr
         private enum ExtraTMP
         {
             Countdown = 0,
+            Info = 1,
         }
 
         private enum ExtraAnimator
@@ -108,6 +111,7 @@ namespace com.hive.projectr
         private Transform _raycastBlocker;
 
         private TMP_Text _countdownText;
+        private TMP_Text _infoText;
 
         private Animator _countdownAnimator;
 
@@ -148,6 +152,7 @@ namespace com.hive.projectr
             _raycastBlocker = Config.ExtraObjects[(int)ExtraObj.RaycastBlocker];
 
             _countdownText = Config.ExtraTextMeshPros[(int)ExtraTMP.Countdown];
+            _infoText = Config.ExtraTextMeshPros[(int)ExtraTMP.Info];
 
             _countdownAnimator = Config.ExtraAnimators[(int)ExtraAnimator.Countdown];
 
@@ -235,6 +240,7 @@ namespace com.hive.projectr
 
             AsteroidProgressTick();
             SpacecraftMovementTick();
+            InfoTextTick();
 
             // debug
             if (InputManager.GetKeyDown(KeyCode.UpArrow))
@@ -388,9 +394,40 @@ namespace com.hive.projectr
             var spacecraftWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(spacecraftScreenPos);
             _spacecraftController.SetWorldPos(new Vector3(spacecraftWorldPos.x, spacecraftWorldPos.y, _spacecraftController.GetWorldPos().z));
         }
+
+        private void InfoTextTick()
+        {
+            if (_state == CoreGameState.Running)
+            {
+                var coreGameData = CoreGameConfig.GetData();
+                _levelRunningTime += Time.deltaTime;
+                var infoIndex = (_levelRunningTime / coreGameData.InfoTextUpdateSec) % 2;
+                switch (infoIndex)
+                {
+                    case 0:
+                        RefreshInfoText($"Catch, Destroy, Collect");
+                        break;
+                    case 1:
+                        RefreshInfoText($"Level {_levelConfigData.Level}");
+                        break;
+                    default:
+                        Debug.LogError($"Undefined core game info index: {infoIndex}");
+                        break;
+                }
+            }
+        }
         #endregion
 
         #region Content
+        private void RefreshInfoText(string info)
+        {
+            if (!string.IsNullOrEmpty(_currentInfo) && _currentInfo == info)
+                return;
+
+            _currentInfo = info;
+            _infoText.text = _currentInfo;
+        }
+
         private void RefreshProgress()
         {
             var current = _endedAsteroidCount;

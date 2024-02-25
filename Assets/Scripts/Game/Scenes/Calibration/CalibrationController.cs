@@ -90,7 +90,7 @@ namespace com.hive.projectr
         
         private Dictionary<CalibrationStageType, CalibrationMarkController> _markDict;
         private CalibrationMarkerController _marker;
-        private SpacecraftController _spacecraftController;
+        private SpacecraftCalibrationController _spacecraftController;
 
         private HiveButton _crossButton;
         private HiveButton _redoButton;
@@ -136,7 +136,7 @@ namespace com.hive.projectr
             var markerConfig = Config.ExtraWidgetConfigs[(int)ExtraConfig.Marker];
             _marker = new CalibrationMarkerController(markerConfig);
             var spacecraftConfig = (SpacecraftConfig)Config.ExtraWidgetConfigs[(int)ExtraConfig.Spacecraft];
-            _spacecraftController = new SpacecraftController(spacecraftConfig);
+            _spacecraftController = new SpacecraftCalibrationController(spacecraftConfig);
 
             _crossButton = Config.ExtraButtons[(int)ExtraBtn.Cross];
             _redoButton = Config.ExtraButtons[(int)ExtraBtn.Redo];

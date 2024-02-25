@@ -17,7 +17,7 @@ namespace com.hive.projectr
     {
         public Transform Transform => _config.transform;
 
-        private SpacecraftConfig _config;
+        protected SpacecraftConfig _config;
         private bool _isMoving;
         private bool _isCapturing;
         private bool _isActive;

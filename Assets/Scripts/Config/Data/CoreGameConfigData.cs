@@ -62,6 +62,7 @@ namespace com.hive.projectr
 
 		public Single AsteroidSpinRoundPerSec => _item.AsteroidSpinRoundPerSec;
 		public Int32 StartCountdownSec => _item.StartCountdownSec;
+		public Int32 InfoTextUpdateSec => _item.InfoTextUpdateSec;
 
 		public CoreGameConfigData(CoreGameSOItem item)
 		{
