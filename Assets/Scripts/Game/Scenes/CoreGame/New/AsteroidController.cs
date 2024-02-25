@@ -157,14 +157,14 @@ namespace com.hive.projectr
             {
                 _onEnterVacuumAir?.Invoke(Id);
             }
-            else if (collision.gameObject.CompareTag(TagNames.Spacecraft))
+            else if (collision.gameObject.CompareTag(TagNames.Spacecraft) && !IsCaptured())
             {
                 _capturingOwner = collision.transform;
                 _offsetFromOwner = _config.transform.position - _capturingOwner.position;
                 _config.Rigidbody2D.velocity = Vector2.zero;
                 _onCaptured?.Invoke(Id);
             }
-            else if (collision.gameObject.CompareTag(TagNames.VacuumBase))
+            else if (collision.gameObject.CompareTag(TagNames.VacuumBase) && !IsCaptured())
             {
                 // reflect
                 if (collision.gameObject.TryGetComponent<VacuumBaseConfig>(out var baseConfig))

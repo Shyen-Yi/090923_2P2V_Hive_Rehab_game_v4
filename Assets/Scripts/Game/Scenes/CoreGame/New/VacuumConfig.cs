@@ -17,9 +17,11 @@ namespace com.hive.projectr
         [SerializeField] private VacuumType _type;
         [SerializeField] private VacuumBaseConfig _baseConfig;
         [SerializeField] private VacuumAirConfig _airConfig;
+        [SerializeField] private Transform _visualScalableRoot;
 
         public VacuumType Type => _type;
         public VacuumBaseConfig BaseConfig => _baseConfig;
         public VacuumAirConfig AirConfig => _airConfig;
+        public Transform VisualScalableRoot => _visualScalableRoot;
     }
 }

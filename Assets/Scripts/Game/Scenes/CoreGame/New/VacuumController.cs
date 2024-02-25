@@ -10,6 +10,7 @@ namespace com.hive.projectr
 
         private VacuumConfig _config;
         private bool _isActive;
+        private Vector3 _initScale;
 
         private static readonly int AirIsActiveBoolHash = Animator.StringToHash("isActive");
         private static readonly int BaseIsActiveBoolHash = Animator.StringToHash("isActive");
@@ -17,6 +18,8 @@ namespace com.hive.projectr
         public VacuumController(VacuumConfig config)
         {
             _config = config;
+
+            _initScale = _config.VisualScalableRoot.localScale;
         }
 
         public void Activate()
@@ -33,6 +36,11 @@ namespace com.hive.projectr
 
             _config.BaseConfig.Animator.SetBool(BaseIsActiveBoolHash, false);
             _config.AirConfig.Animator.SetBool(AirIsActiveBoolHash, false);
+        }
+
+        public void SetAirSize(float scale)
+        {
+            _config.VisualScalableRoot.localScale = new Vector3(_initScale.x * scale, _initScale.y, _initScale.z);
         }
     }
 }
