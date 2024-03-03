@@ -16,4 +16,4 @@ MonoBehaviour:
   - arrowWorldDistanceFromCenter: 1
     stageErrorProtectionTriggerTime: 30
     holdingMaxScreenOffset: 40
-    pendingMarkerAlpha: 0.5
+    pendingMarkerAlpha: 0.2

@@ -15,4 +15,5 @@ MonoBehaviour:
   _items:
   - asteroidSpinRoundPerSec: 0.7
     startCountdownSec: 3
-    infoTextUpdateSec: 20
+    infoTextUpdateSec: 10
+    gameProgressFillSec: 0.15
