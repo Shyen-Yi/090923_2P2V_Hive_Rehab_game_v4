@@ -63,6 +63,7 @@ namespace com.hive.projectr
 		public Single ArrowWorldDistanceFromCenter => _item.ArrowWorldDistanceFromCenter;
 		public Single StageErrorProtectionTriggerTime => _item.StageErrorProtectionTriggerTime;
 		public Single HoldingMaxScreenOffset => _item.HoldingMaxScreenOffset;
+		public Single PendingMarkerAlpha => _item.PendingMarkerAlpha;
 
 		public CalibrationConfigData(CalibrationSOItem item)
 		{
