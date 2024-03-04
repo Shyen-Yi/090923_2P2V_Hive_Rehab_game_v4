@@ -3,6 +3,7 @@ namespace com.hive.projectr
 {
 	public enum PerformanceType
 	{
+		None,
 		Adequate,
 		Competent,
 		Good,

@@ -359,6 +359,7 @@ namespace com.hive.projectr
             var isPassed = _collectedAsteroidCount >= _levelConfigData.NumOfAsteroidCollectedToPass;
 
             LevelManager.Instance.OnLevelCompleted(_levelConfigData.Level, isPassed);
+            StatsManager.Instance.OnLevelCompleted(new LevelStats(_levelConfigData.Level, _collectedAsteroidCount));
 
             if (isPassed)
             {
