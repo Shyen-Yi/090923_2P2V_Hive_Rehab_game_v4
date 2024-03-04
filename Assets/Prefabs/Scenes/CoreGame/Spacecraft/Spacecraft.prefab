@@ -148,7 +148,10 @@ MonoBehaviour:
   _extraRectTransforms: []
   _extraTextMeshPros: []
   _extraButtons: []
-  _extraObjects: []
+  _extraObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   _extraGameObjects: []
   _extraInts: 
   _extraCanvasGroups: []
@@ -520,6 +523,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1625588506897419761, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6467689737652502499, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
       propertyPath: m_Name
       value: FireLeft
@@ -606,6 +613,10 @@ PrefabInstance:
     - target: {fileID: 618887944498366165, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1625588506897419761, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6467689737652502499, guid: 726d87b53ce1dbb449d3e1f1511ee36f, type: 3}
       propertyPath: m_Name

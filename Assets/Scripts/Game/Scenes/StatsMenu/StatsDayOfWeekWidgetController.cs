@@ -32,13 +32,13 @@ namespace com.hive.projectr
             var activeCanvasGroup = config.ExtraCanvasGroups[(int)ExtraCG.Active];
             if (data.isActive)
             {
-                inactiveCanvasGroup.CanvasGroupOn();
-                activeCanvasGroup.CanvasGroupOff();
+                activeCanvasGroup.CanvasGroupOn();
+                inactiveCanvasGroup.CanvasGroupOff();
             }
             else
             {
-                inactiveCanvasGroup.CanvasGroupOff();
-                activeCanvasGroup.CanvasGroupOn();
+                activeCanvasGroup.CanvasGroupOff();
+                inactiveCanvasGroup.CanvasGroupOn();
             }
         }
     }

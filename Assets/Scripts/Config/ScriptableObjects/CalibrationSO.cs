@@ -19,9 +19,11 @@ namespace com.hive.projectr
 		[SerializeField] private Single arrowWorldDistanceFromCenter;
 		[SerializeField] private Single stageErrorProtectionTriggerTime;
 		[SerializeField] private Single holdingMaxScreenOffset;
+		[SerializeField] private Single pendingMarkerAlpha;
 
 		public Single ArrowWorldDistanceFromCenter => arrowWorldDistanceFromCenter;
 		public Single StageErrorProtectionTriggerTime => stageErrorProtectionTriggerTime;
 		public Single HoldingMaxScreenOffset => holdingMaxScreenOffset;
+		public Single PendingMarkerAlpha => pendingMarkerAlpha;
     }
 }

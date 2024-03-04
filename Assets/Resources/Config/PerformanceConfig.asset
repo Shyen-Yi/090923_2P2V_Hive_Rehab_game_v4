@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _items:
   - type: 0
-    desc: Adequate1Desc
-  - type: 0
-    desc: Adequate2Desc
-  - type: 1
-    desc: CompetentDesc
+    desc: 
+  - type: 6
+    desc: You've collected {0} more asteroids than last time. Keep going!
+  - type: 3
+    desc: Good job! Try to move steadily and as much as possible.

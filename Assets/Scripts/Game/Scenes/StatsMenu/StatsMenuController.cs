@@ -125,12 +125,54 @@ namespace com.hive.projectr
         #region Content
         private void RefreshPerformance()
         {
-
+            _performanceText.text = StatsManager.Instance.PerformanceType.ToString();
+            _remarkText.text = StatsManager.Instance.PerformanceDesc;
         }
 
         private void RefreshWeekly()
         {
+            var streak = StatsManager.Instance.PlayingStreak;
+            _streakText.text = streak == 1
+                ? $"{streak} DAY STREAK"
+                : $"{streak} DAYS STREAK";
 
+            var now = TimeManager.Instance.GetCurrentDateTime();
+            var dayOffset = DayOfWeek.Sunday == 0
+                ? (int)now.DayOfWeek
+                : (int)now.DayOfWeek - (int)DayOfWeek.Sunday;
+            for (var i = 0; i < 7; ++i)
+            {
+                var date = now.AddDays(-dayOffset + i);
+                var isPlayed = StatsManager.Instance.DidPlayOnDate(date);
+                var dayOfWeek = date.DayOfWeek;
+                switch (dayOfWeek)
+                {
+                    case DayOfWeek.Sunday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekSun, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Monday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekMon, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Tuesday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekTues, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Wednesday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekWed, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Thursday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekThurs, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Friday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekFri, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Saturday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekSat, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    default:
+                        Debug.LogError($"Invalid day of week: {dayOfWeek}");
+                        break;
+                }
+            }
         }
 
         private void RefreshMonthly()
@@ -149,7 +191,9 @@ namespace com.hive.projectr
                 var showRight = day % 7 != 0;
                 var showTop = day / 7 > 1;
                 var showBottom = !(day % 7 > 0 && daysInMonth / 7 == day / 7);
-                var data = new StatsDayOfMonthWidgetData(day, StatsDayOfMonthState.Active, showLeft, showRight, showTop, showBottom);
+                var date = new DateTime(_year, _month, day);
+                var state = StatsManager.Instance.DidPlayOnDate(date) ? StatsDayOfMonthState.Active : StatsDayOfMonthState.None;
+                var data = new StatsDayOfMonthWidgetData(day, state, showLeft, showRight, showTop, showBottom);
                 _dayOfMonthDataList.Add(data);
             }
 

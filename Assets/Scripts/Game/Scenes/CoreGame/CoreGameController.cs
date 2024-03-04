@@ -45,12 +45,15 @@ namespace com.hive.projectr
         private Vector3 _spacecraftScreenOffsetFromCursor;
         private Vector3 _spacecraftScreenPos;
         private CoreGameState _state;
-        private float _progressFill;
-        private float _maxProgressWidth;
+        private float _currentGameProgressFill = -1;
+        private float _targetGameProgressFill;
+        private float _currentAsteroidProgressFill = -1;
         private CoreGameLevelConfigData _levelConfigData;
         private int _endedAsteroidCount;
         private int _collectedAsteroidCount;
         private float _nextAsteroidSpawnTime;
+        private float _levelRunningTime;
+        private string _currentInfo;
 
         private static readonly int CountdownTriggerHash = Animator.StringToHash("Count");
         #endregion
@@ -77,6 +80,7 @@ namespace com.hive.projectr
         private enum ExtraTMP
         {
             Countdown = 0,
+            Info = 1,
         }
 
         private enum ExtraAnimator
@@ -86,13 +90,8 @@ namespace com.hive.projectr
 
         private enum ExtraImg
         {
-            ProgressBar = 0,
-            AsteroidProgress = 1,
-        }
-
-        private enum ExtraRT
-        {
-            SpacecraftRoot = 0,
+            GameProgressBar = 0,
+            AsteroidProgressBar = 1,
         }
 
         private enum ExtraAnyObj
@@ -108,13 +107,12 @@ namespace com.hive.projectr
         private Transform _raycastBlocker;
 
         private TMP_Text _countdownText;
+        private TMP_Text _infoText;
 
         private Animator _countdownAnimator;
 
-        private Image _progressBar;
-        private Image _asteroidProgress;
-
-        private RectTransform _spacecraftRoot;
+        private Image _gameProgressBar;
+        private Image _asteroidProgressBar;
 
         private GameObject _asteroidPrefab;
         #endregion
@@ -148,14 +146,12 @@ namespace com.hive.projectr
             _raycastBlocker = Config.ExtraObjects[(int)ExtraObj.RaycastBlocker];
 
             _countdownText = Config.ExtraTextMeshPros[(int)ExtraTMP.Countdown];
+            _infoText = Config.ExtraTextMeshPros[(int)ExtraTMP.Info];
 
             _countdownAnimator = Config.ExtraAnimators[(int)ExtraAnimator.Countdown];
 
-            _progressBar = Config.ExtraImages[(int)ExtraImg.ProgressBar];
-            _asteroidProgress = Config.ExtraImages[(int)ExtraImg.AsteroidProgress];
-
-            _spacecraftRoot = Config.ExtraRectTransforms[(int)ExtraRT.SpacecraftRoot];
-            _maxProgressWidth = ((RectTransform)_spacecraftRoot.parent).rect.width;
+            _gameProgressBar = Config.ExtraImages[(int)ExtraImg.GameProgressBar];
+            _asteroidProgressBar = Config.ExtraImages[(int)ExtraImg.AsteroidProgressBar];
 
             _asteroidPrefab = (GameObject)Config.ExtraGameObjects[(int)ExtraAnyObj.AsteroidPrefab];
         }
@@ -225,50 +221,19 @@ namespace com.hive.projectr
         #region Callback
         private void Tick()
         {
-            if (_state != CoreGameState.Running)
-                return;
+            if (_state == CoreGameState.Running)
+            {
+                if (_activeAsteroids.Count < 1 && Time.time >= _nextAsteroidSpawnTime)
+                {
+                    SpawnAsteroid();
+                }
 
-            if (_activeAsteroids.Count < 1 && Time.time >= _nextAsteroidSpawnTime)
-            {
-                SpawnAsteroid();
+                InfoTextTick();
+                AsteroidProgressTick();
+                SpacecraftMovementTick();
             }
 
-            AsteroidProgressTick();
-            SpacecraftMovementTick();
-
-            // debug
-            if (InputManager.GetKeyDown(KeyCode.UpArrow))
-            {
-                _vacuumControllers[VacuumType.Top].Activate();
-            }
-            else if (InputManager.GetKeyUp(KeyCode.UpArrow))
-            {
-                _vacuumControllers[VacuumType.Top].Deactivate();
-            }
-            else if (InputManager.GetKeyDown(KeyCode.LeftArrow))
-            {
-                _vacuumControllers[VacuumType.Left].Activate();
-            }
-            else if(InputManager.GetKeyUp(KeyCode.LeftArrow))
-            {
-                _vacuumControllers[VacuumType.Left].Deactivate();
-            }
-            else if (InputManager.GetKeyDown(KeyCode.RightArrow))
-            {
-                _vacuumControllers[VacuumType.Right].Activate();
-            }
-            else if (InputManager.GetKeyUp(KeyCode.RightArrow))
-            {
-                _vacuumControllers[VacuumType.Right].Deactivate();
-            }
-            else if (InputManager.GetKeyDown(KeyCode.DownArrow))
-            {
-                _vacuumControllers[VacuumType.Bottom].Activate();
-            }
-            else if (InputManager.GetKeyUp(KeyCode.DownArrow))
-            {
-                _vacuumControllers[VacuumType.Bottom].Deactivate();
-            }
+            GameProgressTick();
         }
 
         private void OnAsteroidEnterVacuumAir(int id)
@@ -304,8 +269,6 @@ namespace com.hive.projectr
 
             _nextAsteroidSpawnTime = Time.time + _levelConfigData.AsteroidSpawnGapSec;
 
-            _asteroidProgress.fillAmount = 0;
-
             _spacecraftController.SetCapturing(false);
 
             foreach (var controller in _vacuumControllers.Values)
@@ -314,7 +277,7 @@ namespace com.hive.projectr
             }
 
             ++_endedAsteroidCount;
-            RefreshProgress();
+            UpdateGameProgress(false);
 
             if (_endedAsteroidCount >= _levelConfigData.MaxAsteroidCount)
             {
@@ -327,6 +290,64 @@ namespace com.hive.projectr
             MonoBehaviourUtil.Instance.StartCoroutine(LevelEndRoutine());
         }
 
+        private void SpacecraftMovementTick()
+        {
+            var spacecraftScreenPos = GetSpacecraftScreenPos();
+            var spacecraftSpeed = (_spacecraftScreenPos - spacecraftScreenPos).sqrMagnitude / Time.deltaTime;
+            _spacecraftScreenPos = spacecraftScreenPos;
+            _spacecraftController.SetMoving(spacecraftSpeed > .1f);
+
+            var spacecraftWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(spacecraftScreenPos);
+            _spacecraftController.SetWorldPos(new Vector3(spacecraftWorldPos.x, spacecraftWorldPos.y, _spacecraftController.GetWorldPos().z));
+        }
+
+        private void GameProgressTick()
+        {
+            if (_currentGameProgressFill < _targetGameProgressFill)
+            {
+                var delta = (_targetGameProgressFill - _currentGameProgressFill) / CoreGameConfig.GetData().GameProgressFillSec * Time.deltaTime;
+                _currentGameProgressFill = Mathf.Clamp01(_currentGameProgressFill + delta);
+                _gameProgressBar.fillAmount = _currentGameProgressFill;
+            }
+        }
+
+        private void AsteroidProgressTick()
+        {
+            var activeAsteroids = new List<AsteroidController>(_activeAsteroids.Values);
+            var fill = activeAsteroids.Count > 0
+                ? activeAsteroids[0].GetLifetimeProgress()
+                : 0;
+
+            if (_currentAsteroidProgressFill < fill)
+            {
+                _asteroidProgressBar.fillAmount = _currentAsteroidProgressFill = fill;
+            }
+        }
+
+        private void InfoTextTick()
+        {
+            if (_state == CoreGameState.Running)
+            {
+                var coreGameData = CoreGameConfig.GetData();
+                _levelRunningTime += Time.deltaTime;
+                var infoIndex = ((int)_levelRunningTime / coreGameData.InfoTextUpdateSec) % 2;
+                switch (infoIndex)
+                {
+                    case 0:
+                        RefreshInfoText($"Catch, Destroy, Collect");
+                        break;
+                    case 1:
+                        RefreshInfoText($"Level {_levelConfigData.Level}");
+                        break;
+                    default:
+                        Debug.LogError($"Undefined core game info index: {infoIndex}");
+                        break;
+                }
+            }
+        }
+        #endregion
+
+        #region Content
         private IEnumerator LevelEndRoutine()
         {
             _raycastBlocker.gameObject.SetActive(true);
@@ -338,18 +359,19 @@ namespace com.hive.projectr
             var isPassed = _collectedAsteroidCount >= _levelConfigData.NumOfAsteroidCollectedToPass;
 
             LevelManager.Instance.OnLevelCompleted(_levelConfigData.Level, isPassed);
+            StatsManager.Instance.OnLevelCompleted(new LevelStats(_levelConfigData.Level, _collectedAsteroidCount));
 
             if (isPassed)
             {
-                GameSceneManager.Instance.ShowScene(SceneNames.CoreGameLevelPassed, new CoreGameLevelPassedData(new CoreGameData(_bottomLeftScreenPos, _topRightScreenPos, _centerScreenPos, _spacecraftMovementScale, _levelConfigData.Level)), ()=>
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGameLevelPassed, new CoreGameLevelPassedData(new CoreGameData(_bottomLeftScreenPos, _topRightScreenPos, _centerScreenPos, _spacecraftMovementScale, _levelConfigData.Level)), () =>
                 {
                     GameSceneManager.Instance.HideScene(SceneName);
                 });
             }
             else
             {
-                GameSceneManager.Instance.ShowScene(SceneNames.CoreGameLevelFailed, new CoreGameLevelFailedData(new CoreGameData(_bottomLeftScreenPos, _topRightScreenPos, _centerScreenPos, _spacecraftMovementScale, _levelConfigData.Level)), ()=> 
-                { 
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGameLevelFailed, new CoreGameLevelFailedData(new CoreGameData(_bottomLeftScreenPos, _topRightScreenPos, _centerScreenPos, _spacecraftMovementScale, _levelConfigData.Level)), () =>
+                {
                     GameSceneManager.Instance.HideScene(SceneName);
                 });
             }
@@ -361,58 +383,34 @@ namespace com.hive.projectr
         {
             if (_activeAsteroids.TryGetValue(id, out var controller))
             {
-                controller.Stop(() => PutAsteroidBack(controller));
+                controller.Stop(() => 
+                {
+                    PutAsteroidBack(controller);
+                    _asteroidProgressBar.fillAmount = _currentAsteroidProgressFill = 0;
+                });
             }
         }
 
-        private void AsteroidProgressTick()
+        private void RefreshInfoText(string info)
         {
-            var activeAsteroids = new List<AsteroidController>(_activeAsteroids.Values);
-            if (activeAsteroids.Count > 0)
-            {
-                _asteroidProgress.fillAmount = activeAsteroids[0].GetLifetimeProgress();
-            }
-            else
-            {
-                _asteroidProgress.fillAmount = 0;
-            }
-        }
-
-        private void SpacecraftMovementTick()
-        {
-            var spacecraftScreenPos = GetSpacecraftScreenPos();
-            var spacecraftSpeed = (_spacecraftScreenPos - spacecraftScreenPos).sqrMagnitude / Time.deltaTime;
-            _spacecraftScreenPos = spacecraftScreenPos;
-            _spacecraftController.SetMoving(spacecraftSpeed > .1f);
-
-            var spacecraftWorldPos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(spacecraftScreenPos);
-            _spacecraftController.SetWorldPos(new Vector3(spacecraftWorldPos.x, spacecraftWorldPos.y, _spacecraftController.GetWorldPos().z));
-        }
-        #endregion
-
-        #region Content
-        private void RefreshProgress()
-        {
-            var current = _endedAsteroidCount;
-            var max = _levelConfigData.MaxAsteroidCount;
-            SetProgressBar(Mathf.Clamp01((float)current / max));
-        }
-
-        private void SetProgressBar(float fillAmount)
-        {
-            fillAmount = Mathf.Clamp01(fillAmount);
-
-            if (fillAmount == _progressFill)
+            if (!string.IsNullOrEmpty(_currentInfo) && _currentInfo == info)
                 return;
 
-            _progressFill = fillAmount;
+            _currentInfo = info;
+            _infoText.text = _currentInfo;
+        }
 
-            // fill amount
-            _progressBar.fillAmount = _progressFill;
+        private void UpdateGameProgress(bool isInstant)
+        {
+            var fillAmount = Mathf.Clamp01((float)_endedAsteroidCount / _levelConfigData.MaxAsteroidCount);
+            fillAmount = Mathf.Clamp01(fillAmount);
 
-            // marker pos
-            var xPos = Mathf.Lerp(0, _maxProgressWidth, _progressFill);
-            _spacecraftRoot.anchoredPosition = new Vector2(xPos, _spacecraftRoot.anchoredPosition.y);
+            _targetGameProgressFill = fillAmount;
+
+            if (isInstant)
+            {
+                _gameProgressBar.fillAmount = _currentGameProgressFill = _targetGameProgressFill;
+            }
         }
 
         private void Reset()
@@ -428,6 +426,8 @@ namespace com.hive.projectr
 
             _spacecraftController.Deactivate();
             CenterSpacecraft();
+
+            RefreshInfoText("");
         }
 
         private void Resume()
@@ -467,6 +467,7 @@ namespace com.hive.projectr
             }
 
             LevelManager.Instance.OnLevelStarted(_levelConfigData.Level);
+            UpdateGameProgress(true);
         }
 
         private IEnumerator CountdownRoutine(Action onCountdownFinished)
@@ -550,7 +551,9 @@ namespace com.hive.projectr
             var startWorldPos = GetRandomWorldPointOutsideCircle(spacecraftWorldPos, spacecraftRadius);
             var startScreenPos = CameraManager.Instance.MainCamera.WorldToScreenPoint(startWorldPos);
 
-            var startDirection = (_centerScreenPos - startScreenPos);
+            //var startDirection = (_centerScreenPos - startScreenPos);
+            var startRad = Random.Range(0, Mathf.PI * 2);
+            var startDirection = new Vector2(Mathf.Cos(startRad), Mathf.Sin(startRad));
 
             var id = controller.Id;
             controller.Start(new AsteroidData(startWorldPos, startDirection, _levelConfigData.AsteroidSpeed, _levelConfigData.AsteroidSize, _levelConfigData.AsteroidLifeTime, _levelConfigData.AsteroidMovement, OnAsteroidEnterVacuumAir, OnAsteroidLifetimeRunOut, OnAsteroidCaptured));
