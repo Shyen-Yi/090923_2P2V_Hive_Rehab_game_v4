@@ -13,7 +13,7 @@ namespace com.hive.projectr
             {
                 if (_mainCam == null)
                 {
-                    _mainCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+                    _mainCam = GameObject.FindGameObjectWithTag(TagNames.MainCamera).GetComponent<Camera>();
                 }
                 return _mainCam;
             }
@@ -24,7 +24,7 @@ namespace com.hive.projectr
             {
                 if (_uiCam == null)
                 {
-                    _uiCam = GameObject.FindGameObjectWithTag("UICamera").GetComponent<Camera>();
+                    _uiCam = GameObject.FindGameObjectWithTag(TagNames.UICamera).GetComponent<Camera>();
                 }
                 return _uiCam;
             }

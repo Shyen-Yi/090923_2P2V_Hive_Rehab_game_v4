@@ -14,6 +14,7 @@ TagManager:
   - VacuumBase
   - Spacecraft
   - Asteroid
+  - AudioSourceRoot
   layers:
   - Default
   - TransparentFX

@@ -50,6 +50,14 @@ namespace com.hive.projectr
             {
                 _coreGameData = pData.coreGameData;
             }
+
+            SoundManager.Instance.PlaySound(SoundType.CoreGameLevelEndShowReport);
+            SoundManager.Instance.PlaySound(SoundType.MenuBackground);
+        }
+
+        protected override void OnHide(GameSceneHideState hideState)
+        {
+            SoundManager.Instance.StopSound(SoundType.MenuBackground);
         }
 
         protected override void OnDispose()
@@ -75,11 +83,15 @@ namespace com.hive.projectr
         #region Callback
         private void OnExitButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.GoBack(SceneNames.MainMenu);
         }
 
         private void OnReplayButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
             {
                 GameSceneManager.Instance.HideScene(SceneName);

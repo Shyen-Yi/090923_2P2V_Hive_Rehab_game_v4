@@ -33,9 +33,18 @@ namespace com.hive.projectr
             _statsButton = Config.ExtraButtons[(int)ExtraBtn.Stats];
         }
 
+        protected override void OnShow(ISceneData data, GameSceneShowState showState)
+        {
+            SoundManager.Instance.PlaySound(SoundType.MenuBackground);
+
+            base.OnShow(data, showState);
+        }
+
         protected override void OnDispose()
         {
             UnbindActions();
+
+            base.OnDispose();
         }
         #endregion
 
@@ -58,6 +67,8 @@ namespace com.hive.projectr
         #region Callback
         private void OnStartButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             if (DebugConfig.GetData().EnableCalibration) 
             {
                 GameSceneManager.Instance.ShowScene(SceneNames.TransitionCalibration);
@@ -82,11 +93,15 @@ namespace com.hive.projectr
 
         private void OnSettingsButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.SettingMenu);
         }
 
         private void OnStatsButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.StatsMenu);
         }
         #endregion

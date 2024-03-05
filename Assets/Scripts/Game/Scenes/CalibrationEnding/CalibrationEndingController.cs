@@ -84,11 +84,15 @@ namespace com.hive.projectr
         #region Callback
         private void OnExitButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.GoBack(SceneNames.MainMenu);
         }
 
         private void OnRedoButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.Calibration, null, () =>
             {
                 GameSceneManager.Instance.HideScene(SceneName);
@@ -97,6 +101,8 @@ namespace com.hive.projectr
 
         private void OnPlayButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
             {
                 GameSceneManager.Instance.HideScene(SceneName);

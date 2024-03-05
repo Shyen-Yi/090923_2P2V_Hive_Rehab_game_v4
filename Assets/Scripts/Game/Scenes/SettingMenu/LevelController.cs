@@ -27,7 +27,7 @@ public class LevelController : MonoBehaviour
 
     void IncrementLevel()
     {
-        if(currentLevelIndex < maxLevelIndex)
+        if (currentLevelIndex < maxLevelIndex)
         {
             currentLevelIndex += 1;
             UpdateLevelText();

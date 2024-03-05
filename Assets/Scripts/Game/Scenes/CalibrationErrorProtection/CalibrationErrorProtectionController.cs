@@ -42,6 +42,8 @@ namespace com.hive.projectr
         #region UI Binding
         private void BindActions()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             _backButton.onClick.AddListener(OnBackButtonClick);
             _contactButton.onClick.AddListener(OnContactButtonClick);
             _questionButton.onClick.AddListener(OnQuestionButtonClick);
@@ -58,16 +60,22 @@ namespace com.hive.projectr
         #region Callback
         private void OnBackButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.GoBack();
         }
 
         private void OnContactButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.ContactInfo);
         }
 
         private void OnQuestionButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Calibration));
         }
         #endregion

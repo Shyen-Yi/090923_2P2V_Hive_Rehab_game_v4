@@ -17,3 +17,4 @@ MonoBehaviour:
     startCountdownSec: 3
     infoTextUpdateSec: 10
     gameProgressFillSec: 0.15
+    asteroidWarningSec: 5

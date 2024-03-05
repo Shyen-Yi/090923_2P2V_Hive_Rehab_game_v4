@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.AddressableAssets;
 
 namespace com.hive.projectr
 {
@@ -64,6 +65,7 @@ namespace com.hive.projectr
 		public Int32 StartCountdownSec => _item.StartCountdownSec;
 		public Int32 InfoTextUpdateSec => _item.InfoTextUpdateSec;
 		public Single GameProgressFillSec => _item.GameProgressFillSec;
+		public Single AsteroidWarningSec => _item.AsteroidWarningSec;
 
 		public CoreGameConfigData(CoreGameSOItem item)
 		{

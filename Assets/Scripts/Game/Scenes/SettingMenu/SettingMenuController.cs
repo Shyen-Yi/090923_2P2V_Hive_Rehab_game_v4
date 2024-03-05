@@ -133,27 +133,37 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.GoBack();
         }
 
         private void OnMailButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.ContactInfo);
         }
 
         private void OnQuestionButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Setting));
         }
 
         private void OnLevelUpButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             var level = Mathf.Clamp(_level + 1, CoreGameLevelConfig.MinLevel, CoreGameLevelConfig.MaxLevel);
             RefreshLevel(level);
         }
 
         private void OnLevelDownButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             var level = Mathf.Clamp(_level - 1, CoreGameLevelConfig.MinLevel, CoreGameLevelConfig.MaxLevel);
             RefreshLevel(level);
         }

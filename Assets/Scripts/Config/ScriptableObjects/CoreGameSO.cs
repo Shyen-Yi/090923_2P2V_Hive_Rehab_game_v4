@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.AddressableAssets;
 
 namespace com.hive.projectr
 {
@@ -20,10 +21,12 @@ namespace com.hive.projectr
 		[SerializeField] private Int32 startCountdownSec;
 		[SerializeField] private Int32 infoTextUpdateSec;
 		[SerializeField] private Single gameProgressFillSec;
+		[SerializeField] private Single asteroidWarningSec;
 
 		public Single AsteroidSpinRoundPerSec => asteroidSpinRoundPerSec;
 		public Int32 StartCountdownSec => startCountdownSec;
 		public Int32 InfoTextUpdateSec => infoTextUpdateSec;
 		public Single GameProgressFillSec => gameProgressFillSec;
+		public Single AsteroidWarningSec => asteroidWarningSec;
     }
 }

@@ -230,26 +230,36 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.GoBack();
         }
 
         private void OnShareButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.Share);
         }
 
         private void OnContactButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.ContactInfo);
         }
 
         private void OnQuestionButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Stats));
         }
 
         private void OnPrevMonthButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             if (_month == 1)
             {
                 --_year;
@@ -266,6 +276,8 @@ namespace com.hive.projectr
 
         private void OnNextMonthButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             if (_month == 12)
             {
                 ++_year;

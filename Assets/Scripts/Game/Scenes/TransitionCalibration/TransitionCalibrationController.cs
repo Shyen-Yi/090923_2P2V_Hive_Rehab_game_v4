@@ -78,6 +78,8 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.GoBack();
         }
 
