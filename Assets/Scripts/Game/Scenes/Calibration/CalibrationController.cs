@@ -165,8 +165,6 @@ namespace com.hive.projectr
 
         protected override void OnShow(ISceneData data, GameSceneShowState showState)
         {
-            base.OnShow(data, showState);
-
             if (showState == GameSceneShowState.New)
             {
                 Start();
@@ -179,18 +177,21 @@ namespace com.hive.projectr
                 }
             }
 
+            SoundManager.Instance.PlaySound(SoundType.CalibrationBackground);
+            SoundManager.Instance.StopSound(SoundType.MenuBackground);
+
             InputManager.HideCursor();
             InputManager.SetCursorLockMode(CursorLockMode.None);
         }
 
         protected override void OnHide(GameSceneHideState hideState)
         {
-            base.OnHide(hideState);
-
             if (_status == CalibrationStatus.Running)
             {
                 Pause();
             }
+
+            SoundManager.Instance.StopSound(SoundType.CalibrationBackground);
 
             InputManager.ShowCursor();
             InputManager.SetCursorLockMode(CursorLockMode.Confined);
@@ -314,6 +315,8 @@ namespace com.hive.projectr
 
         private void OnStageCompleted()
         {
+            SoundManager.Instance.PlaySound(SoundType.CalibrationMarkSet);
+
             var currentStageData = _stageDataList[_stageIndex];
             _holdingTime = 0;
             _stageElapsedTime = 0;
@@ -578,22 +581,29 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
             GameSceneManager.Instance.GoBack();
         }
 
         private void OnRedoButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             Reset();
             Start();
         }
 
         private void OnContactButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.ContactInfo);
         }
 
         private void OnQuestionButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Calibration));
         }
 

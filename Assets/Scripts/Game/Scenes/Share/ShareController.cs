@@ -81,11 +81,15 @@ namespace com.hive.projectr
         #region Callback
         private void OnCrossButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.GoBack();
         }
 
         private void OnShareButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.ShareMenu, null, ()=>
             {
                 GameSceneManager.Instance.HideScene(SceneName);

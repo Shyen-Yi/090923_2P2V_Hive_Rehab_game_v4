@@ -1,0 +1,150 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3ad699e560f627449738ddb756e29f9, type: 3}
+  m_Name: SoundConfig
+  m_EditorClassIdentifier: 
+  _items:
+  - type: 0
+    clip:
+      m_AssetGUID: 38c2e5b2367dd3e40aeb014ec78b99d6
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    playType: 0
+    isLoop: 1
+    needCache: 0
+  - type: 1
+    clip:
+      m_AssetGUID: 518436ac31c560148bbd8ab7aeaee535
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 0
+    isLoop: 1
+    needCache: 0
+  - type: 2
+    clip:
+      m_AssetGUID: 518436ac31c560148bbd8ab7aeaee535
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 0
+    isLoop: 1
+    needCache: 0
+  - type: 3
+    clip:
+      m_AssetGUID: 3f23818af001daa4b822c12e678c84d3
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    playType: 1
+    isLoop: 0
+    needCache: 0
+  - type: 4
+    clip:
+      m_AssetGUID: d53ebe3cdd4b7e845be9e07a427d6b9c
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 1
+    isLoop: 0
+    needCache: 0
+  - type: 5
+    clip:
+      m_AssetGUID: 6e734d07627faf847bfa8f97dfe51cd1
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 2
+    isLoop: 0
+    needCache: 0
+  - type: 6
+    clip:
+      m_AssetGUID: c309a701f35af12458b1d549c33323dc
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 2
+    isLoop: 0
+    needCache: 0
+  - type: 7
+    clip:
+      m_AssetGUID: 0884287c46e7489478a19a63b1fb82fc
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 1
+    isLoop: 0
+    needCache: 1
+  - type: 8
+    clip:
+      m_AssetGUID: 9fc3278f7242011488b48fdee341a666
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 1
+    isLoop: 0
+    needCache: 1
+  - type: 9
+    clip:
+      m_AssetGUID: 51c56549703f8f54c99ea37484068b8c
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 1
+    isLoop: 0
+    needCache: 1
+  - type: 10
+    clip:
+      m_AssetGUID: 2edaff1eecf511e4c9161c3f0a058504
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 2
+    isLoop: 0
+    needCache: 1
+  - type: 11
+    clip:
+      m_AssetGUID: 3af74f89332f0d647b4b34766b0e990d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 2
+    isLoop: 0
+    needCache: 1
+  - type: 12
+    clip:
+      m_AssetGUID: 15227ff877b469445a556db3ac390a74
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 2
+    isLoop: 0
+    needCache: 1
+  - type: 13
+    clip:
+      m_AssetGUID: cfb2ae5f8761ab141b4da5a315e28c34
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 1
+    isLoop: 0
+    needCache: 0
+  - type: 14
+    clip:
+      m_AssetGUID: 80bafce2598817341b264dabc948c900
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    playType: 2
+    isLoop: 0
+    needCache: 1

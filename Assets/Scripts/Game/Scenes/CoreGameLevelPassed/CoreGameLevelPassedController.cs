@@ -78,8 +78,11 @@ namespace com.hive.projectr
                 }
                 else
                 {
+                    // next level!
                     _playButton.gameObject.SetActive(false);
                     _nextLevelButton.gameObject.SetActive(true);
+
+                    SoundManager.Instance.PlaySound(SoundType.LevelUp);
                 }
             }
             else
@@ -98,6 +101,14 @@ namespace com.hive.projectr
             {
                 Logger.LogError($"No defined feature info data for {FeatureType.CoreGameLevelPassed}");
             }
+
+            SoundManager.Instance.PlaySound(SoundType.CoreGameLevelEndShowReport);
+            SoundManager.Instance.PlaySound(SoundType.MenuBackground);
+        }
+
+        protected override void OnHide(GameSceneHideState hideState)
+        {
+            SoundManager.Instance.StopSound(SoundType.MenuBackground);
         }
 
         protected override void OnDispose()
@@ -127,11 +138,15 @@ namespace com.hive.projectr
         #region Callback
         private void OnExitButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.GoBack(SceneNames.MainMenu);
         }
 
         private void OnPlayButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
             {
                 GameSceneManager.Instance.HideScene(SceneName);
@@ -140,6 +155,8 @@ namespace com.hive.projectr
 
         private void OnReplayButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, ()=>
             {
                 GameSceneManager.Instance.HideScene(SceneName);
@@ -148,6 +165,8 @@ namespace com.hive.projectr
 
         private void OnNextLevelButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
             GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, new CoreGameData(_coreGameData.bottomLeftScreenPos, _coreGameData.topRightScreenPos, _coreGameData.centerScreenPos, _coreGameData.spacecraftMovementScale, _coreGameData.level + 1), () =>
             {
                 GameSceneManager.Instance.HideScene(SceneName);

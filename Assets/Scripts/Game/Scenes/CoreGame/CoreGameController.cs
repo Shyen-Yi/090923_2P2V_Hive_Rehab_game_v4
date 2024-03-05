@@ -177,6 +177,9 @@ namespace com.hive.projectr
                 Resume();
             }
 
+            SoundManager.Instance.PlaySound(SoundType.CoreGameBackground);
+            SoundManager.Instance.StopSound(SoundType.MenuBackground);
+
             InputManager.HideCursor();
             InputManager.SetCursorLockMode(CursorLockMode.None);
         }
@@ -192,6 +195,8 @@ namespace com.hive.projectr
             {
                 CSVManager.Instance.StopRecording();
             }
+
+            SoundManager.Instance.StopSound(SoundType.CoreGameBackground);
 
             InputManager.ShowCursor();
             InputManager.SetCursorLockMode(CursorLockMode.Confined);
@@ -250,6 +255,8 @@ namespace com.hive.projectr
         private void OnAsteroidSpawned()
         {
             _netController.PlaySpawnAnimation();
+
+            SoundManager.Instance.PlaySound(SoundType.AsteroidSpawn);
         }
 
         private void OnAsteroidCaptured(int id)
@@ -261,10 +268,14 @@ namespace com.hive.projectr
             var index = Random.Range(0, vacuumControllers.Count);
             var activeController = vacuumControllers[index];
             activeController.Activate();
+
+            SoundManager.Instance.PlaySound(SoundType.AsteroidCaught);
         }
 
         private void OnAsteroidEnded(int id)
         {
+            SoundManager.Instance.PlaySound(SoundType.AsteroidGone);
+
             DestroyAsteroid(id);
 
             _nextAsteroidSpawnTime = Time.time + _levelConfigData.AsteroidSpawnGapSec;
@@ -360,6 +371,8 @@ namespace com.hive.projectr
 
             LevelManager.Instance.OnLevelCompleted(_levelConfigData.Level, isPassed);
             StatsManager.Instance.OnLevelCompleted(new LevelStats(_levelConfigData.Level, _collectedAsteroidCount));
+
+            SoundManager.Instance.PlaySound(SoundType.CoreGameLevelEnd);
 
             if (isPassed)
             {

@@ -40,7 +40,7 @@ namespace com.hive.projectr
 
                 if (Time.time >= _nextWriteTime)
                 {
-                    _asteroidObj = GameObject.FindWithTag("Asteroid");
+                    _asteroidObj = GameObject.FindWithTag(TagNames.Asteroid);
 
                     if (_asteroidObj == null)
                     {

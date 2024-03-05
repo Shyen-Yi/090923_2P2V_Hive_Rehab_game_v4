@@ -29,6 +29,7 @@ namespace com.hive.projectr
         UInt64 = 15,
         AnimationCurve = 16,
         Vector2Int = 17,
+        AssetReference = 18,
     }
 
     public enum ConfigHeaderTypeNamespace
@@ -36,6 +37,7 @@ namespace com.hive.projectr
         System,
         ProjectR,
         UnityEngine,
+        AddressableAssets,
     }
 
     [Serializable]
@@ -400,6 +402,8 @@ namespace com.hive.projectr
                     return "com.hive.projectr";
                 case ConfigHeaderTypeNamespace.UnityEngine:
                     return "UnityEngine";
+                case ConfigHeaderTypeNamespace.AddressableAssets:
+                    return "UnityEngine.AddressableAssets";
                 default:
                     Logger.LogError($"Undefined ConfigHeaderTypeNamespace {type}");
                     return "System";
@@ -414,6 +418,8 @@ namespace com.hive.projectr
                 return ConfigHeaderTypeNamespace.ProjectR;
             if (nameSpace == "UnityEngine")
                 return ConfigHeaderTypeNamespace.UnityEngine;
+            if (nameSpace == "UnityEngine.AddressableAssets")
+                return ConfigHeaderTypeNamespace.AddressableAssets;
 
             Logger.LogError($"Undefined namespace: {nameSpace}");
             return ConfigHeaderTypeNamespace.System;
