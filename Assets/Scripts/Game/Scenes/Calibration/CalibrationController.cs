@@ -191,8 +191,6 @@ namespace com.hive.projectr
                 Pause();
             }
 
-            SoundManager.Instance.StopSound(SoundType.CalibrationBackground);
-
             InputManager.ShowCursor();
             InputManager.SetCursorLockMode(CursorLockMode.Confined);
         }
@@ -205,7 +203,10 @@ namespace com.hive.projectr
 
             if (_endCoroutine != null)
             {
-                MonoBehaviourUtil.Instance.StopCoroutine(_endCoroutine);
+                if (MonoBehaviourUtil.Instance != null)
+                {
+                    MonoBehaviourUtil.Instance.StopCoroutine(_endCoroutine);
+                }
                 _endCoroutine = null;
             }
         }
@@ -294,7 +295,10 @@ namespace com.hive.projectr
         {
             if (_endCoroutine != null)
             {
-                MonoBehaviourUtil.Instance.StopCoroutine(_endCoroutine);
+                if (MonoBehaviourUtil.Instance != null)
+                {
+                    MonoBehaviourUtil.Instance.StopCoroutine(_endCoroutine);
+                }
                 _endCoroutine = null;
             }
 

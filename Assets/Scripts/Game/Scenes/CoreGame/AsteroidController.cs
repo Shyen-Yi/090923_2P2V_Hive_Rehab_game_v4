@@ -124,6 +124,8 @@ namespace com.hive.projectr
 
         public void Deactivate()
         {
+            SoundManager.Instance.StopSound(SoundType.AsteroidWarning);
+
             _config.onCollisionEnter2D -= OnCollisionEnter2D;
             _config.onTriggerEnter2D -= OnTriggerEnter2D;
 
@@ -201,6 +203,8 @@ namespace com.hive.projectr
             _remainingLifetime -= Time.deltaTime;
             var lifetimeProgress = GetLifetimeProgress();
             _config.Renderer.color = new Color(1, 1 - lifetimeProgress, 1 - lifetimeProgress, 1);
+
+            Debug.LogError($"_remainingLifetime: {_remainingLifetime} | AsteroidWarningSec: {CoreGameConfig.GetData().AsteroidWarningSec}");
 
             if (_remainingLifetime < CoreGameConfig.GetData().AsteroidWarningSec)
             {

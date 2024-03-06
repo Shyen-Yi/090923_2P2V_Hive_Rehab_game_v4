@@ -179,6 +179,7 @@ namespace com.hive.projectr
 
             SoundManager.Instance.PlaySound(SoundType.CoreGameBackground);
             SoundManager.Instance.StopSound(SoundType.MenuBackground);
+            SoundManager.Instance.StopSound(SoundType.CalibrationBackground);
 
             InputManager.HideCursor();
             InputManager.SetCursorLockMode(CursorLockMode.None);

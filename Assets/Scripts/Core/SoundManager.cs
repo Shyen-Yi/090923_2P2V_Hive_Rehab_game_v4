@@ -66,7 +66,10 @@ namespace com.hive.projectr
         {
             if (_routine != null)
             {
-                MonoBehaviourUtil.Instance.StopCoroutine(_routine);
+                if (MonoBehaviourUtil.Instance != null)
+                {
+                    MonoBehaviourUtil.Instance.StopCoroutine(_routine);
+                }
                 _routine = null;
             }
         }
