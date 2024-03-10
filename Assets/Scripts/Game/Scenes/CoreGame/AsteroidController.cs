@@ -204,8 +204,6 @@ namespace com.hive.projectr
             var lifetimeProgress = GetLifetimeProgress();
             _config.Renderer.color = new Color(1, 1 - lifetimeProgress, 1 - lifetimeProgress, 1);
 
-            Debug.LogError($"_remainingLifetime: {_remainingLifetime} | AsteroidWarningSec: {CoreGameConfig.GetData().AsteroidWarningSec}");
-
             if (_remainingLifetime < CoreGameConfig.GetData().AsteroidWarningSec)
             {
                 SoundManager.Instance.PlaySound(SoundType.AsteroidWarning);

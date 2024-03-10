@@ -9,48 +9,43 @@ namespace com.hive.projectr
 {
     public class SettingMenuController : GameSceneControllerBase
     {
-        #region Fields
-        private int _level = -1;
-        private int _year = -1;
-        private int _month = -1;
-        private int _goal = -1;
-        private string _goalInputCache = string.Empty;
-        private string _name = string.Empty;
-        #endregion
+        private enum SettingMenuWidgetType
+        {
+            None,
+            Settings,
+            Unlock
+        }
 
         #region Extra
+        private enum ExtraConfig
+        {
+            SettingsWidget = 0,
+            UnlockWidget = 1,
+        }
+
         private enum ExtraBtn
         {
             Cross = 0,
             Mail = 1,
             Question = 2,
-            LevelUp = 3,
-            LevelDown = 4,
+            Lock = 3,
+            Unlock = 4,
         }
 
-        private enum ExtraTMP
-        {
-            CalendarDate = 0,
-            Level = 1,
-        }
-
-        private enum ExtraObj
-        {
-            NameInputField = 0,
-            GoalInputField = 1,
-        }
+        private SettingMenuSettingsWidgetController _settingsWidgetController;
+        private SettingMenuUnlockWidgetController _unlockWidgetController;
 
         private HiveButton _crossButton;
         private HiveButton _mailButton;
         private HiveButton _questionButton;
-        private HiveButton _levelUpButton;
-        private HiveButton _levelDownButton;
+        private HiveButton _lockButton;
+        private HiveButton _unlockButton;
+        #endregion
 
-        private TMP_Text _calendarDateText;
-        private TMP_Text _levelText;
+        #region Fields
+        private SettingMenuWidgetType _widgetType = SettingMenuWidgetType.None;
 
-        private TMP_InputField _nameInputField;
-        private TMP_InputField _goalInputField;
+        private static readonly SettingMenuWidgetType DefaultWidget = SettingMenuWidgetType.Unlock;
         #endregion
 
         #region Lifecycle
@@ -62,42 +57,39 @@ namespace com.hive.projectr
 
         private void InitExtra()
         {
+            var settingsWidgetConfig = Config.ExtraWidgetConfigs[(int)ExtraConfig.SettingsWidget];
+            _settingsWidgetController = new SettingMenuSettingsWidgetController(settingsWidgetConfig);
+            _settingsWidgetController.Init();
+            var unlockWidgetConfig = Config.ExtraWidgetConfigs[(int)ExtraConfig.UnlockWidget];
+            _unlockWidgetController = new SettingMenuUnlockWidgetController(unlockWidgetConfig);
+            _unlockWidgetController.Init();
+
             _crossButton = Config.ExtraButtons[(int)ExtraBtn.Cross];
             _mailButton = Config.ExtraButtons[(int)ExtraBtn.Mail];
             _questionButton = Config.ExtraButtons[(int)ExtraBtn.Question];
-            _levelUpButton = Config.ExtraButtons[(int)ExtraBtn.LevelUp];
-            _levelDownButton = Config.ExtraButtons[(int)ExtraBtn.LevelDown];
+            _lockButton = Config.ExtraButtons[(int)ExtraBtn.Lock];
+            _unlockButton = Config.ExtraButtons[(int)ExtraBtn.Unlock];
+        }
 
-            _calendarDateText = Config.ExtraTextMeshPros[(int)ExtraTMP.CalendarDate];
-            _levelText = Config.ExtraTextMeshPros[(int)ExtraTMP.Level];
-
-            _nameInputField = Config.ExtraObjects[(int)ExtraObj.NameInputField].GetComponent<TMP_InputField>();
-            _goalInputField = Config.ExtraObjects[(int)ExtraObj.GoalInputField].GetComponent<TMP_InputField>();
+        private void DisposeExtra()
+        {
+            _settingsWidgetController.Dispose();
+            _unlockWidgetController.Dispose();
         }
 
         protected override void OnShow(ISceneData data, GameSceneShowState showState)
         {
-            var year = DateTime.Now.Year;
-            var month = DateTime.Now.Month;
-            var name = SettingManager.Instance.DisplayName;
-            var level = SettingManager.Instance.Level;
-            var goal = SettingManager.Instance.DailyBlock;
+            if (showState == GameSceneShowState.New)
+            {
+                _widgetType = DefaultWidget;
+            }
 
-            // calendar date
-            RefreshCalendarDate(year, month);
-
-            // name
-            RefreshName(name);
-
-            // level
-            RefreshLevel(level);
-
-            // goal
-            RefreshGoal(goal);
+            ShowWidget(_widgetType, true);
         }
 
         protected override void OnDispose()
         {
+            DisposeExtra();
             UnbindActions();
         }
         #endregion
@@ -108,12 +100,8 @@ namespace com.hive.projectr
             _crossButton.onClick.AddListener(OnCrossButtonClick);
             _mailButton.onClick.AddListener(OnMailButtonClick);
             _questionButton.onClick.AddListener(OnQuestionButtonClick);
-            _levelUpButton.onClick.AddListener(OnLevelUpButtonClick);
-            _levelDownButton.onClick.AddListener(OnLevelDownButtonClick);
-
-            _nameInputField.onEndEdit.AddListener(OnNameEndEdit);
-            _goalInputField.onSelect.AddListener(OnGoalSelect);
-            _goalInputField.onEndEdit.AddListener(OnGoalEndEdit);
+            _lockButton.onClick.AddListener(OnLockButtonClick);
+            _unlockButton.onClick.AddListener(OnUnlockButtonClick);
         }
 
         private void UnbindActions()
@@ -121,12 +109,39 @@ namespace com.hive.projectr
             _crossButton.onClick.RemoveAllListeners();
             _mailButton.onClick.RemoveAllListeners();
             _questionButton.onClick.RemoveAllListeners();
-            _levelUpButton.onClick.RemoveAllListeners();
-            _levelDownButton.onClick.RemoveAllListeners();
+            _lockButton.onClick.RemoveAllListeners();
+            _unlockButton.onClick.RemoveAllListeners();
+        }
+        #endregion
 
-            _nameInputField.onEndEdit.RemoveAllListeners();
-            _goalInputField.onSelect.RemoveAllListeners();
-            _goalInputField.onEndEdit.RemoveAllListeners();
+        #region Content
+        private void ShowWidget(SettingMenuWidgetType type, bool forceUpdate = false)
+        {
+            if (_widgetType == type && !forceUpdate)
+                return;
+
+            _widgetType = type;
+
+            if (_widgetType == SettingMenuWidgetType.Settings)
+            {
+                _settingsWidgetController.Show();
+            }
+            else
+            {
+                _settingsWidgetController.Hide();
+            }
+
+            if (_widgetType == SettingMenuWidgetType.Unlock)
+            {
+                _unlockWidgetController.Show();
+            }
+            else
+            {
+                _unlockWidgetController.Hide();
+            }
+
+            _unlockButton.gameObject.SetActive(_widgetType == SettingMenuWidgetType.Unlock);
+            _lockButton.gameObject.SetActive(_widgetType != SettingMenuWidgetType.Unlock);
         }
         #endregion
 
@@ -152,95 +167,21 @@ namespace com.hive.projectr
             GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Setting));
         }
 
-        private void OnLevelUpButtonClick()
+        private void OnLockButtonClick()
         {
-            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
-
-            var level = Mathf.Clamp(_level + 1, CoreGameLevelConfig.MinLevel, CoreGameLevelConfig.MaxLevel);
-            RefreshLevel(level);
+            ShowWidget(SettingMenuWidgetType.Unlock);
         }
 
-        private void OnLevelDownButtonClick()
+        private void OnUnlockButtonClick()
         {
-            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
-
-            var level = Mathf.Clamp(_level - 1, CoreGameLevelConfig.MinLevel, CoreGameLevelConfig.MaxLevel);
-            RefreshLevel(level);
-        }
-
-        private void OnNameEndEdit(string displayName)
-        {
-            SettingManager.Instance.UpdateDisplayName(displayName, true);
-        }
-
-        private void OnGoalSelect(string txt)
-        {
-            _goalInputCache = txt;
-        }
-
-        private void OnGoalEndEdit(string txt)
-        {
-            if (int.TryParse(txt, out var dailyBlock))
+            var canUnlock = true;
+            if (canUnlock)
             {
-                dailyBlock = Mathf.Clamp(dailyBlock, GameGeneralConfig.GetData().MinGoal, GameGeneralConfig.GetData().MaxGoal);
-
-                SettingManager.Instance.UpdateDailyBlock(dailyBlock, true);
-
-                _goalInputField.text = $"{dailyBlock}";
+                ShowWidget(SettingMenuWidgetType.Settings);
             }
             else
             {
-                _goalInputField.text = _goalInputCache;
-            }
 
-            _goalInputCache = null;
-        }
-
-        private void OnLevelUpdate(int level)
-        {
-            SettingManager.Instance.UpdateLevel(level, true);
-        }
-        #endregion
-
-        #region Content
-        private void RefreshCalendarDate(int year, int month)
-        {
-            if (_year != year || _month != month)
-            {
-                _year = year;
-                _month = month;
-
-                var date = new DateTime(_year, _month, 1);
-                _calendarDateText.text = date.ToString("MMMM, yyyy");
-            }
-        }
-
-        private void RefreshName(string name)
-        {
-            if (_name == null || !_name.Equals(name))
-            {
-                _name = name;
-                _nameInputField.text = _name;
-            }
-        }
-
-        private void RefreshLevel(int level)
-        {
-            if (_level != level)
-            {
-                _level = level;
-                _levelText.text = $"{_level}";
-
-                OnLevelUpdate(level);
-            }
-        }
-
-        private void RefreshGoal(int goal)
-        {
-            if (_goal != goal)
-            {
-                _goal = goal;
-                _goalInputField.text = $"{_goal}";
             }
         }
         #endregion
