@@ -9,19 +9,16 @@ namespace com.hive.projectr
         public int LatestLevelPlayed { get; private set; }
         public int LatestLevelPassedStreak { get; private set; }
 
-        private static readonly string LatestLevelPlayedKey = "LatestLevelPlayed";
-        private static readonly string LatestLevelPassedStreakKey = "LatestLevelPassedStreak";
-
         public void OnLevelStarted(int level)
         {
             if (LatestLevelPlayed != level)
             {
                 LatestLevelPassedStreak = 0;
-                PlayerPrefs.SetInt(LatestLevelPassedStreakKey, 0);
+                PlayerPrefs.SetInt(PlayerPrefKeys.LatestLevelPassedStreak, 0);
             }
 
             LatestLevelPlayed = level;
-            PlayerPrefs.SetInt(LatestLevelPlayedKey, LatestLevelPlayed);
+            PlayerPrefs.SetInt(PlayerPrefKeys.LatestLevelPlayed, LatestLevelPlayed);
 
             Debug.LogError($"OnLevelStarted - LatestLevelPlayed: {LatestLevelPlayed} | LatestLevelPassedStreak: {LatestLevelPassedStreak}");
         }
@@ -36,25 +33,25 @@ namespace com.hive.projectr
 
             // save latest level result
             LatestLevelPassedStreak = isPassed ? LatestLevelPassedStreak + 1 : 0;
-            PlayerPrefs.SetInt(LatestLevelPassedStreakKey, LatestLevelPassedStreak);
+            PlayerPrefs.SetInt(PlayerPrefKeys.LatestLevelPassedStreak, LatestLevelPassedStreak);
 
             Debug.LogError($"OnLevelCompleted - LatestLevelPlayed: {LatestLevelPlayed} | LatestLevelPassedStreak: {LatestLevelPassedStreak}");
         }
 
         public void OnInit()
         {
-            if (PlayerPrefs.HasKey(LatestLevelPlayedKey))
+            if (PlayerPrefs.HasKey(PlayerPrefKeys.LatestLevelPlayed))
             {
-                LatestLevelPlayed = PlayerPrefs.GetInt(LatestLevelPlayedKey);
+                LatestLevelPlayed = PlayerPrefs.GetInt(PlayerPrefKeys.LatestLevelPlayed);
             }
             else
             {
                 LatestLevelPlayed = 0;
             }
 
-            if (PlayerPrefs.HasKey(LatestLevelPassedStreakKey))
+            if (PlayerPrefs.HasKey(PlayerPrefKeys.LatestLevelPassedStreak))
             {
-                LatestLevelPassedStreak = PlayerPrefs.GetInt(LatestLevelPassedStreakKey);
+                LatestLevelPassedStreak = PlayerPrefs.GetInt(PlayerPrefKeys.LatestLevelPassedStreak);
             }
             else
             {

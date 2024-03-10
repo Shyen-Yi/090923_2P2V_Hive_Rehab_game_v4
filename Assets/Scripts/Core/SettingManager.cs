@@ -10,16 +10,12 @@ namespace com.hive.projectr
         public int Level { get; private set; }
         public int DailyBlock { get; private set; }
 
-        private static readonly string PlayerPrefKeyDisplayName = "DisplayName";
-        private static readonly string PlayerPrefKeyLevel = "Level";
-        private static readonly string PlayerPrefKeyDailyBlock = "DailyBlock";
-
         #region Lifecycle
         public void OnInit()
         { 
-            DisplayName = PlayerPrefs.HasKey(PlayerPrefKeyDisplayName) ? PlayerPrefs.GetString(PlayerPrefKeyDisplayName) : "";
-            Level = PlayerPrefs.HasKey(PlayerPrefKeyLevel) ? PlayerPrefs.GetInt(PlayerPrefKeyLevel) : CoreGameLevelConfig.MinLevel;
-            DailyBlock = PlayerPrefs.HasKey(PlayerPrefKeyDailyBlock) ? PlayerPrefs.GetInt(PlayerPrefKeyDailyBlock) : GameGeneralConfig.GetData().DefaultGoal;
+            DisplayName = PlayerPrefs.HasKey(PlayerPrefKeys.DisplayName) ? PlayerPrefs.GetString(PlayerPrefKeys.DisplayName) : "";
+            Level = PlayerPrefs.HasKey(PlayerPrefKeys.Level) ? PlayerPrefs.GetInt(PlayerPrefKeys.Level) : CoreGameLevelConfig.MinLevel;
+            DailyBlock = PlayerPrefs.HasKey(PlayerPrefKeys.DailyBlock) ? PlayerPrefs.GetInt(PlayerPrefKeys.DailyBlock) : GameGeneralConfig.GetData().DefaultGoal;
         }
 
         public void OnDispose()
@@ -32,17 +28,17 @@ namespace com.hive.projectr
 
         private void SaveDisplayName()
         {
-            PlayerPrefs.SetString(PlayerPrefKeyDisplayName, DisplayName);
+            PlayerPrefs.SetString(PlayerPrefKeys.DisplayName, DisplayName);
         }
 
         private void SaveLevel()
         {
-            PlayerPrefs.SetInt(PlayerPrefKeyLevel, Level);
+            PlayerPrefs.SetInt(PlayerPrefKeys.Level, Level);
         }
 
         private void SaveDailyBlock()
         {
-            PlayerPrefs.SetInt(PlayerPrefKeyDailyBlock, DailyBlock);
+            PlayerPrefs.SetInt(PlayerPrefKeys.DailyBlock, DailyBlock);
         }
 
         public void UpdateDisplayName(string displayName, bool toSave)

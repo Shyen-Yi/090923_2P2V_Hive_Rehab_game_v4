@@ -174,7 +174,7 @@ namespace com.hive.projectr
 
         private void OnUnlockButtonClick()
         {
-            var canUnlock = true;
+            var canUnlock = _unlockWidgetController.TryAuthenticate();
             if (canUnlock)
             {
                 ShowWidget(SettingMenuWidgetType.Settings);
