@@ -1915,7 +1915,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -170}
-  m_SizeDelta: {x: 835, y: 176}
+  m_SizeDelta: {x: 1600, y: 176}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1259460003
 GameObject:
@@ -2000,6 +2000,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81d8e362cd3e45343904617f9ea61dc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _canvasGroup: {fileID: 0}
   _extraWidgetConfigs: []
   _extraRectTransforms: []
   _extraTextMeshPros: []

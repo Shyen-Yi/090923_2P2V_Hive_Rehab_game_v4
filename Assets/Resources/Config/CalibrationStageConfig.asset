@@ -15,40 +15,44 @@ MonoBehaviour:
   _items:
   - stage: 0
     sortingId: 1
-    instruction: Get Yourself Comfortable And Stay Still
-    instructionWhenHolding: Calibrating Center...
+    instruction: Extend then hold your arm in a comfortable spot until the animation
+      ends for calibration.
+    instructionWhenHolding: Calibrating the centre point...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
     holdingPreparationTime: 2
     cooldownTime: 2
   - stage: 1
     sortingId: 2
-    instruction: Reach to Your MOST Top Left And Hold
-    instructionWhenHolding: Calibrating Top Left Corner...
+    instruction: Extend your arm to the most top-left corner and hold still for calibration.
+    instructionWhenHolding: Calibrating the top left corner...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
     holdingPreparationTime: 2
     cooldownTime: 2
   - stage: 2
     sortingId: 3
-    instruction: Reach to Your MOST Top Right And Hold
-    instructionWhenHolding: Calibrating Top Right Corner...
+    instruction: Extend your arm to the most top-right corner and hold still for
+      calibration.
+    instructionWhenHolding: Calibrating top-right corner...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
     holdingPreparationTime: 2
     cooldownTime: 2
   - stage: 3
     sortingId: 4
-    instruction: Reach to Your MOST Bottom Right And Hold
-    instructionWhenHolding: Calibrating BottomRight Corner...
+    instruction: Extend your arm to the most bottom-right corner and hold still for
+      calibration.
+    instructionWhenHolding: Calibrating buttom-right corner...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
     holdingPreparationTime: 2
     cooldownTime: 2
   - stage: 4
     sortingId: 5
-    instruction: Reach to Your MOST Bottom Left And Hold
-    instructionWhenHolding: Calibrating Bottom Left Corner...
+    instruction: Extend your arm to the most bottom-left corner and hold still for
+      calibration.
+    instructionWhenHolding: Calibrating bottom-left corner...
     maxHoldingCheckCount: 3
     eachHoldingCheckDuration: 1
     holdingPreparationTime: 2
