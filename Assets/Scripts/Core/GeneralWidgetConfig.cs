@@ -9,6 +9,8 @@ namespace com.hive.projectr
 {
     public class GeneralWidgetConfig : SimpleGridElement
     {
+        [SerializeField] private CanvasGroup _canvasGroup;
+
         [Header("Extra")]
         [SerializeField] private List<GeneralWidgetConfig> _extraWidgetConfigs;
         [SerializeField] private List<RectTransform> _extraRectTransforms;
@@ -27,6 +29,8 @@ namespace com.hive.projectr
         [SerializeField] private List<TMP_ColorGradient> _extraColorGradients;
         [SerializeField] private List<Animator> _extraAnimators;
         [SerializeField] private List<Renderer> _extraRenderers;
+
+        public CanvasGroup CanvasGroup => _canvasGroup;
 
         // extra
         public List<GeneralWidgetConfig> ExtraWidgetConfigs => _extraWidgetConfigs;

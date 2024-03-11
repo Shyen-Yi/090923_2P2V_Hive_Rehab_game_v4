@@ -64,7 +64,7 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 1
-    playType: 2
+    playType: 1
     isLoop: 0
     needCache: 0
   - type: 6
@@ -109,7 +109,7 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 1
-    playType: 2
+    playType: 1
     isLoop: 0
     needCache: 1
   - type: 11
@@ -118,7 +118,7 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 1
-    playType: 2
+    playType: 1
     isLoop: 0
     needCache: 1
   - type: 12
@@ -127,7 +127,7 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 1
-    playType: 2
+    playType: 1
     isLoop: 0
     needCache: 1
   - type: 13
@@ -145,6 +145,6 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 1
-    playType: 2
+    playType: 1
     isLoop: 0
     needCache: 1

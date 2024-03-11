@@ -124,6 +124,8 @@ namespace com.hive.projectr
 
         public void Deactivate()
         {
+            SoundManager.Instance.StopSound(SoundType.AsteroidWarning);
+
             _config.onCollisionEnter2D -= OnCollisionEnter2D;
             _config.onTriggerEnter2D -= OnTriggerEnter2D;
 
