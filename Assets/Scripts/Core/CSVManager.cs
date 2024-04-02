@@ -1,6 +1,7 @@
 using System.Collections;
 using System.IO;
 using UnityEngine;
+using System.Text;
 
 namespace com.hive.projectr
 {
@@ -11,6 +12,7 @@ namespace com.hive.projectr
 
         private string _filePath;
         private StreamWriter _csvWriter;
+        private StringBuilder _logSb;
         private float recordInterval = 0.1f; // Record position every 0.1 second
 
         private bool _isRecording;
@@ -49,7 +51,7 @@ namespace com.hive.projectr
                             System.DateTime.Now, _handObj.position.x, _handObj.position.y);
 
                         // Write the line to the CSV file
-                        _csvWriter.WriteLine(line);
+                        AddLine(line);
                     }
                     else
                     {
@@ -60,7 +62,7 @@ namespace com.hive.projectr
                                                  _asteroidObj.transform.position.x, _asteroidObj.transform.position.y);
 
                         // Write the line to the CSV file
-                        _csvWriter.WriteLine(line);
+                        AddLine(line);
                     }
 
                     // Wait for the specified interval
@@ -83,10 +85,15 @@ namespace com.hive.projectr
             System.DateTime currentTime = System.DateTime.Now;
 
             // Format the date and time as a string (you can adjust the format as needed)
+            string dayString = currentTime.ToString("yyyy-MM-dd");
             string dateTimeString = currentTime.ToString("yyyy-MM-dd_HH-mm");
 
             // Define the folder path
-            string folderPath = Application.dataPath + "/CSVFiles/";
+#if UNITY_EDITOR
+            string folderPath = Path.Combine(Application.dataPath, "CSVFiles", dayString);
+#else
+            string folderPath = Path.Combine(Application.persistentDataPath, "CSVFiles", dayString);
+#endif
 
             // Create the directory if it doesn't exist
             if (!Directory.Exists(folderPath))
@@ -95,24 +102,29 @@ namespace com.hive.projectr
             }
 
             // Define the file path for the CSV file with the date and time in the name
-            _filePath = folderPath + "movement_data_" + dateTimeString + ".csv";
+            _filePath = folderPath + $"/movement_data_{dateTimeString}.csv";
 
             // Create or overwrite the CSV file
             _csvWriter = new StreamWriter(_filePath, false);
 
-            // Write headers to the CSV file
-            _csvWriter.WriteLine("Time,CursorX,CursorY,MeteorX,MeteorY");
-            _csvWriter.WriteLine(string.Format("{0:yyyy-MM-dd HH:mm:ss.fff},{1:F2},{2:F2},{3:F2},{4:F2}",
-                 currentTime, 0, 0, 0, 0));
+            _logSb = new StringBuilder();
+
+            AddLine("Time,CursorX,CursorY,MeteorX,MeteorY");
+            AddLine(string.Format("{0:yyyy-MM-dd HH:mm:ss.fff},{1:F2},{2:F2},{3:F2},{4:F2}", currentTime, 0, 0, 0, 0));
 
             // Start recording
             _isRecording = true;
         }
 
+        private void AddLine(string text)
+        {
+            _logSb.AppendLine(text);
+        }
+
         public void PauseRecording()
         {
             _isRecording = false;
-            _csvWriter.WriteLine("######################## PAUSED ########################");
+            AddLine("######################## PAUSED ########################");
         }
 
         public void StopRecording()
@@ -122,6 +134,13 @@ namespace com.hive.projectr
             // Close the CSV file when recording is terminated
             if (_csvWriter != null)
             {
+                if (_logSb != null)
+                {
+                    _csvWriter.Write(_logSb.ToString());
+                }
+
+                _logSb = null;
+
                 _csvWriter.Close();
                 _csvWriter = null;
             }
