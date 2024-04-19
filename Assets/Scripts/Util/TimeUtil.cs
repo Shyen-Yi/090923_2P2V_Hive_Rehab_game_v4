@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace com.hive.projectr
 {
     public static class TimeUtil
     {
+        public static DateTime Now => DateTime.Now;
+
         public static string GetMonthName(int month)
         {
             switch (month)
