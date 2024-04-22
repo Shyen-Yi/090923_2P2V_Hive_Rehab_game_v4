@@ -45,6 +45,8 @@ namespace com.hive.projectr
         private int _calibrationNum;
         private int _coreGameNum;
         private int _sessionNum;
+        private DateTime _logTime;
+        private StringBuilder _logTextSb;
 
         private static readonly string DayFolderTemplate = "{0:00}/{1:00}/{2:0000}.{3}"; // 03/13/2024.Mark
         private static readonly string SessionFolderTemplate = SessionNumPrefix + "{0}.{1:00}:{2:00}"; // Session#3.14:25
@@ -82,18 +84,40 @@ namespace com.hive.projectr
         #endregion
 
         #region Calibration
+        public void OnCalibrationStarted(DateTime logTime)
+        {
+            Init(logTime);
+        }
+
+        /// <summary>
+        /// Called when a calibration is finished.
+        /// Save calibration CSV data.
+        /// </summary>
+        /// <param name="data"></param>
         public void OnCalibrationEnded(CSVCalibration data)
         {
-            var dayFolderPath = SetupDayFolder(TimeUtil.Now);
 
-            _csvWriter = new StreamWriter(_filePath, false);
+
+            Reset();
         }
         #endregion
 
         #region Core Game
-        public void OnAsteroidSpawned()
+        public void OnCoreGameStarted(DateTime logTime)
+        {
+            Init(logTime);
+            AppendLog($"Asteroid's ID, Asteroid Spawn Time, Asteroid's Coordinate X (Spawned), Asteroid's Coordinate Y (Spawned), Cursor's Coordinate X (Spawned), Cursor's Coordinate Y (Spawned), Is Asteroid Captured, Asteroid Capture Time, Asteroid's Coordinate X (Captured), Asteroid's Coordinate Y (Captured), Cursor's Coordinate X (Captured), Cursor's Coordinate Y (Captured), Is Asteroid Destroyed, Asteroid Destroy Time, Asteroid's Coordinate X (Destroyed), Asteroid's Coordinate Y (Destroyed), Vacuum's Coordinate X (Destroyed), Vacuum's Coordinate Y (Destroyed)");
+        }
+
+        public void OnCoreGameAsteroidSpawned(CSVAsteroid data)
+        {
+        }
+
+        public void OnCoreGameEnded()
         {
 
+
+            Reset();
         }
         #endregion
 
@@ -174,14 +198,15 @@ namespace com.hive.projectr
         /// <summary>
         /// Need to be called before writing any log to local file
         /// </summary>
+        /// <param name="logTime">Generation time of the log</param>
         /// <returns>If success</returns>
-        private bool Setup()
+        private bool Init(DateTime logTime)
         {
-            var time = TimeUtil.Now;
+            _logTime = logTime;
 
             try
             {
-                var dayFolderPath = GetDayFolderPath(time, SettingManager.Instance.DisplayName);
+                var dayFolderPath = GetDayFolderPath(logTime, SettingManager.Instance.DisplayName);
 
                 if (!Directory.Exists(dayFolderPath))
                 {
@@ -206,7 +231,7 @@ namespace com.hive.projectr
                     _sessionNum = sessionNum + 1;
                 }
 
-                var sessionFolderPath = GetSessionFolderPath(dayFolderPath, _sessionNum, time);
+                var sessionFolderPath = GetSessionFolderPath(dayFolderPath, _sessionNum, logTime);
                 if (!Directory.Exists(sessionFolderPath))
                 {
                     Directory.CreateDirectory(sessionFolderPath);
@@ -226,6 +251,30 @@ namespace com.hive.projectr
 
             Logger.Log($"CSVManager::Setup - _sessionNum: {_sessionNum} | _calibrationNum: {_calibrationNum} | _coreGameNum: {_coreGameNum}");
             return true;
+        }
+
+        private void Reset()
+        {
+            _calibrationNum = 0;
+            _coreGameNum = 0;
+            _sessionNum = 0;
+            _logTime = DateTime.MinValue;
+            _logTextSb = null;
+        }
+
+        private void AppendLog(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return;
+
+            if (_logSb != null)
+            {
+                _logSb.Append(text);
+            }
+            else
+            {
+                Logger.LogError($"Cannot append log when _logSb is null!");
+            }
         }
         #endregion
 
@@ -322,23 +371,14 @@ namespace com.hive.projectr
 
         private string SetupDayFolder(DateTime time)
         {
-            var dayFolderPath = "";
+            var dayFolderPath = GetDayFolderPath(time, SettingManager.Instance.DisplayName);
 
             try
             {
-                var dayString = $"{time.ToString("yyyy-MM-dd")}.";
-
-#if UNITY_EDITOR
-                dayFolderPath = Path.Combine(Application.dataPath, "CSVFiles", $"{dayString}.{SettingManager.Instance.DisplayName}");
-#else
-                dayFolderPath = Path.Combine(Application.persistentDataPath, "CSVFiles", $"{dayString}.{SettingManager.Instance.DisplayName}");
-#endif
-
                 if (!Directory.Exists(dayFolderPath))
                 {
                     Directory.CreateDirectory(dayFolderPath);
                 }
-
             }
             catch (Exception e)
             {
