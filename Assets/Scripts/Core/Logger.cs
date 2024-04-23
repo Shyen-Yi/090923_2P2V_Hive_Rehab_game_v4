@@ -24,7 +24,10 @@ namespace com.hive.projectr
 
         public static void LogException(Exception e)
         {
-            Debug.LogError($"Exception::{e.Message}.\nStackTrace: {e.StackTrace}");
+            if (e != null)
+            {
+                Debug.LogError($"Exception::{e.Message}.\nStackTrace: {e.StackTrace}");
+            }
         }
     }
 }

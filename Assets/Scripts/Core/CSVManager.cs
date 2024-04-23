@@ -3,25 +3,80 @@ using System.IO;
 using UnityEngine;
 using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace com.hive.projectr
 {
     #region CSV Data
-    public struct CSVAsteroid
+    public struct CSVCoreGameEndedData
     {
-        public int asteroidId;
-        public float spawnTime;
-        public Vector2 asteroidCoordinateWhenSpawned;
-        public Vector2 cursorCoordinateWhenAsteroidSpawned;
-        public float captureSec;
-        public Vector2 asteroidCoordinateWhenCaptured;
-        public Vector2 cursorCoordinateWhenAsteroidCaptured;
-        public bool isAsteroidCaptured;
-        public bool isAsteroidDestroyed;
-        public Vector2 vacuumCenterCoordinate;
+        public int level;
+        public int capturedCount;
+        public int collectedCount;
+        public int totalCount;
+        public int successRate; // percentage
+
+        public CSVCoreGameEndedData(int level, int capturedCount, int collectedCount, int totalCount, int successRate)
+        {
+            this.level = level;
+            this.capturedCount = capturedCount;
+            this.collectedCount = collectedCount;
+            this.totalCount = totalCount;
+            this.successRate = successRate;
+        }
     }
 
-    public struct CSVCalibration
+    public struct CSVCoreGameTickData
+    {
+        public float coreGameTime;
+        public Vector2 cursorCoordinate;
+
+        public CSVCoreGameTickData(float coreGameTime, Vector2 cursorCoordinate)
+        {
+            this.coreGameTime = coreGameTime;
+            this.cursorCoordinate = cursorCoordinate;
+        }
+    }
+
+    public struct CSVCoreGameAsteroidSpawnedData
+    {
+        public int asteroidId;
+
+        // spawn
+        public float asteroidSpawnTime;
+        public Vector2 asteroidCoordinateWhenSpawned;
+        public Vector2 cursorCoordinateWhenAsteroidSpawned;
+
+        // capture
+        public bool isAsteroidCaptured;
+        public float timeSpentToCaptureAsteroid;
+        public Vector2 asteroidCoordinateWhenCaptured;
+        public Vector2 cursorCoordinateWhenAsteroidCaptured;
+
+        // collect
+        public bool isAsteroidCollected;
+        public float timeSpentToCollectAsteroid;
+        public Vector2 asteroidCoordinateWhenCollected;
+        public Vector2 vacuumCenterCoordinateWhenCollected;
+
+        public CSVCoreGameAsteroidSpawnedData(int asteroidId, float asteroidSpawnTime, Vector2 asteroidCoordinateWhenSpawned, Vector2 cursorCoordinateWhenAsteroidSpawned, bool isAsteroidCaptured, float timeSpentToCaptureAsteroid, Vector2 asteroidCoordinateWhenCaptured, Vector2 cursorCoordinateWhenAsteroidCaptured, bool isAsteroidCollected, float timeSpentToCollectAsteroid, Vector2 asteroidCoordinateWhenCollected, Vector2 vacuumCenterCoordinateWhenCollected)
+        {
+            this.asteroidId = asteroidId;
+            this.asteroidSpawnTime = asteroidSpawnTime;
+            this.asteroidCoordinateWhenSpawned = asteroidCoordinateWhenSpawned;
+            this.cursorCoordinateWhenAsteroidSpawned = cursorCoordinateWhenAsteroidSpawned;
+            this.isAsteroidCaptured = isAsteroidCaptured;
+            this.timeSpentToCaptureAsteroid = timeSpentToCaptureAsteroid;
+            this.asteroidCoordinateWhenCaptured = asteroidCoordinateWhenCaptured;
+            this.cursorCoordinateWhenAsteroidCaptured = cursorCoordinateWhenAsteroidCaptured;
+            this.isAsteroidCollected = isAsteroidCollected;
+            this.timeSpentToCollectAsteroid = timeSpentToCollectAsteroid;
+            this.asteroidCoordinateWhenCollected = asteroidCoordinateWhenCollected;
+            this.vacuumCenterCoordinateWhenCollected = vacuumCenterCoordinateWhenCollected;
+        }
+    }
+
+    public struct CSVCalibrationEndedData
     {
         public Vector2 center;
         public Vector2 topLeft;
@@ -29,7 +84,7 @@ namespace com.hive.projectr
         public Vector2 bottomRight;
         public Vector2 bottomLeft;
 
-        public CSVCalibration(Vector2 center, Vector2 topLeft, Vector2 topRight, Vector2 bottomRight, Vector2 bottomLeft)
+        public CSVCalibrationEndedData(Vector2 center, Vector2 topLeft, Vector2 topRight, Vector2 bottomRight, Vector2 bottomLeft)
         {
             this.center = center;
             this.topLeft = topLeft;
@@ -40,13 +95,26 @@ namespace com.hive.projectr
     }
     #endregion
 
+    public enum CSVType
+    {
+        CoordinatePos,
+        Summary,
+        Coordinates,
+    }
+
     public class CSVManager : SingletonBase<CSVManager>, ICoreManager
     {
+        private bool _isLogging;
+
         private int _calibrationNum;
         private int _coreGameNum;
         private int _sessionNum;
         private DateTime _logTime;
-        private StringBuilder _logTextSb;
+        private Dictionary<CSVType, StringBuilder> _logSbDict = new Dictionary<CSVType, StringBuilder>();
+
+        private string _coordinatePosFilePath;
+        private string _coordinatesFilePath;
+        private string _summaryFilePath;
 
         private static readonly string DayFolderTemplate = "{0:00}/{1:00}/{2:0000}.{3}"; // 03/13/2024.Mark
         private static readonly string SessionFolderTemplate = SessionNumPrefix + "{0}.{1:00}:{2:00}"; // Session#3.14:25
@@ -55,38 +123,35 @@ namespace com.hive.projectr
         private static readonly string CoordinatesFileTemplate = "{0}_{1}/{2}/{3}_{4}Block_Level{5}_Coordinates"; // Mark_03/13/2024_100Block_Level1_Coordinates
         private static readonly string SummaryFileTemplate = "{0}_Summary"; // Mark_Summary
 
-
-
-
-        private Transform _handObj; // Reference to the GameObject whose position we want to record
-        private GameObject _asteroidObj = null; //Is Meteoroid correct? Sounds weird
-
-        private string _filePath;
-        private StreamWriter _csvWriter;
-        private StringBuilder _logSb;
-        private float recordInterval = 0.1f; // Record position every 0.1 second
-
-        private bool _isRecording;
-        private float _nextWriteTime;
-
         #region Lifecycle
         public void OnInit()
         {
             SetupDayFolder(TimeUtil.Now);
 
-            MonoBehaviourUtil.OnUpdate += Tick;
+            MonoBehaviourUtil.OnApplicationQuitEvent += OnApplicationQuit;
         }
 
         public void OnDispose()
         {
-            MonoBehaviourUtil.OnUpdate -= Tick;
+            MonoBehaviourUtil.OnApplicationQuitEvent -= OnApplicationQuit;
+        }
+        #endregion
+
+        #region Event
+        private void OnApplicationQuit()
+        {
+            TryEndLog();
         }
         #endregion
 
         #region Calibration
         public void OnCalibrationStarted(DateTime logTime)
         {
-            Init(logTime);
+            StartLog(logTime);
+
+            // coordinatePos
+            AppendLog(CSVType.CoordinatePos, $"Calibration #{_calibrationNum}\n");
+            AppendLog(CSVType.CoordinatePos, $"Centre Point X, Centre Point Y, Top Left X, Top Left Y, Top Right X, Top Right Y, Bottom Right X, Bottom Right Y, Bottom Left X, Bottom Left Y\n");
         }
 
         /// <summary>
@@ -94,34 +159,74 @@ namespace com.hive.projectr
         /// Save calibration CSV data.
         /// </summary>
         /// <param name="data"></param>
-        public void OnCalibrationEnded(CSVCalibration data)
+        public void OnCalibrationEnded(CSVCalibrationEndedData data)
         {
+            // coordinatePos
+            AppendLog(CSVType.CoordinatePos, $"{data.center.x}, {data.center.y}, {data.topLeft.x}, {data.topLeft.y}, {data.topRight.x}, {data.topRight.y}, {data.bottomRight.x}, {data.bottomRight.y}, {data.bottomLeft.x}, {data.bottomLeft.y}\n");
 
-
-            Reset();
+            TryEndLog();
         }
         #endregion
 
         #region Core Game
         public void OnCoreGameStarted(DateTime logTime)
         {
-            Init(logTime);
-            AppendLog($"Asteroid's ID, Asteroid Spawn Time, Asteroid's Coordinate X (Spawned), Asteroid's Coordinate Y (Spawned), Cursor's Coordinate X (Spawned), Cursor's Coordinate Y (Spawned), Is Asteroid Captured, Asteroid Capture Time, Asteroid's Coordinate X (Captured), Asteroid's Coordinate Y (Captured), Cursor's Coordinate X (Captured), Cursor's Coordinate Y (Captured), Is Asteroid Destroyed, Asteroid Destroy Time, Asteroid's Coordinate X (Destroyed), Asteroid's Coordinate Y (Destroyed), Vacuum's Coordinate X (Destroyed), Vacuum's Coordinate Y (Destroyed)");
+            StartLog(logTime);
+
+            // coordinatePos
+            AppendLog(CSVType.CoordinatePos, $"Exercise #{_coreGameNum}");
+            AppendLog(CSVType.CoordinatePos, $"Asteroid ID, Asteroid Spawn Time, Asteroid's Coordinate X (Spawned), Asteroid's Coordinate Y (Spawned), Cursor's Coordinate X (Spawned), Cursor's Coordinate Y (Spawned), Is Asteroid Captured, Asteroid Capture Time, Asteroid's Coordinate X (Captured), Asteroid's Coordinate Y (Captured), Cursor's Coordinate X (Captured), Cursor's Coordinate Y (Captured), Is Asteroid Collected, Asteroid Collect Time, Asteroid's Coordinate X (Collected), Asteroid's Coordinate Y (Collected), Vacuum's Coordinate X (Captured), Vacuum's Coordinate Y (Captured)");
+
+            // summary
+            AppendLog(CSVType.Summary, $"Exercise #{_coreGameNum}");
+            AppendLog(CSVType.Summary, $"Date, Time, Level, Captured Count, Collected Count, Total Count, Success Rate");
+
+            // coordinates
+            AppendLog(CSVType.Coordinates, $"Exercise #{_coreGameNum}");
+            AppendLog(CSVType.Coordinates, $"Time, Cursor Coordinate X, Cursor Coordinate Y");
         }
 
-        public void OnCoreGameAsteroidSpawned(CSVAsteroid data)
+        public void OnCoreGameAsteroidSpawned(CSVCoreGameAsteroidSpawnedData data)
         {
+            // coordinatePos
+            AppendLog(CSVType.CoordinatePos, $"{data.asteroidId}, {data.asteroidSpawnTime}, {data.asteroidCoordinateWhenSpawned.x}, {data.asteroidCoordinateWhenSpawned.y}, {data.cursorCoordinateWhenAsteroidSpawned.x}, {data.cursorCoordinateWhenAsteroidSpawned.y}, {data.isAsteroidCaptured}, {data.timeSpentToCaptureAsteroid}, {data.asteroidCoordinateWhenCaptured.x}, {data.asteroidCoordinateWhenCaptured.y}, {data.cursorCoordinateWhenAsteroidCaptured.x}, {data.cursorCoordinateWhenAsteroidCaptured.y}, {data.isAsteroidCollected}, {data.timeSpentToCollectAsteroid}, {data.asteroidCoordinateWhenCollected.x}, {data.asteroidCoordinateWhenCollected.y}, {data.vacuumCenterCoordinateWhenCollected.x}, {data.vacuumCenterCoordinateWhenCollected.y}");
         }
 
-        public void OnCoreGameEnded()
+        public void OnCoreGameTick(CSVCoreGameTickData data)
         {
+            // coordinates
+            AppendLog(CSVType.Coordinates, $"{data.coreGameTime}, {data.cursorCoordinate.x}, {data.cursorCoordinate.y}");
+        }
 
+        public void OnCoreGameEnded(CSVCoreGameEndedData data)
+        {
+            // summary
+            AppendLog(CSVType.Summary, $"{_logTime.Month:00}/{_logTime.Day:00}/{_logTime.Year:0000}, {_logTime.Hour:00}/{_logTime.Minute:00}, {data.level}, {data.capturedCount}, {data.collectedCount}, {data.totalCount}, {data.successRate}%");
 
-            Reset();
+            TryEndLog();
         }
         #endregion
 
         #region Private
+        private string SetupDayFolder(DateTime time)
+        {
+            var dayFolderPath = GetDayFolderPath(time, SettingManager.Instance.DisplayName);
+
+            try
+            {
+                if (!Directory.Exists(dayFolderPath))
+                {
+                    Directory.CreateDirectory(dayFolderPath);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogException(e);
+            }
+
+            return dayFolderPath;
+        }
+
         private string GetDayFolderName(DateTime time, string username)
         {
             return string.Format(DayFolderTemplate, time.Month, time.Day, time.Year, username);
@@ -196,12 +301,88 @@ namespace com.hive.projectr
         }
 
         /// <summary>
+        /// Called when a logging session starts / ends
+        /// </summary>
+        /// <returns></returns>
+        private bool TryEndLog()
+        {
+            if (_isLogging)
+            {
+                _isLogging = false;
+
+                foreach (var pair in _logSbDict)
+                {
+                    var type = pair.Key;
+                    var sb = pair.Value;
+                    SaveLog(type, sb.ToString());
+                }
+
+                _calibrationNum = 0;
+                _coreGameNum = 0;
+                _sessionNum = 0;
+                _logTime = DateTime.MinValue;
+                _logSbDict.Clear();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private void SaveLog(CSVType type, string content)
+        {
+            try
+            {
+                StreamWriter writer = null;
+                switch (type)
+                {
+                    case CSVType.CoordinatePos:
+                        if (!string.IsNullOrEmpty(_coordinatePosFilePath))
+                        {
+                            writer = new StreamWriter(_coordinatePosFilePath, false);
+                        }
+                        break;
+                    case CSVType.Summary:
+                        if (!string.IsNullOrEmpty(_summaryFilePath))
+                        {
+                            writer = new StreamWriter(_summaryFilePath, false);
+                        }
+                        break;
+                    case CSVType.Coordinates:
+                        if (!string.IsNullOrEmpty(_coordinatesFilePath))
+                        {
+                            writer = new StreamWriter(_coordinatesFilePath, false);
+                        }
+                        break;
+                    default:
+                        Logger.LogError($"Undefined CSVType: {type}");
+                        break;
+                }
+
+                if (writer != null)
+                {
+                    writer.Write(content);
+                    writer.WriteLine();
+                    writer.Close();
+                    writer = null;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogException(e);
+            }
+        }
+
+        /// <summary>
         /// Need to be called before writing any log to local file
         /// </summary>
         /// <param name="logTime">Generation time of the log</param>
         /// <returns>If success</returns>
-        private bool Init(DateTime logTime)
+        private bool StartLog(DateTime logTime)
         {
+            TryEndLog();
+
+            _isLogging = true;
             _logTime = logTime;
 
             try
@@ -237,11 +418,9 @@ namespace com.hive.projectr
                     Directory.CreateDirectory(sessionFolderPath);
                 }
 
-                /*
-                var coordinatePosFilePath = GetCoordinatePosFilePath(sessionFolderPath, time, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
-                var coordinatesFilePath = GetCoordinatesFilePath(sessionFolderPath, time, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
-                var summaryFilePath = GetSummaryFilePath(sessionFolderPath, SettingManager.Instance.DisplayName);
-                */
+                _coordinatePosFilePath = GetCoordinatePosFilePath(sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
+                _coordinatesFilePath = GetCoordinatesFilePath(sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
+                _summaryFilePath = GetSummaryFilePath(sessionFolderPath, SettingManager.Instance.DisplayName);
             }
             catch (Exception e)
             {
@@ -249,27 +428,24 @@ namespace com.hive.projectr
                 return false;
             }
 
-            Logger.Log($"CSVManager::Setup - _sessionNum: {_sessionNum} | _calibrationNum: {_calibrationNum} | _coreGameNum: {_coreGameNum}");
+            Logger.Log($"CSVManager::Setup - _sessionNum: {_sessionNum} | _calibrationNum: {_calibrationNum} | _coreGameNum: {_coreGameNum} | _coordinatePosFilePath: {_coordinatePosFilePath} | _coordinatesFilePath: {_coordinatesFilePath} | _summaryFilePath: {_summaryFilePath}");
             return true;
         }
 
-        private void Reset()
-        {
-            _calibrationNum = 0;
-            _coreGameNum = 0;
-            _sessionNum = 0;
-            _logTime = DateTime.MinValue;
-            _logTextSb = null;
-        }
-
-        private void AppendLog(string text)
+        private void AppendLog(CSVType type, string text)
         {
             if (string.IsNullOrEmpty(text))
                 return;
 
-            if (_logSb != null)
+            if (!_logSbDict.TryGetValue(type, out var sb))
             {
-                _logSb.Append(text);
+                sb = new StringBuilder();
+                _logSbDict[type] = sb;
+            }
+
+            if (sb != null)
+            {
+                sb.Append(text);
             }
             else
             {
@@ -277,161 +453,5 @@ namespace com.hive.projectr
             }
         }
         #endregion
-
-        #region Public
-        public void StartRecording(Transform handObj)
-        {
-            _handObj = handObj;
-
-            if (_csvWriter != null)
-            {
-                _isRecording = true;
-                return;
-            }
-
-            // Get the current date and time
-            var currentTime = TimeUtil.Now;
-
-            // Format the date and time as a string (you can adjust the format as needed)
-            var dateTimeString = currentTime.ToString("yyyy-MM-dd_HH-mm");
-
-            // Day folder
-            var dayFolderPath = SetupDayFolder(currentTime);
-
-            // Session folder
-            var maxSessionNum = 0;
-            var sessionFolders = Directory.GetDirectories(dayFolderPath);
-            var sessionFolderPrefix = "Session#";
-            foreach (var sessionFolder in sessionFolders)
-            {
-                var sessionStr = sessionFolder.Substring(sessionFolder.IndexOf(sessionFolderPrefix) + sessionFolderPrefix.Length);
-                if (sessionStr.Length > 0 &&
-                    int.TryParse(sessionStr[0].ToString(), out var sessionNum))
-                {
-                    maxSessionNum = Mathf.Max(maxSessionNum, sessionNum);
-                }
-                else
-                {
-                    Debug.LogError($"Invalid session folder name detected! Please check! -> {sessionFolder}");
-                }
-            }
-
-            var newSessionNum = maxSessionNum + 1;
-            var sessionFoliderPath = Path.Combine(dayFolderPath, $"{sessionFolderPrefix}{newSessionNum}.{currentTime.Hour:00}:{currentTime.Minute:00}");
-
-            if (!Directory.Exists(sessionFoliderPath))
-            {
-                Directory.CreateDirectory(sessionFoliderPath);
-            }
-
-            var sessionCoordinates1Path = Path.Combine(sessionFoliderPath, $"{SettingManager.Instance.DisplayName}_{currentTime.Month:00}/{currentTime.Day:00}/{currentTime.Year:0000}_Block{SettingManager.Instance.DailyBlock}_Level{SettingManager.Instance.Level}_CoordinatePOS");
-            var sessionCoordinates2Path = Path.Combine(sessionFoliderPath, $"{SettingManager.Instance.DisplayName}_{currentTime.Month:00}/{currentTime.Day:00}/{currentTime.Year:0000}_Block{SettingManager.Instance.DailyBlock}_Level{SettingManager.Instance.Level}_Coordinate");
-            var sessionSummaryPath = Path.Combine(sessionFoliderPath, $"{SettingManager.Instance.DisplayName}_{currentTime.Month:00}/{currentTime.Day:00}/{currentTime.Year:0000}_Block{SettingManager.Instance.DailyBlock}_Level{SettingManager.Instance.Level}_Summary");
-
-            // Define the file path for the CSV file with the date and time in the name
-            _filePath = dayFolderPath + $"/movement_data_{dateTimeString}.csv";
-
-            // Create or overwrite the CSV file
-            _csvWriter = new StreamWriter(_filePath, false);
-
-            _logSb = new StringBuilder();
-
-            AddLine("Time,CursorX,CursorY,MeteorX,MeteorY");
-            AddLine(string.Format("{0:yyyy-MM-dd HH:mm:ss.fff},{1:F2},{2:F2},{3:F2},{4:F2}", currentTime, 0, 0, 0, 0));
-
-            // Start recording
-            _isRecording = true;
-        }
-
-        public void PauseRecording()
-        {
-            _isRecording = false;
-            AddLine("######################## PAUSED ########################");
-        }
-
-        public void StopRecording()
-        {
-            _isRecording = false;
-
-            // Close the CSV file when recording is terminated
-            if (_csvWriter != null)
-            {
-                if (_logSb != null)
-                {
-                    _csvWriter.Write(_logSb.ToString());
-                }
-
-                _logSb = null;
-
-                _csvWriter.Close();
-                _csvWriter = null;
-            }
-        }
-        #endregion
-
-        private string SetupDayFolder(DateTime time)
-        {
-            var dayFolderPath = GetDayFolderPath(time, SettingManager.Instance.DisplayName);
-
-            try
-            {
-                if (!Directory.Exists(dayFolderPath))
-                {
-                    Directory.CreateDirectory(dayFolderPath);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogException(e);
-            }
-
-            return dayFolderPath;
-        }
-
-        private void Tick()
-        {
-            if (_isRecording)
-            {
-                if (_handObj == null)
-                {
-                    StopRecording();
-                    return;
-                }
-
-                if (Time.time >= _nextWriteTime)
-                {
-                    _asteroidObj = GameObject.FindWithTag(TagNames.Asteroid);
-
-                    if (_asteroidObj == null)
-                    {
-                        // Record the current position and time with timestamp
-                        string line = string.Format("{0:yyyy-MM-dd HH:mm:ss.fff},{1:F2},{2:F2}",
-                            System.DateTime.Now, _handObj.position.x, _handObj.position.y);
-
-                        // Write the line to the CSV file
-                        AddLine(line);
-                    }
-                    else
-                    {
-                        // Handle the case where no object with the "Meteoroid" tag was found
-                        // Debug.LogWarning("No object with the 'Meteoroid' tag was found.");
-                        string line = string.Format("{0:yyyy-MM-dd HH:mm:ss.fff},{1:F2},{2:F2},{3:F2},{4:F2},",
-                            System.DateTime.Now, _handObj.position.x, _handObj.position.y,
-                                                 _asteroidObj.transform.position.x, _asteroidObj.transform.position.y);
-
-                        // Write the line to the CSV file
-                        AddLine(line);
-                    }
-
-                    // Wait for the specified interval
-                    _nextWriteTime = Time.time + recordInterval;
-                }
-            }
-        }
-
-        private void AddLine(string text)
-        {
-            _logSb.AppendLine(text);
-        }
     }
 }
