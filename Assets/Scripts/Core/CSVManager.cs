@@ -19,127 +19,187 @@ namespace com.hive.projectr
     public struct CSVCoreGameEndedData : ICSVData
     {
         [Name("Level")]
-        public int level;
+        public int Level { get; private set; }
 
         [Name("Captured Amount")]
-        public int capturedCount;
+        public int CapturedCount { get; private set; }
 
         [Name("Collected Amount")]
-        public int collectedCount;
+        public int CollectedCount { get; private set; }
 
         [Name("Total Amount")]
-        public int totalCount;
+        public int TotalCount { get; private set; }
 
         [Name("Success Rate")]
-        public int successRate; // percentage
+        public int SuccessRate { get; private set; } // percentage
 
         public CSVCoreGameEndedData(int level, int capturedCount, int collectedCount, int totalCount, int successRate)
         {
-            this.level = level;
-            this.capturedCount = capturedCount;
-            this.collectedCount = collectedCount;
-            this.totalCount = totalCount;
-            this.successRate = successRate;
+            this.Level = level;
+            this.CapturedCount = capturedCount;
+            this.CollectedCount = collectedCount;
+            this.TotalCount = totalCount;
+            this.SuccessRate = successRate;
         }
     }
 
     public struct CSVCoreGameTickData : ICSVData
     {
         [Name("Time")]
-        public float coreGameTime;
+        public float CoreGameTime { get; private set; }
 
-        [Name("Cursor Coordinate")]
-        public Vector2 cursorCoordinate;
+        [Name("Cursor Coordinate X")]
+        public float CursorCoordinateX { get; private set; }
+
+        [Name("Cursor Coordinate Y")]
+        public float CursorCoordinateY { get; private set; }
 
         public CSVCoreGameTickData(float coreGameTime, Vector2 cursorCoordinate)
         {
-            this.coreGameTime = coreGameTime;
-            this.cursorCoordinate = cursorCoordinate;
+            CoreGameTime = coreGameTime;
+            CursorCoordinateX = cursorCoordinate.x;
+            CursorCoordinateY = cursorCoordinate.y;
         }
     }
 
     public struct CSVCoreGameAsteroidEndedData : ICSVData
     {
         [Name("Asteroid ID")]
-        public int asteroidId;
+        public int AsteroidId { get; private set; }
 
         // spawn
         [Name("Asteroid Spawn Time")]
-        public float asteroidSpawnTime;
+        public float AsteroidSpawnTime { get; private set; }
 
-        [Name("Asteroid Coordinate When Spawned")]
-        public Vector2 asteroidCoordinateWhenSpawned;
+        [Name("Asteroid Coordinate When Spawned X")]
+        public float AsteroidCoordinateWhenSpawnedX { get; private set; }
 
-        [Name("Cursor Coordinate When Asteroid Spawned")]
-        public Vector2 cursorCoordinateWhenAsteroidSpawned;
+        [Name("Asteroid Coordinate When Spawned Y")]
+        public float AsteroidCoordinateWhenSpawnedY { get; private set; }
+
+        [Name("Cursor Coordinate When Asteroid Spawned X")]
+        public float CursorCoordinateWhenAsteroidSpawnedX { get; private set; }
+
+        [Name("Cursor Coordinate When Asteroid Spawned Y")]
+        public float CursorCoordinateWhenAsteroidSpawnedY { get; private set; }
 
         // capture
         [Name("Is Asteroid Captured")]
-        public bool isAsteroidCaptured;
+        public bool IsAsteroidCaptured { get; private set; }
         
         [Name("Time To Capture")]
-        public float timeSpentToCaptureAsteroid;
+        public float TimeSpentToCaptureAsteroid { get; private set; }
 
-        [Name("Asteroid Coordinate When Captured")]
-        public Vector2 asteroidCoordinateWhenCaptured;
+        [Name("Asteroid Coordinate When Captured X")]
+        public float AsteroidCoordinateWhenCapturedX { get; private set; }
 
-        [Name("Cursor Coordinate When Asteroid Captured")]
-        public Vector2 cursorCoordinateWhenAsteroidCaptured;
+        [Name("Asteroid Coordinate When Captured Y")]
+        public float AsteroidCoordinateWhenCapturedY { get; private set; }
+
+        [Name("Cursor Coordinate When Asteroid Captured X")]
+        public float CursorCoordinateWhenAsteroidCapturedX { get; private set; }
+
+        [Name("Cursor Coordinate When Asteroid Captured Y")]
+        public float CursorCoordinateWhenAsteroidCapturedY { get; private set; }
 
         // collect
         [Name("Is Asteroid Collected")]
-        public bool isAsteroidCollected;
+        public bool IsAsteroidCollected { get; private set; }
 
         [Name("Time To Collect")]
-        public float timeSpentToCollectAsteroid;
+        public float TimeSpentToCollectAsteroid { get; private set; }
         
-        [Name("Asteroid Coordinate When Collected")]
-        public Vector2 asteroidCoordinateWhenCollected;
+        [Name("Asteroid Coordinate When Collected X")]
+        public float AsteroidCoordinateWhenCollectedX { get; private set; }
 
-        [Name("Vacuum Center Coordinate When Asteroid Collected")]
-        public Vector2 vacuumCenterCoordinateWhenCollected;
+        [Name("Asteroid Coordinate When Collected Y")]
+        public float AsteroidCoordinateWhenCollectedY { get; private set; }
+
+        [Name("Vacuum Center Coordinate When Asteroid Collected X")]
+        public float VacuumCenterCoordinateWhenCollectedX { get; private set; }
+
+        [Name("Vacuum Center Coordinate When Asteroid Collected Y")]
+        public float VacuumCenterCoordinateWhenCollectedY { get; private set; }
 
         public CSVCoreGameAsteroidEndedData(int asteroidId, float asteroidSpawnTime, Vector2 asteroidCoordinateWhenSpawned, Vector2 cursorCoordinateWhenAsteroidSpawned, bool isAsteroidCaptured, float timeSpentToCaptureAsteroid, Vector2 asteroidCoordinateWhenCaptured, Vector2 cursorCoordinateWhenAsteroidCaptured, bool isAsteroidCollected, float timeSpentToCollectAsteroid, Vector2 asteroidCoordinateWhenCollected, Vector2 vacuumCenterCoordinateWhenCollected)
         {
-            this.asteroidId = asteroidId;
-            this.asteroidSpawnTime = asteroidSpawnTime;
-            this.asteroidCoordinateWhenSpawned = asteroidCoordinateWhenSpawned;
-            this.cursorCoordinateWhenAsteroidSpawned = cursorCoordinateWhenAsteroidSpawned;
-            this.isAsteroidCaptured = isAsteroidCaptured;
-            this.timeSpentToCaptureAsteroid = timeSpentToCaptureAsteroid;
-            this.asteroidCoordinateWhenCaptured = asteroidCoordinateWhenCaptured;
-            this.cursorCoordinateWhenAsteroidCaptured = cursorCoordinateWhenAsteroidCaptured;
-            this.isAsteroidCollected = isAsteroidCollected;
-            this.timeSpentToCollectAsteroid = timeSpentToCollectAsteroid;
-            this.asteroidCoordinateWhenCollected = asteroidCoordinateWhenCollected;
-            this.vacuumCenterCoordinateWhenCollected = vacuumCenterCoordinateWhenCollected;
+            AsteroidId = asteroidId;
+            AsteroidSpawnTime = asteroidSpawnTime;
+            AsteroidCoordinateWhenSpawnedX = asteroidCoordinateWhenSpawned.x;
+            AsteroidCoordinateWhenSpawnedY = asteroidCoordinateWhenSpawned.y;
+            CursorCoordinateWhenAsteroidSpawnedX = cursorCoordinateWhenAsteroidSpawned.x;
+            CursorCoordinateWhenAsteroidSpawnedY = cursorCoordinateWhenAsteroidSpawned.y;
+            IsAsteroidCaptured = isAsteroidCaptured;
+            TimeSpentToCaptureAsteroid = timeSpentToCaptureAsteroid;
+            AsteroidCoordinateWhenCapturedX = asteroidCoordinateWhenCaptured.x;
+            AsteroidCoordinateWhenCapturedY = asteroidCoordinateWhenCaptured.y;
+            CursorCoordinateWhenAsteroidCapturedX = cursorCoordinateWhenAsteroidCaptured.x;
+            CursorCoordinateWhenAsteroidCapturedY = cursorCoordinateWhenAsteroidCaptured.y;
+            IsAsteroidCollected = isAsteroidCollected;
+            TimeSpentToCollectAsteroid = timeSpentToCollectAsteroid;
+            AsteroidCoordinateWhenCollectedX = asteroidCoordinateWhenCollected.x;
+            AsteroidCoordinateWhenCollectedY = asteroidCoordinateWhenCollected.y;
+            VacuumCenterCoordinateWhenCollectedX = vacuumCenterCoordinateWhenCollected.x;
+            VacuumCenterCoordinateWhenCollectedY = vacuumCenterCoordinateWhenCollected.y;
         }
     }
 
     public struct CSVCalibrationEndedData : ICSVData
     {
-        [Name("Center Coordinate")]
-        public Vector2 center;
+        [Name("Center Coordinate X")]
+        public float CenterX { get; private set; }
 
-        [Name("Top Left Coordinate")]
-        public Vector2 topLeft;
+        [Name("Center Coordinate X")]
+        public float CenterY { get; private set; }
 
-        [Name("Top Right Coordinate")]
-        public Vector2 topRight;
+        [Name("Top Left Coordinate X")]
+        public float TopLeftX { get; private set; }
 
-        [Name("Bottom Right Coordinate")]
-        public Vector2 bottomRight;
+        [Name("Top Left Coordinate Y")]
+        public float TopLeftY { get; private set; }
 
-        [Name("Bottom Left Coordinate")]
-        public Vector2 bottomLeft;
+        [Name("Top Right Coordinate X")]
+        public float TopRightX { get; private set; }
+
+        [Name("Top Right Coordinate Y")]
+        public float TopRightY { get; private set; }
+
+        [Name("Bottom Right Coordinate X")]
+        public float BottomRightX { get; private set; }
+
+        [Name("Bottom Right Coordinate Y")]
+        public float BottomRightY { get; private set; }
+
+        [Name("Bottom Left Coordinate X")]
+        public float BottomLeftX { get; private set; }
+
+        [Name("Bottom Left Coordinate Y")]
+        public float BottomLeftY { get; private set; }
 
         public CSVCalibrationEndedData(Vector2 center, Vector2 topLeft, Vector2 topRight, Vector2 bottomRight, Vector2 bottomLeft)
         {
-            this.center = center;
-            this.topLeft = topLeft;
-            this.topRight = topRight;
-            this.bottomRight = bottomRight;
-            this.bottomLeft = bottomLeft;
+            CenterX = center.x;
+            CenterY = center.y;
+            TopLeftX = topLeft.x;
+            TopLeftY = topLeft.y;
+            TopRightX = topRight.x;
+            TopRightY = topRight.y;
+            BottomRightX = bottomRight.x;
+            BottomRightY = bottomRight.y;
+            BottomLeftX = bottomLeft.x;
+            BottomLeftY = bottomLeft.y;
+        }
+    }
+
+    public struct CSVSessionInfo : ICSVData
+    {
+        public int CalibrationNum { get; private set; }
+        public int CoreGameNum { get; private set; }
+
+        public CSVSessionInfo(int calibrationNum, int coreGameNum)
+        {
+            CalibrationNum = calibrationNum;
+            CoreGameNum = coreGameNum;
         }
     }
     #endregion
@@ -151,18 +211,6 @@ namespace com.hive.projectr
         Coordinates,
     }
 
-    public struct CSVSessionInfo : ICSVData
-    {
-        public int calibrationNum;
-        public int coreGameNum;
-
-        public CSVSessionInfo(int calibrationNum, int coreGameNum)
-        {
-            this.calibrationNum = calibrationNum;
-            this.coreGameNum = coreGameNum;
-        }
-    }
-
     public class CSVManager : SingletonBase<CSVManager>, ICoreManager
     {
         private bool _isLogging;
@@ -170,12 +218,12 @@ namespace com.hive.projectr
         private int _calibrationNum;
         private int _coreGameNum;
         private int _sessionNum;
-        private DateTime _logTime;
         private Dictionary<CSVType, StringBuilder> _logSbDict = new Dictionary<CSVType, StringBuilder>();
 
         private string _coordinatePosFilePath;
         private string _coordinatesFilePath;
         private string _summaryFilePath;
+        private string _sessionFolderPath;
         private string _sessionInfoFilePath;
 
         private static readonly string DayFolderTemplate = "{0:00}-{1:00}-{2:0000}_{3}"; // 03-13-2024_Mark
@@ -361,7 +409,7 @@ namespace com.hive.projectr
 
         private string GetSessionInfoFilePath(string sessionFolderPath)
         {
-            return Path.Combine(sessionFolderPath, $"Info.txt");
+            return Path.Combine(sessionFolderPath, $"SessionInfo.txt");
         }
 
         private bool TryParseSessionFolder(string sessionFolderName, out int sessionNum)
@@ -371,7 +419,7 @@ namespace com.hive.projectr
             var sessionStr = sessionFolderName.Substring(sessionFolderName.IndexOf(SessionNumPrefix) + SessionNumPrefix.Length);
             if (sessionStr.Length > 0)
             {
-                var sessionNumStr = sessionStr.Substring(0, sessionStr.IndexOf('.'));
+                var sessionNumStr = sessionStr.Substring(0, sessionStr.IndexOf('_'));
                 if (int.TryParse(sessionNumStr, out sessionNum) && sessionNum >= 1)
                 {
                     return true;
@@ -399,26 +447,22 @@ namespace com.hive.projectr
                     {
                         var type = pair.Key;
                         var sb = pair.Value;
-                        SaveLog(type, sb.ToString());
-                    }
-
-                    if (File.Exists(_sessionInfoFilePath))
-                    {
-                        using (var writer = new StreamWriter(_sessionInfoFilePath, false))
+                        if (sb != null)
                         {
-                            writer.WriteLine(_calibrationNum);
-                            writer.WriteLine(_coreGameNum);
+                            var str = sb.ToString();
+                            if (str.Length > 0)
+                            {
+                                SaveLog(type, str);
+                            }
                         }
                     }
 
-                    _calibrationNum = 0;
-                    _coreGameNum = 0;
-                    _sessionNum = 0;
+                    SaveSessionInfo(_sessionInfoFilePath, new CSVSessionInfo(_calibrationNum, _coreGameNum));
+
                     _coordinatePosFilePath = null;
                     _coordinatesFilePath = null;
                     _summaryFilePath = null;
                     _sessionInfoFilePath = null;
-                    _logTime = DateTime.MinValue;
                     _logSbDict.Clear();
 
                     return true;
@@ -432,6 +476,24 @@ namespace com.hive.projectr
             return false;
         }
 
+        private void SaveSessionInfo(string path, CSVSessionInfo info)
+        {
+            try
+            {
+                using (var writer = new StreamWriter(path, false))
+                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    csv.WriteRecord(info);
+                    csv.Flush();
+                    writer.Flush();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogException(e);
+            }
+        }
+
         private void SaveLog(CSVType type, string content)
         {
             Logger.Log($"CSVManager::SaveLog - type: {type} | content: {content}");
@@ -443,7 +505,7 @@ namespace com.hive.projectr
                     case CSVType.CoordinatePos:
                         if (!string.IsNullOrEmpty(_coordinatePosFilePath))
                         {
-                            using (var writer = new StreamWriter(_coordinatePosFilePath, false))
+                            using (var writer = new StreamWriter(_coordinatePosFilePath, true))
                             {
                                 if (writer != null)
                                 {
@@ -457,7 +519,7 @@ namespace com.hive.projectr
                     case CSVType.Summary:
                         if (!string.IsNullOrEmpty(_summaryFilePath))
                         {
-                            using (var writer = new StreamWriter(_summaryFilePath, false))
+                            using (var writer = new StreamWriter(_summaryFilePath, true))
                             {
                                 if (writer != null)
                                 {
@@ -471,7 +533,7 @@ namespace com.hive.projectr
                     case CSVType.Coordinates:
                         if (!string.IsNullOrEmpty(_coordinatesFilePath))
                         {
-                            using (var writer = new StreamWriter(_coordinatesFilePath, false))
+                            using (var writer = new StreamWriter(_coordinatesFilePath, true))
                             {
                                 if (writer != null)
                                 {
@@ -500,14 +562,16 @@ namespace com.hive.projectr
         /// <returns>If success</returns>
         private bool StartLog(DateTime logTime)
         {
+            var isSuccess = true;
+
             TryEndLog();
 
             _isLogging = true;
-            _logTime = logTime;
 
             try
             {
                 var dayFolderPath = GetDayFolderPath(logTime, SettingManager.Instance.DisplayName);
+                var isNewSession = false;
 
                 if (!Directory.Exists(dayFolderPath))
                 {
@@ -530,29 +594,33 @@ namespace com.hive.projectr
                 if (_sessionNum == 0 || _sessionNum != sessionNum) // init session (folder and stuff)
                 {
                     _sessionNum = sessionNum + 1;
+                    isNewSession = true;
                 }
 
-                var sessionFolderPath = GetSessionFolderPath(dayFolderPath, _sessionNum, logTime);
-                Directory.CreateDirectory(sessionFolderPath); // does nothing when already exists
+                if (isNewSession)
+                {
+                    _sessionFolderPath = GetSessionFolderPath(dayFolderPath, _sessionNum, logTime);
+                }
 
-                _coordinatePosFilePath = GetCoordinatePosFilePath(sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
-                _coordinatesFilePath = GetCoordinatesFilePath(sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
-                _summaryFilePath = GetSummaryFilePath(sessionFolderPath, SettingManager.Instance.DisplayName);
+                Directory.CreateDirectory(_sessionFolderPath); // does nothing when already exists
+
+                _coordinatePosFilePath = GetCoordinatePosFilePath(_sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
+                _coordinatesFilePath = GetCoordinatesFilePath(_sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
+                _summaryFilePath = GetSummaryFilePath(_sessionFolderPath, SettingManager.Instance.DisplayName);
                 
                 // read session info
-                _sessionInfoFilePath = GetSessionInfoFilePath(sessionFolderPath);
+                _sessionInfoFilePath = GetSessionInfoFilePath(_sessionFolderPath);
+
                 if (File.Exists(_sessionInfoFilePath))
                 {
                     using (var reader = new StreamReader(_sessionInfoFilePath))
+                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
-                        if (!int.TryParse(reader.ReadLine(), out _calibrationNum))
+                        var infos = csv.GetRecords<CSVSessionInfo>();
+                        foreach (var info in infos)
                         {
-                            Logger.LogError($"Failed to parse calibration num from: {_sessionInfoFilePath}");
-                        }
-
-                        if (!int.TryParse(reader.ReadLine(), out _coreGameNum))
-                        {
-                            Logger.LogError($"Failed to parse core game num from: {_sessionInfoFilePath}");
+                            _calibrationNum = info.CalibrationNum;
+                            _coreGameNum = info.CoreGameNum;
                         }
                     }
                 }
@@ -565,12 +633,11 @@ namespace com.hive.projectr
             catch (Exception e)
             {
                 Logger.LogException(e);
-                Logger.Log($"CSVManager::Setup - _sessionNum: {_sessionNum} | _calibrationNum: {_calibrationNum} | _coreGameNum: {_coreGameNum} | _coordinatePosFilePath: {_coordinatePosFilePath} | _coordinatesFilePath: {_coordinatesFilePath} | _summaryFilePath: {_summaryFilePath}");
-                return false;
+                isSuccess = false;
             }
 
-            Logger.Log($"CSVManager::Setup - _sessionNum: {_sessionNum} | _calibrationNum: {_calibrationNum} | _coreGameNum: {_coreGameNum} | _coordinatePosFilePath: {_coordinatePosFilePath} | _coordinatesFilePath: {_coordinatesFilePath} | _summaryFilePath: {_summaryFilePath}");
-            return true;
+            Logger.Log($"CSVManager::StartLog - _sessionNum: {_sessionNum} | _sessionFolderPath: {_sessionFolderPath} | _sessionInfoFilePath: {_sessionInfoFilePath} | _calibrationNum: {_calibrationNum} | _coreGameNum: {_coreGameNum} | _coordinatePosFilePath: {_coordinatePosFilePath} | _coordinatesFilePath: {_coordinatesFilePath} | _summaryFilePath: {_summaryFilePath}");
+            return isSuccess;
         }
 
         public string GenerateCSVHeader<T>() where T : ICSVData

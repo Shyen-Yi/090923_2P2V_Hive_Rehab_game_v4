@@ -257,7 +257,7 @@ namespace com.hive.projectr
             var minLevelData = CoreGameLevelConfig.GetLevelData(CoreGameLevelConfig.MinLevel);
             _spacecraftController.Activate(new SpacecraftData(minLevelData.SpacecraftSize));
 
-            CSVManager.Instance.OnCoreGameStarted(TimeUtil.Now);
+            CSVManager.Instance.OnCalibrationStarted(TimeUtil.Now);
         }
 
         private void Resume()

@@ -613,6 +613,8 @@ namespace com.hive.projectr
                     _spacecraftController.Activate(new SpacecraftData(_levelConfigData.SpacecraftSize));
                     CenterSpacecraft();
                     UpdateState(CoreGameState.Running);
+
+                    CSVManager.Instance.OnCoreGameStarted(TimeUtil.Now);
                 }));
             }
             else if (_state == CoreGameState.Paused)

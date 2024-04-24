@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.IO.LowLevel.Unsafe;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -77,23 +79,31 @@ namespace com.hive.projectr
                 canvas.sortingOrder += Index * 100;
             }
 
+            Logger.Log($"GameSceneController::Init - SceneName: {SceneName}");
+
             OnInit();
         }
 
         public void Show(ISceneData data, GameSceneShowState showState)
         {
+            Logger.Log($"GameSceneController::Show - SceneName: {SceneName} | ShowState: {showState}");
+
             OnShow(data, showState);
             Config.CanvasGroup.CanvasGroupOn();
         }
 
         public void Hide(GameSceneHideState hideState)
         {
+            Logger.Log($"GameSceneController::Hide - SceneName: {SceneName} | HideState: {hideState}");
+
             OnHide(hideState);
             Config.CanvasGroup.CanvasGroupOff();
         }
 
         public void Dispose()
         {
+            Logger.Log($"GameSceneController::Dispose - SceneName: {SceneName}");
+
             OnDispose();
 
             CameraManager.Instance.RemoveFromMainStackWithOwner(Scene.name);

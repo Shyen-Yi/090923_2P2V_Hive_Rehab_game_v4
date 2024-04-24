@@ -19,8 +19,6 @@ namespace com.hive.projectr
 
             LatestLevelPlayed = level;
             PlayerPrefs.SetInt(PlayerPrefKeys.LatestLevelPlayed, LatestLevelPlayed);
-
-            Debug.LogError($"OnLevelStarted - LatestLevelPlayed: {LatestLevelPlayed} | LatestLevelPassedStreak: {LatestLevelPassedStreak}");
         }
 
         public void OnLevelCompleted(int level, bool isPassed)
