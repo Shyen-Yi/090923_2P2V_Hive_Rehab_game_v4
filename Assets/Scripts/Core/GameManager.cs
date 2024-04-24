@@ -41,14 +41,14 @@ namespace com.hive.projectr
             _configManager = new ConfigDataManager();
             _configManager.OnInit();
 
-            _csvManager = new CSVManager();
+            _settingManager = new SettingManager();
+            _settingManager.OnInit();
+
+            _csvManager = new CSVManager(); // after setting
             _csvManager.OnInit();
 
             _inputManager = new InputManager(); // after camera
             _inputManager.OnInit();
-
-            _settingManager = new SettingManager();
-            _settingManager.OnInit();
 
             _levelManager = new LevelManager();
             _levelManager.OnInit();

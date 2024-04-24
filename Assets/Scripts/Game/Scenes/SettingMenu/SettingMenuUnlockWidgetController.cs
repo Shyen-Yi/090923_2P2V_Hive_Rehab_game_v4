@@ -10,11 +10,11 @@ namespace com.hive.projectr
     {
         public Dictionary<string, string> dict;
 
-        public SettingUserInfoStorage(string username, string password)
-        {
-            dict = new Dictionary<string, string>();
-            dict.Add(username, password);
-        }
+        //public SettingUserInfoStorage(string username, string password)
+        //{
+        //    dict = new Dictionary<string, string>();
+        //    dict.Add(username, password);
+        //}
     }
 
     public class SettingMenuUnlockWidgetController
@@ -169,7 +169,12 @@ namespace com.hive.projectr
             else
             {
                 // save & pass
-                var storage = new SettingUserInfoStorage(username, password);
+                var storage = new SettingUserInfoStorage() { 
+                    dict = new Dictionary<string, string>()
+                    {
+                        { username, password }
+                    }
+                };
                 var storageJson = JsonConvert.SerializeObject(storage);
                 PlayerPrefs.SetString(PlayerPrefKeys.UserInfoStorage, storageJson);
 

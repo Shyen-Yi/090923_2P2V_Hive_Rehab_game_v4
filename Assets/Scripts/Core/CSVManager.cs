@@ -4,16 +4,33 @@ using UnityEngine;
 using System.Text;
 using System;
 using System.Collections.Generic;
+using CsvHelper;
+using CsvHelper.Configuration.Attributes;
+using System.Globalization;
 
 namespace com.hive.projectr
 {
-    #region CSV Data
-    public struct CSVCoreGameEndedData
+    public interface ICSVData
     {
+
+    }
+
+    #region CSV Data
+    public struct CSVCoreGameEndedData : ICSVData
+    {
+        [Name("Level")]
         public int level;
+
+        [Name("Captured Amount")]
         public int capturedCount;
+
+        [Name("Collected Amount")]
         public int collectedCount;
+
+        [Name("Total Amount")]
         public int totalCount;
+
+        [Name("Success Rate")]
         public int successRate; // percentage
 
         public CSVCoreGameEndedData(int level, int capturedCount, int collectedCount, int totalCount, int successRate)
@@ -26,9 +43,12 @@ namespace com.hive.projectr
         }
     }
 
-    public struct CSVCoreGameTickData
+    public struct CSVCoreGameTickData : ICSVData
     {
+        [Name("Time")]
         public float coreGameTime;
+
+        [Name("Cursor Coordinate")]
         public Vector2 cursorCoordinate;
 
         public CSVCoreGameTickData(float coreGameTime, Vector2 cursorCoordinate)
@@ -38,25 +58,45 @@ namespace com.hive.projectr
         }
     }
 
-    public struct CSVCoreGameAsteroidEndedData
+    public struct CSVCoreGameAsteroidEndedData : ICSVData
     {
+        [Name("Asteroid ID")]
         public int asteroidId;
 
         // spawn
+        [Name("Asteroid Spawn Time")]
         public float asteroidSpawnTime;
+
+        [Name("Asteroid Coordinate When Spawned")]
         public Vector2 asteroidCoordinateWhenSpawned;
+
+        [Name("Cursor Coordinate When Asteroid Spawned")]
         public Vector2 cursorCoordinateWhenAsteroidSpawned;
 
         // capture
+        [Name("Is Asteroid Captured")]
         public bool isAsteroidCaptured;
+        
+        [Name("Time To Capture")]
         public float timeSpentToCaptureAsteroid;
+
+        [Name("Asteroid Coordinate When Captured")]
         public Vector2 asteroidCoordinateWhenCaptured;
+
+        [Name("Cursor Coordinate When Asteroid Captured")]
         public Vector2 cursorCoordinateWhenAsteroidCaptured;
 
         // collect
+        [Name("Is Asteroid Collected")]
         public bool isAsteroidCollected;
+
+        [Name("Time To Collect")]
         public float timeSpentToCollectAsteroid;
+        
+        [Name("Asteroid Coordinate When Collected")]
         public Vector2 asteroidCoordinateWhenCollected;
+
+        [Name("Vacuum Center Coordinate When Asteroid Collected")]
         public Vector2 vacuumCenterCoordinateWhenCollected;
 
         public CSVCoreGameAsteroidEndedData(int asteroidId, float asteroidSpawnTime, Vector2 asteroidCoordinateWhenSpawned, Vector2 cursorCoordinateWhenAsteroidSpawned, bool isAsteroidCaptured, float timeSpentToCaptureAsteroid, Vector2 asteroidCoordinateWhenCaptured, Vector2 cursorCoordinateWhenAsteroidCaptured, bool isAsteroidCollected, float timeSpentToCollectAsteroid, Vector2 asteroidCoordinateWhenCollected, Vector2 vacuumCenterCoordinateWhenCollected)
@@ -76,12 +116,21 @@ namespace com.hive.projectr
         }
     }
 
-    public struct CSVCalibrationEndedData
+    public struct CSVCalibrationEndedData : ICSVData
     {
+        [Name("Center Coordinate")]
         public Vector2 center;
+
+        [Name("Top Left Coordinate")]
         public Vector2 topLeft;
+
+        [Name("Top Right Coordinate")]
         public Vector2 topRight;
+
+        [Name("Bottom Right Coordinate")]
         public Vector2 bottomRight;
+
+        [Name("Bottom Left Coordinate")]
         public Vector2 bottomLeft;
 
         public CSVCalibrationEndedData(Vector2 center, Vector2 topLeft, Vector2 topRight, Vector2 bottomRight, Vector2 bottomLeft)
@@ -102,6 +151,18 @@ namespace com.hive.projectr
         Coordinates,
     }
 
+    public struct CSVSessionInfo : ICSVData
+    {
+        public int calibrationNum;
+        public int coreGameNum;
+
+        public CSVSessionInfo(int calibrationNum, int coreGameNum)
+        {
+            this.calibrationNum = calibrationNum;
+            this.coreGameNum = coreGameNum;
+        }
+    }
+
     public class CSVManager : SingletonBase<CSVManager>, ICoreManager
     {
         private bool _isLogging;
@@ -115,12 +176,13 @@ namespace com.hive.projectr
         private string _coordinatePosFilePath;
         private string _coordinatesFilePath;
         private string _summaryFilePath;
+        private string _sessionInfoFilePath;
 
-        private static readonly string DayFolderTemplate = "{0:00}/{1:00}/{2:0000}.{3}"; // 03/13/2024.Mark
-        private static readonly string SessionFolderTemplate = SessionNumPrefix + "{0}.{1:00}:{2:00}"; // Session#3.14:25
+        private static readonly string DayFolderTemplate = "{0:00}-{1:00}-{2:0000}_{3}"; // 03-13-2024_Mark
+        private static readonly string SessionFolderTemplate = "Session#{0}_{1:00}-{2:00}"; // Session#3_14-25
         private static readonly string SessionNumPrefix = "Session#";
-        private static readonly string CoordinatePosFileTemplate = "{0}_{1}/{2}/{3}_{4}Block_Level{5}_CoordinatePOS"; // Mark_03/13/2024_100Block_Level1_CoordinatePOS
-        private static readonly string CoordinatesFileTemplate = "{0}_{1}/{2}/{3}_{4}Block_Level{5}_Coordinates"; // Mark_03/13/2024_100Block_Level1_Coordinates
+        private static readonly string CoordinatePosFileTemplate = "{0}_{1}-{2}-{3}_{4}Block_Level{5}_CoordinatePOS"; // Mark_03-13-2024_100Block_Level1_CoordinatePOS
+        private static readonly string CoordinatesFileTemplate = "{0}_{1}-{2}-{3}_{4}Block_Level{5}_Coordinates"; // Mark_03-13-2024_100Block_Level1_Coordinates
         private static readonly string SummaryFileTemplate = "{0}_Summary"; // Mark_Summary
 
         #region Lifecycle
@@ -147,11 +209,15 @@ namespace com.hive.projectr
         #region Calibration
         public void OnCalibrationStarted(DateTime logTime)
         {
+            Logger.Log($"CSVManager::OnCalibrationStarted - logTime: {logTime}");
+
             StartLog(logTime);
+
+            ++_calibrationNum;
 
             // coordinatePos
             AppendLog(CSVType.CoordinatePos, $"Calibration #{_calibrationNum}\n");
-            AppendLog(CSVType.CoordinatePos, $"Centre Point X, Centre Point Y, Top Left X, Top Left Y, Top Right X, Top Right Y, Bottom Right X, Bottom Right Y, Bottom Left X, Bottom Left Y\n");
+            AppendLog(CSVType.CoordinatePos, GenerateCSVHeader<CSVCalibrationEndedData>());
         }
 
         /// <summary>
@@ -161,8 +227,10 @@ namespace com.hive.projectr
         /// <param name="data"></param>
         public void OnCalibrationEnded(CSVCalibrationEndedData data)
         {
+            Logger.Log($"CSVManager::OnCalibrationEnded");
+
             // coordinatePos
-            AppendLog(CSVType.CoordinatePos, $"{data.center.x}, {data.center.y}, {data.topLeft.x}, {data.topLeft.y}, {data.topRight.x}, {data.topRight.y}, {data.bottomRight.x}, {data.bottomRight.y}, {data.bottomLeft.x}, {data.bottomLeft.y}\n");
+            AppendLog(CSVType.CoordinatePos, GenerateCSVContent(new List<CSVCalibrationEndedData>() { data }));
 
             TryEndLog();
         }
@@ -171,37 +239,47 @@ namespace com.hive.projectr
         #region Core Game
         public void OnCoreGameStarted(DateTime logTime)
         {
+            Logger.Log($"CSVManager::OnCoreGameStarted - logTime: {logTime}");
+
             StartLog(logTime);
 
+            ++_coreGameNum;
+
             // coordinatePos
-            AppendLog(CSVType.CoordinatePos, $"Exercise #{_coreGameNum}");
-            AppendLog(CSVType.CoordinatePos, $"Asteroid ID, Asteroid Spawn Time, Asteroid's Coordinate X (Spawned), Asteroid's Coordinate Y (Spawned), Cursor's Coordinate X (Spawned), Cursor's Coordinate Y (Spawned), Is Asteroid Captured, Asteroid Capture Time, Asteroid's Coordinate X (Captured), Asteroid's Coordinate Y (Captured), Cursor's Coordinate X (Captured), Cursor's Coordinate Y (Captured), Is Asteroid Collected, Asteroid Collect Time, Asteroid's Coordinate X (Collected), Asteroid's Coordinate Y (Collected), Vacuum's Coordinate X (Captured), Vacuum's Coordinate Y (Captured)");
+            AppendLog(CSVType.CoordinatePos, $"Exercise #{_coreGameNum}\n");
+            AppendLog(CSVType.CoordinatePos, GenerateCSVHeader<CSVCoreGameAsteroidEndedData>());
 
             // summary
-            AppendLog(CSVType.Summary, $"Exercise #{_coreGameNum}");
-            AppendLog(CSVType.Summary, $"Date, Time, Level, Captured Count, Collected Count, Total Count, Success Rate");
+            AppendLog(CSVType.Summary, $"Exercise #{_coreGameNum}\n");
+            AppendLog(CSVType.Summary, GenerateCSVHeader<CSVCoreGameEndedData>());
 
             // coordinates
-            AppendLog(CSVType.Coordinates, $"Exercise #{_coreGameNum}");
-            AppendLog(CSVType.Coordinates, $"Time, Cursor Coordinate X, Cursor Coordinate Y");
+            AppendLog(CSVType.Coordinates, $"Exercise #{_coreGameNum}\n");
+            AppendLog(CSVType.Coordinates, GenerateCSVHeader<CSVCoreGameTickData>());
         }
 
         public void OnCoreGameAsteroidEnded(CSVCoreGameAsteroidEndedData data)
         {
+            Logger.Log($"CSVManager::OnCoreGameAsteroidEnded");
+
             // coordinatePos
-            AppendLog(CSVType.CoordinatePos, $"{data.asteroidId}, {data.asteroidSpawnTime}, {data.asteroidCoordinateWhenSpawned.x}, {data.asteroidCoordinateWhenSpawned.y}, {data.cursorCoordinateWhenAsteroidSpawned.x}, {data.cursorCoordinateWhenAsteroidSpawned.y}, {data.isAsteroidCaptured}, {data.timeSpentToCaptureAsteroid}, {data.asteroidCoordinateWhenCaptured.x}, {data.asteroidCoordinateWhenCaptured.y}, {data.cursorCoordinateWhenAsteroidCaptured.x}, {data.cursorCoordinateWhenAsteroidCaptured.y}, {data.isAsteroidCollected}, {data.timeSpentToCollectAsteroid}, {data.asteroidCoordinateWhenCollected.x}, {data.asteroidCoordinateWhenCollected.y}, {data.vacuumCenterCoordinateWhenCollected.x}, {data.vacuumCenterCoordinateWhenCollected.y}");
+            AppendLog(CSVType.Coordinates, GenerateCSVContent(new List<CSVCoreGameAsteroidEndedData>() { data }));
         }
 
         public void OnCoreGameTick(CSVCoreGameTickData data)
         {
+            Logger.Log($"CSVManager::OnCoreGameTick");
+
             // coordinates
-            AppendLog(CSVType.Coordinates, $"{data.coreGameTime}, {data.cursorCoordinate.x}, {data.cursorCoordinate.y}");
+            AppendLog(CSVType.Coordinates, GenerateCSVContent(new List<CSVCoreGameTickData>() { data }));
         }
 
         public void OnCoreGameEnded(CSVCoreGameEndedData data)
         {
+            Logger.Log($"CSVManager::OnCoreGameEnded");
+
             // summary
-            AppendLog(CSVType.Summary, $"{_logTime.Month:00}/{_logTime.Day:00}/{_logTime.Year:0000}, {_logTime.Hour:00}/{_logTime.Minute:00}, {data.level}, {data.capturedCount}, {data.collectedCount}, {data.totalCount}, {data.successRate}%");
+            AppendLog(CSVType.Summary, GenerateCSVContent(new List<CSVCoreGameEndedData>() { data }));
 
             TryEndLog();
         }
@@ -214,15 +292,14 @@ namespace com.hive.projectr
 
             try
             {
-                if (!Directory.Exists(dayFolderPath))
-                {
-                    Directory.CreateDirectory(dayFolderPath);
-                }
+                Directory.CreateDirectory(dayFolderPath); // does nothing when already exists
             }
             catch (Exception e)
             {
                 Logger.LogException(e);
             }
+
+            Logger.Log($"CSVManager::SetupDayFolder - dayFolderPath: {dayFolderPath}");
 
             return dayFolderPath;
         }
@@ -282,6 +359,11 @@ namespace com.hive.projectr
             return Path.Combine(sessionFolderPath, $"{GetSummaryFileName(username)}.csv");
         }
 
+        private string GetSessionInfoFilePath(string sessionFolderPath)
+        {
+            return Path.Combine(sessionFolderPath, $"Info.txt");
+        }
+
         private bool TryParseSessionFolder(string sessionFolderName, out int sessionNum)
         {
             sessionNum = 1;
@@ -306,24 +388,45 @@ namespace com.hive.projectr
         /// <returns></returns>
         private bool TryEndLog()
         {
-            if (_isLogging)
+            try
             {
-                _isLogging = false;
-
-                foreach (var pair in _logSbDict)
+                if (_isLogging)
                 {
-                    var type = pair.Key;
-                    var sb = pair.Value;
-                    SaveLog(type, sb.ToString());
+                    _isLogging = false;
+
+                    // save
+                    foreach (var pair in _logSbDict)
+                    {
+                        var type = pair.Key;
+                        var sb = pair.Value;
+                        SaveLog(type, sb.ToString());
+                    }
+
+                    if (File.Exists(_sessionInfoFilePath))
+                    {
+                        using (var writer = new StreamWriter(_sessionInfoFilePath, false))
+                        {
+                            writer.WriteLine(_calibrationNum);
+                            writer.WriteLine(_coreGameNum);
+                        }
+                    }
+
+                    _calibrationNum = 0;
+                    _coreGameNum = 0;
+                    _sessionNum = 0;
+                    _coordinatePosFilePath = null;
+                    _coordinatesFilePath = null;
+                    _summaryFilePath = null;
+                    _sessionInfoFilePath = null;
+                    _logTime = DateTime.MinValue;
+                    _logSbDict.Clear();
+
+                    return true;
                 }
-
-                _calibrationNum = 0;
-                _coreGameNum = 0;
-                _sessionNum = 0;
-                _logTime = DateTime.MinValue;
-                _logSbDict.Clear();
-
-                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.LogException(e);
             }
 
             return false;
@@ -331,40 +434,57 @@ namespace com.hive.projectr
 
         private void SaveLog(CSVType type, string content)
         {
+            Logger.Log($"CSVManager::SaveLog - type: {type} | content: {content}");
+
             try
             {
-                StreamWriter writer = null;
                 switch (type)
                 {
                     case CSVType.CoordinatePos:
                         if (!string.IsNullOrEmpty(_coordinatePosFilePath))
                         {
-                            writer = new StreamWriter(_coordinatePosFilePath, false);
+                            using (var writer = new StreamWriter(_coordinatePosFilePath, false))
+                            {
+                                if (writer != null)
+                                {
+                                    writer.Write(content);
+                                    writer.WriteLine();
+                                    writer.Close();
+                                }
+                            }
                         }
                         break;
                     case CSVType.Summary:
                         if (!string.IsNullOrEmpty(_summaryFilePath))
                         {
-                            writer = new StreamWriter(_summaryFilePath, false);
+                            using (var writer = new StreamWriter(_summaryFilePath, false))
+                            {
+                                if (writer != null)
+                                {
+                                    writer.Write(content);
+                                    writer.WriteLine();
+                                    writer.Close();
+                                }
+                            }
                         }
                         break;
                     case CSVType.Coordinates:
                         if (!string.IsNullOrEmpty(_coordinatesFilePath))
                         {
-                            writer = new StreamWriter(_coordinatesFilePath, false);
+                            using (var writer = new StreamWriter(_coordinatesFilePath, false))
+                            {
+                                if (writer != null)
+                                {
+                                    writer.Write(content);
+                                    writer.WriteLine();
+                                    writer.Close();
+                                }
+                            }
                         }
                         break;
                     default:
                         Logger.LogError($"Undefined CSVType: {type}");
                         break;
-                }
-
-                if (writer != null)
-                {
-                    writer.Write(content);
-                    writer.WriteLine();
-                    writer.Close();
-                    writer = null;
                 }
             }
             catch (Exception e)
@@ -413,23 +533,64 @@ namespace com.hive.projectr
                 }
 
                 var sessionFolderPath = GetSessionFolderPath(dayFolderPath, _sessionNum, logTime);
-                if (!Directory.Exists(sessionFolderPath))
-                {
-                    Directory.CreateDirectory(sessionFolderPath);
-                }
+                Directory.CreateDirectory(sessionFolderPath); // does nothing when already exists
 
                 _coordinatePosFilePath = GetCoordinatePosFilePath(sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
                 _coordinatesFilePath = GetCoordinatesFilePath(sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
                 _summaryFilePath = GetSummaryFilePath(sessionFolderPath, SettingManager.Instance.DisplayName);
+                
+                // read session info
+                _sessionInfoFilePath = GetSessionInfoFilePath(sessionFolderPath);
+                if (File.Exists(_sessionInfoFilePath))
+                {
+                    using (var reader = new StreamReader(_sessionInfoFilePath))
+                    {
+                        if (!int.TryParse(reader.ReadLine(), out _calibrationNum))
+                        {
+                            Logger.LogError($"Failed to parse calibration num from: {_sessionInfoFilePath}");
+                        }
+
+                        if (!int.TryParse(reader.ReadLine(), out _coreGameNum))
+                        {
+                            Logger.LogError($"Failed to parse core game num from: {_sessionInfoFilePath}");
+                        }
+                    }
+                }
+                else
+                {
+                    _coreGameNum = 0;
+                    _calibrationNum = 0;
+                }
             }
             catch (Exception e)
             {
                 Logger.LogException(e);
+                Logger.Log($"CSVManager::Setup - _sessionNum: {_sessionNum} | _calibrationNum: {_calibrationNum} | _coreGameNum: {_coreGameNum} | _coordinatePosFilePath: {_coordinatePosFilePath} | _coordinatesFilePath: {_coordinatesFilePath} | _summaryFilePath: {_summaryFilePath}");
                 return false;
             }
 
             Logger.Log($"CSVManager::Setup - _sessionNum: {_sessionNum} | _calibrationNum: {_calibrationNum} | _coreGameNum: {_coreGameNum} | _coordinatePosFilePath: {_coordinatePosFilePath} | _coordinatesFilePath: {_coordinatesFilePath} | _summaryFilePath: {_summaryFilePath}");
             return true;
+        }
+
+        public string GenerateCSVHeader<T>() where T : ICSVData
+        {
+            using (var writer = new StringWriter())
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.WriteHeader(typeof(T));
+                return writer.ToString();
+            }
+        }
+
+        public string GenerateCSVContent<T>(IEnumerable<T> records) where T : ICSVData
+        {
+            using (var writer = new StringWriter())
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.WriteRecords(records);
+                return writer.ToString();
+            }
         }
 
         private void AppendLog(CSVType type, string text)

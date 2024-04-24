@@ -19,3 +19,4 @@ MonoBehaviour:
     coreGameTransitionSec: 2
     calibrationTransitionSec: 5
     passingStreakToNextLevel: 1
+    defaultUserName: NewPlayer

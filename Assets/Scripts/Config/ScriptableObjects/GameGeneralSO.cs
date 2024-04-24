@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.AddressableAssets;
 
 namespace com.hive.projectr
 {
@@ -22,6 +23,7 @@ namespace com.hive.projectr
 		[SerializeField] private Single coreGameTransitionSec;
 		[SerializeField] private Single calibrationTransitionSec;
 		[SerializeField] private Int32 passingStreakToNextLevel;
+		[SerializeField] private String defaultUserName;
 
 		public Int32 DefaultGoal => defaultGoal;
 		public Int32 MinGoal => minGoal;
@@ -29,5 +31,6 @@ namespace com.hive.projectr
 		public Single CoreGameTransitionSec => coreGameTransitionSec;
 		public Single CalibrationTransitionSec => calibrationTransitionSec;
 		public Int32 PassingStreakToNextLevel => passingStreakToNextLevel;
+		public String DefaultUserName => defaultUserName;
     }
 }
