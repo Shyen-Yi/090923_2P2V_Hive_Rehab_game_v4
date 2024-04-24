@@ -38,7 +38,7 @@ namespace com.hive.projectr
         }
     }
 
-    public struct CSVCoreGameAsteroidSpawnedData
+    public struct CSVCoreGameAsteroidEndedData
     {
         public int asteroidId;
 
@@ -59,7 +59,7 @@ namespace com.hive.projectr
         public Vector2 asteroidCoordinateWhenCollected;
         public Vector2 vacuumCenterCoordinateWhenCollected;
 
-        public CSVCoreGameAsteroidSpawnedData(int asteroidId, float asteroidSpawnTime, Vector2 asteroidCoordinateWhenSpawned, Vector2 cursorCoordinateWhenAsteroidSpawned, bool isAsteroidCaptured, float timeSpentToCaptureAsteroid, Vector2 asteroidCoordinateWhenCaptured, Vector2 cursorCoordinateWhenAsteroidCaptured, bool isAsteroidCollected, float timeSpentToCollectAsteroid, Vector2 asteroidCoordinateWhenCollected, Vector2 vacuumCenterCoordinateWhenCollected)
+        public CSVCoreGameAsteroidEndedData(int asteroidId, float asteroidSpawnTime, Vector2 asteroidCoordinateWhenSpawned, Vector2 cursorCoordinateWhenAsteroidSpawned, bool isAsteroidCaptured, float timeSpentToCaptureAsteroid, Vector2 asteroidCoordinateWhenCaptured, Vector2 cursorCoordinateWhenAsteroidCaptured, bool isAsteroidCollected, float timeSpentToCollectAsteroid, Vector2 asteroidCoordinateWhenCollected, Vector2 vacuumCenterCoordinateWhenCollected)
         {
             this.asteroidId = asteroidId;
             this.asteroidSpawnTime = asteroidSpawnTime;
@@ -186,7 +186,7 @@ namespace com.hive.projectr
             AppendLog(CSVType.Coordinates, $"Time, Cursor Coordinate X, Cursor Coordinate Y");
         }
 
-        public void OnCoreGameAsteroidSpawned(CSVCoreGameAsteroidSpawnedData data)
+        public void OnCoreGameAsteroidEnded(CSVCoreGameAsteroidEndedData data)
         {
             // coordinatePos
             AppendLog(CSVType.CoordinatePos, $"{data.asteroidId}, {data.asteroidSpawnTime}, {data.asteroidCoordinateWhenSpawned.x}, {data.asteroidCoordinateWhenSpawned.y}, {data.cursorCoordinateWhenAsteroidSpawned.x}, {data.cursorCoordinateWhenAsteroidSpawned.y}, {data.isAsteroidCaptured}, {data.timeSpentToCaptureAsteroid}, {data.asteroidCoordinateWhenCaptured.x}, {data.asteroidCoordinateWhenCaptured.y}, {data.cursorCoordinateWhenAsteroidCaptured.x}, {data.cursorCoordinateWhenAsteroidCaptured.y}, {data.isAsteroidCollected}, {data.timeSpentToCollectAsteroid}, {data.asteroidCoordinateWhenCollected.x}, {data.asteroidCoordinateWhenCollected.y}, {data.vacuumCenterCoordinateWhenCollected.x}, {data.vacuumCenterCoordinateWhenCollected.y}");
