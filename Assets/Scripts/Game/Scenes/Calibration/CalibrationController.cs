@@ -388,10 +388,10 @@ namespace com.hive.projectr
 
             CSVManager.Instance.OnCalibrationEnded(new CSVCalibrationEndedData(
                 Vector2.zero,
-                UIUtil.ScreenPosToGameCoordinate(topLeftScreenPos),
-                UIUtil.ScreenPosToGameCoordinate(topRightScreenPos),
-                UIUtil.ScreenPosToGameCoordinate(bottomRightScreenPos),
-                UIUtil.ScreenPosToGameCoordinate(bottomLeftScreenPos)
+                UIUtil.WorldPosToGameCoordinate(_markDict[CalibrationStageType.TopLeft].GetCurrentWorldPos()),
+                UIUtil.WorldPosToGameCoordinate(_markDict[CalibrationStageType.TopRight].GetCurrentWorldPos()),
+                UIUtil.WorldPosToGameCoordinate(_markDict[CalibrationStageType.BottomRight].GetCurrentWorldPos()),
+                UIUtil.WorldPosToGameCoordinate(_markDict[CalibrationStageType.BottomLeft].GetCurrentWorldPos())
             ));
 
             var topLeftWorldPos = CameraManager.Instance.UICamera.ScreenToWorldPoint(topLeftScreenPos);
@@ -572,7 +572,7 @@ namespace com.hive.projectr
             }
             else
             {
-                Debug.LogError($"Invalid stageIndex: {_stageIndex}");
+                Logger.LogError($"Invalid stageIndex: {_stageIndex}");
             }
         }
 

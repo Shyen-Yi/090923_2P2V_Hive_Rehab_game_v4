@@ -102,13 +102,14 @@ namespace com.hive.projectr
             this.cursorCoordinateWhenAsteroidCaptured = cursorCoordinate;
         }
 
-        public void OnCollected(float levelTime, Vector2 asteroidCoordinate, Vector2 cursorCoordinate)
+        public void OnCollected(float levelTime, Vector2 asteroidCoordinate, Vector2 cursorCoordinate, Vector2 vacuumCoordinate)
         {
             isAsteroidCollected = true;
             asteroidCollectTime = levelTime;
             timeSpentToCollectAsteroid = asteroidCollectTime - asteroidCaptureTime;
-            this.asteroidCoordinateWhenCollected = asteroidCoordinate;
-            this.cursorCoordinateWhenAsteroidCaptured = cursorCoordinate;
+            asteroidCoordinateWhenCollected = asteroidCoordinate;
+            cursorCoordinateWhenAsteroidCaptured = cursorCoordinate;
+            vacuumCenterCoordinateWhenCollected = vacuumCoordinate;
         }
     }
 
@@ -346,7 +347,7 @@ namespace com.hive.projectr
             if (_activeAsteroids.TryGetValue(id, out var controller) &&
                 _asteroidDataDict.TryGetValue(id, out var data))
             {
-                data.OnCollected(_levelRunningTime, UIUtil.WorldPosToGameCoordinate(controller.GetWorldPos()), UIUtil.WorldPosToGameCoordinate(vacuumAirObj.transform.position));
+                data.OnCollected(_levelRunningTime, UIUtil.WorldPosToGameCoordinate(controller.GetWorldPos()), UIUtil.WorldPosToGameCoordinate(vacuumAirObj.transform.position), UIUtil.WorldPosToGameCoordinate(vacuumAirObj.transform.position));
             }
 
             OnAsteroidEnded(id);
@@ -359,7 +360,9 @@ namespace com.hive.projectr
 
         private void OnAsteroidSpawned(AsteroidController controller)
         {
-            _asteroidDataDict[controller.Id] = new CoreGameAsteroidData(controller.Id);
+            var asteroidData = new CoreGameAsteroidData(controller.Id);
+            asteroidData.OnSpawned(_levelRunningTime, UIUtil.WorldPosToGameCoordinate(controller.GetWorldPos()), UIUtil.ScreenPosToGameCoordinate(_spacecraftScreenPos));
+            _asteroidDataDict[controller.Id] = asteroidData;
 
             _netController.PlaySpawnAnimation();
 
@@ -483,7 +486,7 @@ namespace com.hive.projectr
                         RefreshInfoText($"Level {_levelConfigData.Level}");
                         break;
                     default:
-                        Debug.LogError($"Undefined core game info index: {infoIndex}");
+                        Logger.LogError($"Undefined core game info index: {infoIndex}");
                         break;
                 }
             }
@@ -646,7 +649,7 @@ namespace com.hive.projectr
                 capturedCount,
                 collectedCount,
                 totalCount,
-                collectedCount * 100 / totalCount
+                (int)(collectedCount * 100f / totalCount)
                 ));
         }
 
@@ -780,10 +783,11 @@ namespace com.hive.projectr
             {
                 controller = _inactiveAsteroids.Pop();
             }
-            
+
+            controller.Activate(_endedAsteroidCount + 1);
+
             _activeAsteroids[controller.Id] = controller;
 
-            controller.Activate();
             return controller;
         }
 

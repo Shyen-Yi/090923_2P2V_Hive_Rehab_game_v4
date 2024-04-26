@@ -193,8 +193,8 @@ namespace com.hive.projectr
 
     public struct CSVSessionInfo : ICSVData
     {
-        public int CalibrationNum { get; private set; }
-        public int CoreGameNum { get; private set; }
+        public int CalibrationNum { get; set; }
+        public int CoreGameNum { get; set; }
 
         public CSVSessionInfo(int calibrationNum, int coreGameNum)
         {
@@ -311,7 +311,7 @@ namespace com.hive.projectr
             Logger.Log($"CSVManager::OnCoreGameAsteroidEnded");
 
             // coordinatePos
-            AppendLog(CSVType.Coordinates, GenerateCSVContent(new List<CSVCoreGameAsteroidEndedData>() { data }));
+            AppendLog(CSVType.CoordinatePos, GenerateCSVContent(new List<CSVCoreGameAsteroidEndedData>() { data }));
         }
 
         public void OnCoreGameTick(CSVCoreGameTickData data)
@@ -426,7 +426,7 @@ namespace com.hive.projectr
                 }
             }
 
-            Debug.LogError($"Invalid session folder name detected! Please check! -> {sessionFolderName}");
+            Logger.LogError($"Invalid session folder name detected! Please check! -> {sessionFolderName}");
             return false;
         }
 
@@ -483,9 +483,9 @@ namespace com.hive.projectr
                 using (var writer = new StreamWriter(path, false))
                 using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {
+                    csv.WriteHeader<CSVSessionInfo>();
+                    csv.NextRecord();
                     csv.WriteRecord(info);
-                    csv.Flush();
-                    writer.Flush();
                 }
             }
             catch (Exception e)
@@ -616,6 +616,9 @@ namespace com.hive.projectr
                     using (var reader = new StreamReader(_sessionInfoFilePath))
                     using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
+                        csv.Read();
+                        csv.ReadHeader();
+
                         var infos = csv.GetRecords<CSVSessionInfo>();
                         foreach (var info in infos)
                         {

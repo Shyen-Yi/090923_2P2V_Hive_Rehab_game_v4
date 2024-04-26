@@ -47,12 +47,9 @@ namespace com.hive.projectr
         private float _remainingLifetime;
         private float _totalLifetime;
 
-        private static int UId = 0;
-
         public AsteroidController(AsteroidConfig config)
         {
             _config = config;
-            Id = ++UId;
         }
 
         public void Start(AsteroidData data)
@@ -103,8 +100,10 @@ namespace com.hive.projectr
                 });
         }
 
-        public void Activate()
+        public void Activate(int id)
         {
+            Id = id;
+
             _config.onCollisionEnter2D += OnCollisionEnter2D;
             _config.onTriggerEnter2D += OnTriggerEnter2D;
 
@@ -124,6 +123,8 @@ namespace com.hive.projectr
 
         public void Deactivate()
         {
+            Id = 0;
+
             SoundManager.Instance.StopSound(SoundType.AsteroidWarning);
 
             _config.onCollisionEnter2D -= OnCollisionEnter2D;

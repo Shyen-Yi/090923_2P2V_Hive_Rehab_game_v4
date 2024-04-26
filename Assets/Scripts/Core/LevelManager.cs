@@ -25,15 +25,13 @@ namespace com.hive.projectr
         {
             if (level != LatestLevelPlayed)
             {
-                Debug.LogError($"Level completed {level} doesn't match the level started {LatestLevelPlayed}!");
+                Logger.LogError($"Level completed {level} doesn't match the level started {LatestLevelPlayed}!");
                 return;
             }
 
             // save latest level result
             LatestLevelPassedStreak = isPassed ? LatestLevelPassedStreak + 1 : 0;
             PlayerPrefs.SetInt(PlayerPrefKeys.LatestLevelPassedStreak, LatestLevelPassedStreak);
-
-            Debug.LogError($"OnLevelCompleted - LatestLevelPlayed: {LatestLevelPlayed} | LatestLevelPassedStreak: {LatestLevelPassedStreak}");
         }
 
         public void OnInit()

@@ -169,7 +169,7 @@ namespace com.hive.projectr
                         StatsDayOfWeekWidgetController.ShowData(_dayOfWeekSat, new StatsDayOfWeekWidgetData(isPlayed));
                         break;
                     default:
-                        Debug.LogError($"Invalid day of week: {dayOfWeek}");
+                        Logger.LogError($"Invalid day of week: {dayOfWeek}");
                         break;
                 }
             }
