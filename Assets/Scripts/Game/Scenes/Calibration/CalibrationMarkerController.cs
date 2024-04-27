@@ -114,7 +114,7 @@ namespace com.hive.projectr
             }
             else
             {
-                Debug.LogError($"Undefined marker type: {markerType}");
+                Logger.LogError($"Undefined marker type: {markerType}");
             }
 
             SetAlpha(1);

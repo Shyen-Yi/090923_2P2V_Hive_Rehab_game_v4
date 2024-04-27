@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace com.hive.projectr
 {
     public static class TimeUtil
     {
+        public static DateTime Now => TimeManager.Instance.GetCurrentDateTime();
+
         public static string GetMonthName(int month)
         {
             switch (month)
@@ -35,7 +38,7 @@ namespace com.hive.projectr
                 case 12:
                     return "December";
                 default:
-                    Debug.LogError($"Invalid month: {month}!");
+                    Logger.LogError($"Invalid month: {month}!");
                     return "";
             }
         }

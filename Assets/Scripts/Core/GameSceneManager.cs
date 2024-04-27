@@ -77,10 +77,7 @@ namespace com.hive.projectr
         #region Callback
         private void Tick()
         {
-            if (Input.GetKeyDown(KeyCode.Backspace))
-            {
-                TryHideSceneOnTop(true);
-            }
+
         }
         #endregion
 

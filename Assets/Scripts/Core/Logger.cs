@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace com.hive.projectr
 {
@@ -19,6 +20,14 @@ namespace com.hive.projectr
         public static void LogError(string msg)
         {
             Debug.LogError($"{msg}\nFrame: {Time.frameCount}\nTime: {Time.time}");
+        }
+
+        public static void LogException(Exception e)
+        {
+            if (e != null)
+            {
+                Debug.LogError($"Exception::{e.Message}.\nStackTrace: {e.StackTrace}");
+            }
         }
     }
 }

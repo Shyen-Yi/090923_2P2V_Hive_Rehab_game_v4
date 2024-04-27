@@ -256,6 +256,8 @@ namespace com.hive.projectr
 
             var minLevelData = CoreGameLevelConfig.GetLevelData(CoreGameLevelConfig.MinLevel);
             _spacecraftController.Activate(new SpacecraftData(minLevelData.SpacecraftSize));
+
+            CSVManager.Instance.OnCalibrationStarted(TimeUtil.Now);
         }
 
         private void Resume()
@@ -383,6 +385,14 @@ namespace com.hive.projectr
             var topRightScreenPos = RectTransformUtility.WorldToScreenPoint(CameraManager.Instance.UICamera, _cornerDict[CalibrationStageType.TopRight].position);
             var bottomRightScreenPos = RectTransformUtility.WorldToScreenPoint(CameraManager.Instance.UICamera, _cornerDict[CalibrationStageType.BottomRight].position);
             var bottomLeftScreenPos = RectTransformUtility.WorldToScreenPoint(CameraManager.Instance.UICamera, _cornerDict[CalibrationStageType.BottomLeft].position);
+
+            CSVManager.Instance.OnCalibrationEnded(new CSVCalibrationEndedData(
+                Vector2.zero,
+                UIUtil.WorldPosToGameCoordinate(_markDict[CalibrationStageType.TopLeft].GetCurrentWorldPos()),
+                UIUtil.WorldPosToGameCoordinate(_markDict[CalibrationStageType.TopRight].GetCurrentWorldPos()),
+                UIUtil.WorldPosToGameCoordinate(_markDict[CalibrationStageType.BottomRight].GetCurrentWorldPos()),
+                UIUtil.WorldPosToGameCoordinate(_markDict[CalibrationStageType.BottomLeft].GetCurrentWorldPos())
+            ));
 
             var topLeftWorldPos = CameraManager.Instance.UICamera.ScreenToWorldPoint(topLeftScreenPos);
             var topRightWorldPos = CameraManager.Instance.UICamera.ScreenToWorldPoint(topRightScreenPos);
@@ -562,7 +572,7 @@ namespace com.hive.projectr
             }
             else
             {
-                Debug.LogError($"Invalid stageIndex: {_stageIndex}");
+                Logger.LogError($"Invalid stageIndex: {_stageIndex}");
             }
         }
 

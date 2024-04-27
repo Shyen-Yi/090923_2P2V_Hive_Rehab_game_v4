@@ -6,16 +6,19 @@ namespace com.hive.projectr
 {
     public class SettingManager : SingletonBase<SettingManager>, ICoreManager
     {
+        public bool IsDefaultUser => DisplayName.Equals(GameGeneralConfig.GetData().DefaultUserName);
         public string DisplayName { get; private set; }
         public int Level { get; private set; }
         public int DailyBlock { get; private set; }
 
         #region Lifecycle
         public void OnInit()
-        { 
-            DisplayName = PlayerPrefs.HasKey(PlayerPrefKeys.DisplayName) ? PlayerPrefs.GetString(PlayerPrefKeys.DisplayName) : "";
+        {
+            DisplayName = PlayerPrefs.HasKey(PlayerPrefKeys.DisplayName) ? PlayerPrefs.GetString(PlayerPrefKeys.DisplayName) : GameGeneralConfig.GetData().DefaultUserName;
             Level = PlayerPrefs.HasKey(PlayerPrefKeys.Level) ? PlayerPrefs.GetInt(PlayerPrefKeys.Level) : CoreGameLevelConfig.MinLevel;
             DailyBlock = PlayerPrefs.HasKey(PlayerPrefKeys.DailyBlock) ? PlayerPrefs.GetInt(PlayerPrefKeys.DailyBlock) : GameGeneralConfig.GetData().DefaultGoal;
+
+            Logger.Log($"Setting loaded. Username: {DisplayName} | Level: {Level} | DailyBlock: {DailyBlock}");
         }
 
         public void OnDispose()
@@ -26,19 +29,47 @@ namespace com.hive.projectr
         }
         #endregion
 
+        public void Reset()
+        {
+            if (PlayerPrefs.HasKey(PlayerPrefKeys.DisplayName))
+            {
+                PlayerPrefs.DeleteKey(PlayerPrefKeys.DisplayName);
+            }
+
+            if (PlayerPrefs.HasKey(PlayerPrefKeys.Level))
+            {
+                PlayerPrefs.DeleteKey(PlayerPrefKeys.Level);
+            }
+
+            if (PlayerPrefs.HasKey(PlayerPrefKeys.DailyBlock))
+            {
+                PlayerPrefs.DeleteKey(PlayerPrefKeys.DailyBlock);
+            }
+
+            DisplayName = GameGeneralConfig.GetData().DefaultUserName;
+            Level = CoreGameLevelConfig.MinLevel;
+            DailyBlock = GameGeneralConfig.GetData().DefaultGoal;
+        }
+
         private void SaveDisplayName()
         {
             PlayerPrefs.SetString(PlayerPrefKeys.DisplayName, DisplayName);
+
+            Logger.Log($"Username {DisplayName} saved.");
         }
 
         private void SaveLevel()
         {
             PlayerPrefs.SetInt(PlayerPrefKeys.Level, Level);
+         
+            Logger.Log($"Level {Level} saved.");
         }
 
         private void SaveDailyBlock()
         {
             PlayerPrefs.SetInt(PlayerPrefKeys.DailyBlock, DailyBlock);
+
+            Logger.Log($"DailyBlock {DailyBlock} saved.");
         }
 
         public void UpdateDisplayName(string displayName, bool toSave)

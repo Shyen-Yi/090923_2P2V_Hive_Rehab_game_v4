@@ -43,19 +43,19 @@ namespace com.hive.projectr
         {
             if (_handler == null)
             {
-                Debug.LogError($"SimpleGrid has not valid handler!");
+                Logger.LogError($"SimpleGrid has not valid handler!");
                 return;
             }
 
             if (_elementPrefab == null)
             {
-                Debug.LogError($"_elementPrefab is null");
+                Logger.LogError($"_elementPrefab is null");
                 return;
             }
 
             if (_elementPrefab.GetComponent<GeneralWidgetConfig>() == null)
             {
-                Debug.LogError($"_elementPrefab needs a GeneralWidgetConfig!");
+                Logger.LogError($"_elementPrefab needs a GeneralWidgetConfig!");
                 return;
             }
 
@@ -120,7 +120,7 @@ namespace com.hive.projectr
         {
             if (_handler == null)
             {
-                Debug.LogError($"SimpleGrid has not valid handler!");
+                Logger.LogError($"SimpleGrid has not valid handler!");
                 return;
             }
 

@@ -26,6 +26,93 @@ namespace com.hive.projectr
         }
     }
 
+    public struct CoreGameAsteroidCapturedData
+    {
+        public int asteroidId;
+        public float timeSpentToCapture;
+        public Vector2 asteroidCoordinate;
+        public Vector2 cursorCoordinate;
+
+        public CoreGameAsteroidCapturedData(int asteroid, float timeSpentToCapture, Vector2 asteroidCoordinate, Vector2 cursorCoordinate)
+        {
+            this.asteroidId = asteroid;
+            this.timeSpentToCapture = timeSpentToCapture;
+            this.asteroidCoordinate = asteroidCoordinate;
+            this.cursorCoordinate = cursorCoordinate;
+        }
+    }
+
+    public struct CoreGameAsteroidCollectedData
+    {
+        public int asteroidId;
+        public float timeSpentToCollect;
+        public Vector2 asteroidCoordinate;
+        public Vector2 vacuumCenterCoordinate;
+
+        public CoreGameAsteroidCollectedData(int asteroidId, float timeSpentToCollect, Vector2 asteroidCoordinate, Vector2 vacuumCenterCoordinate)
+        {
+            this.asteroidId = asteroidId;
+            this.timeSpentToCollect = timeSpentToCollect;
+            this.asteroidCoordinate = asteroidCoordinate;
+            this.vacuumCenterCoordinate = vacuumCenterCoordinate;
+        }
+    }
+
+    public class CoreGameAsteroidData
+    {
+        public int asteroidId;
+
+        // spawn
+        public float asteroidSpawnTime;
+        public Vector2 asteroidCoordinateWhenSpawned;
+        public Vector2 cursorCoordinateWhenAsteroidSpawned;
+
+        // capture
+        public bool isAsteroidCaptured;
+        public float asteroidCaptureTime;
+        public float timeSpentToCaptureAsteroid;
+        public Vector2 asteroidCoordinateWhenCaptured;
+        public Vector2 cursorCoordinateWhenAsteroidCaptured;
+
+        // collect
+        public bool isAsteroidCollected;
+        public float asteroidCollectTime;
+        public float timeSpentToCollectAsteroid;
+        public Vector2 asteroidCoordinateWhenCollected;
+        public Vector2 vacuumCenterCoordinateWhenCollected;
+
+        public CoreGameAsteroidData(int id)
+        {
+            asteroidId = id;
+        }
+
+        public void OnSpawned(float levelTime, Vector2 asteroidCoordinate, Vector2 cursorCoordinate)
+        {
+            this.asteroidSpawnTime = levelTime;
+            this.asteroidCoordinateWhenSpawned = asteroidCoordinate;
+            this.cursorCoordinateWhenAsteroidSpawned = cursorCoordinate;
+        }
+
+        public void OnCaptured(float levelTime, Vector2 asteroidCoordinate, Vector2 cursorCoordinate)
+        {
+            isAsteroidCaptured = true;
+            asteroidCaptureTime = levelTime;
+            timeSpentToCaptureAsteroid = asteroidCaptureTime - asteroidSpawnTime;
+            this.asteroidCoordinateWhenCaptured = asteroidCoordinate;
+            this.cursorCoordinateWhenAsteroidCaptured = cursorCoordinate;
+        }
+
+        public void OnCollected(float levelTime, Vector2 asteroidCoordinate, Vector2 cursorCoordinate, Vector2 vacuumCoordinate)
+        {
+            isAsteroidCollected = true;
+            asteroidCollectTime = levelTime;
+            timeSpentToCollectAsteroid = asteroidCollectTime - asteroidCaptureTime;
+            asteroidCoordinateWhenCollected = asteroidCoordinate;
+            cursorCoordinateWhenAsteroidCaptured = cursorCoordinate;
+            vacuumCenterCoordinateWhenCollected = vacuumCoordinate;
+        }
+    }
+
     public class CoreGameController : GameSceneControllerBase
     {
         private enum CoreGameState
@@ -49,13 +136,15 @@ namespace com.hive.projectr
         private float _targetGameProgressFill;
         private float _currentAsteroidProgressFill = -1;
         private CoreGameLevelConfigData _levelConfigData;
-        private int _endedAsteroidCount;
-        private int _collectedAsteroidCount;
+        private Dictionary<int, CoreGameAsteroidData> _asteroidDataDict = new Dictionary<int, CoreGameAsteroidData>();
         private float _nextAsteroidSpawnTime;
         private float _levelRunningTime;
         private string _currentInfo;
+        private int _lastCSVTick;
+        private int _endedAsteroidCount;
 
         private static readonly int CountdownTriggerHash = Animator.StringToHash("Count");
+        private static readonly float CSVTickGap = .01f;
         #endregion
 
         #region Pool
@@ -190,11 +279,10 @@ namespace com.hive.projectr
             if (hideState == GameSceneHideState.Covered)
             {
                 Pause();
-                CSVManager.Instance.PauseRecording();
             }
             else
             {
-                CSVManager.Instance.StopRecording();
+                End();
             }
 
             SoundManager.Instance.StopSound(SoundType.CoreGameBackground);
@@ -229,7 +317,19 @@ namespace com.hive.projectr
         {
             if (_state == CoreGameState.Running)
             {
-                if (_activeAsteroids.Count < 1 && Time.time >= _nextAsteroidSpawnTime)
+                _levelRunningTime += Time.deltaTime;
+
+                var csvTick = (int)(_levelRunningTime / CSVTickGap);
+                if (csvTick > _lastCSVTick)
+                {
+                    _lastCSVTick = csvTick;
+                    CSVManager.Instance.OnCoreGameTick(new CSVCoreGameTickData(
+                        _levelRunningTime,
+                        UIUtil.ScreenPosToGameCoordinate(_spacecraftScreenPos)
+                        ));
+                }
+
+                if (_activeAsteroids.Count < 1 && _levelRunningTime >= _nextAsteroidSpawnTime)
                 {
                     SpawnAsteroid();
                 }
@@ -242,9 +342,14 @@ namespace com.hive.projectr
             GameProgressTick();
         }
 
-        private void OnAsteroidEnterVacuumAir(int id)
+        private void OnAsteroidEnterVacuumAir(int id, GameObject vacuumAirObj)
         {
-            ++_collectedAsteroidCount;
+            if (_activeAsteroids.TryGetValue(id, out var controller) &&
+                _asteroidDataDict.TryGetValue(id, out var data))
+            {
+                data.OnCollected(_levelRunningTime, UIUtil.WorldPosToGameCoordinate(controller.GetWorldPos()), UIUtil.WorldPosToGameCoordinate(vacuumAirObj.transform.position), UIUtil.WorldPosToGameCoordinate(vacuumAirObj.transform.position));
+            }
+
             OnAsteroidEnded(id);
         }
 
@@ -253,8 +358,12 @@ namespace com.hive.projectr
             OnAsteroidEnded(id);
         }
 
-        private void OnAsteroidSpawned()
+        private void OnAsteroidSpawned(AsteroidController controller)
         {
+            var asteroidData = new CoreGameAsteroidData(controller.Id);
+            asteroidData.OnSpawned(_levelRunningTime, UIUtil.WorldPosToGameCoordinate(controller.GetWorldPos()), UIUtil.ScreenPosToGameCoordinate(_spacecraftScreenPos));
+            _asteroidDataDict[controller.Id] = asteroidData;
+
             _netController.PlaySpawnAnimation();
 
             SoundManager.Instance.PlaySound(SoundType.AsteroidSpawn);
@@ -262,6 +371,12 @@ namespace com.hive.projectr
 
         private void OnAsteroidCaptured(int id)
         {
+            if (_activeAsteroids.TryGetValue(id, out var controller) &&
+                _asteroidDataDict.TryGetValue(id, out var data))
+            {
+                data.OnCaptured(_levelRunningTime, UIUtil.WorldPosToGameCoordinate(controller.GetWorldPos()), UIUtil.ScreenPosToGameCoordinate(_spacecraftScreenPos));
+            }
+
             _spacecraftController.SetCapturing(true);
 
             // activate a random vacuum
@@ -275,11 +390,30 @@ namespace com.hive.projectr
 
         private void OnAsteroidEnded(int id)
         {
+            if (_asteroidDataDict.TryGetValue(id, out var data))
+            {
+                CSVManager.Instance.OnCoreGameAsteroidEnded(new CSVCoreGameAsteroidEndedData(
+                    id,
+                    data.asteroidSpawnTime,
+                    data.asteroidCoordinateWhenSpawned,
+                    data.cursorCoordinateWhenAsteroidSpawned,
+                    data.isAsteroidCaptured,
+                    data.timeSpentToCaptureAsteroid,
+                    data.asteroidCoordinateWhenCaptured,
+                    data.cursorCoordinateWhenAsteroidCaptured,
+                    data.isAsteroidCollected,
+                    data.timeSpentToCollectAsteroid,
+                    data.asteroidCoordinateWhenCollected,
+                    data.vacuumCenterCoordinateWhenCollected
+                ));
+            }
+            
+
             SoundManager.Instance.PlaySound(SoundType.AsteroidGone);
 
             DestroyAsteroid(id);
 
-            _nextAsteroidSpawnTime = Time.time + _levelConfigData.AsteroidSpawnGapSec;
+            _nextAsteroidSpawnTime = _levelRunningTime + _levelConfigData.AsteroidSpawnGapSec;
 
             _spacecraftController.SetCapturing(false);
 
@@ -289,6 +423,7 @@ namespace com.hive.projectr
             }
 
             ++_endedAsteroidCount;
+
             UpdateGameProgress(false);
 
             if (_endedAsteroidCount >= _levelConfigData.MaxAsteroidCount)
@@ -341,7 +476,6 @@ namespace com.hive.projectr
             if (_state == CoreGameState.Running)
             {
                 var coreGameData = CoreGameConfig.GetData();
-                _levelRunningTime += Time.deltaTime;
                 var infoIndex = ((int)_levelRunningTime / coreGameData.InfoTextUpdateSec) % 2;
                 switch (infoIndex)
                 {
@@ -352,7 +486,7 @@ namespace com.hive.projectr
                         RefreshInfoText($"Level {_levelConfigData.Level}");
                         break;
                     default:
-                        Debug.LogError($"Undefined core game info index: {infoIndex}");
+                        Logger.LogError($"Undefined core game info index: {infoIndex}");
                         break;
                 }
             }
@@ -368,10 +502,19 @@ namespace com.hive.projectr
 
             yield return new WaitForSeconds(_levelConfigData.AsteroidSpawnGapSec);
 
-            var isPassed = _collectedAsteroidCount >= _levelConfigData.NumOfAsteroidCollectedToPass;
+            var collectedCount = 0;
+            foreach (var data in _asteroidDataDict.Values)
+            {
+                if (data.isAsteroidCollected)
+                {
+                    ++collectedCount;
+                }
+            }
+
+            var isPassed = collectedCount >= _levelConfigData.NumOfAsteroidCollectedToPass;
 
             LevelManager.Instance.OnLevelCompleted(_levelConfigData.Level, isPassed);
-            StatsManager.Instance.OnLevelCompleted(new LevelStats(_levelConfigData.Level, _collectedAsteroidCount));
+            StatsManager.Instance.OnLevelCompleted(new LevelStats(_levelConfigData.Level, collectedCount));
 
             SoundManager.Instance.PlaySound(SoundType.CoreGameLevelEnd);
 
@@ -429,6 +572,11 @@ namespace com.hive.projectr
 
         private void Reset()
         {
+            _levelRunningTime = 0;
+            _lastCSVTick = 0;
+            _asteroidDataDict.Clear();
+            _endedAsteroidCount = 0;
+
             UpdateState(CoreGameState.NotStarted);
 
             // vacuums
@@ -464,24 +612,45 @@ namespace com.hive.projectr
                 _spacecraftController.Deactivate();
                 MonoBehaviourUtil.Instance.StartCoroutine(CountdownRoutine(() =>
                 {
-                    _nextAsteroidSpawnTime = Time.time + _levelConfigData.AsteroidSpawnGapSec;
+                    _nextAsteroidSpawnTime = _levelRunningTime + _levelConfigData.AsteroidSpawnGapSec;
                     _spacecraftController.Activate(new SpacecraftData(_levelConfigData.SpacecraftSize));
                     CenterSpacecraft();
                     UpdateState(CoreGameState.Running);
 
-                    CSVManager.Instance.StartRecording(_spacecraftController.Transform);
+                    CSVManager.Instance.OnCoreGameStarted(TimeUtil.Now);
                 }));
             }
             else if (_state == CoreGameState.Paused)
             {
                 _spacecraftController.Activate(new SpacecraftData(_levelConfigData.SpacecraftSize));
                 UpdateState(CoreGameState.Running);
-
-                CSVManager.Instance.StartRecording(_spacecraftController.Transform);
             }
 
             LevelManager.Instance.OnLevelStarted(_levelConfigData.Level);
             UpdateGameProgress(true);
+        }
+
+        private void End()
+        {
+            var capturedCount = 0;
+            var collectedCount = 0;
+            var totalCount = _asteroidDataDict.Count;
+
+            foreach (var data in _asteroidDataDict.Values)
+            {
+                if (data.isAsteroidCaptured)
+                    ++capturedCount;
+                if (data.isAsteroidCollected)
+                    ++collectedCount;
+            }
+
+            CSVManager.Instance.OnCoreGameEnded(new CSVCoreGameEndedData(
+                _levelConfigData.Level,
+                capturedCount,
+                collectedCount,
+                totalCount,
+                (int)(collectedCount * 100f / totalCount)
+                ));
         }
 
         private IEnumerator CountdownRoutine(Action onCountdownFinished)
@@ -555,7 +724,7 @@ namespace com.hive.projectr
         #region Asteroid
         private void SpawnAsteroid()
         {
-            var controller = GetAsteroidController();
+            var controller = CreateAsteroidController();
 
             var degree = Random.Range(0, 360);
             var radian = Mathf.Deg2Rad * degree;
@@ -572,7 +741,7 @@ namespace com.hive.projectr
             var id = controller.Id;
             controller.Start(new AsteroidData(startWorldPos, startDirection, _levelConfigData.AsteroidSpeed, _levelConfigData.AsteroidSize, _levelConfigData.AsteroidLifeTime, _levelConfigData.AsteroidMovement, OnAsteroidEnterVacuumAir, OnAsteroidLifetimeRunOut, OnAsteroidCaptured));
 
-            OnAsteroidSpawned();
+            OnAsteroidSpawned(controller);
         }
 
         private Vector3 GetRandomWorldPointOutsideCircle(Vector3 circleWorldPos, float radius)
@@ -600,7 +769,7 @@ namespace com.hive.projectr
             return randomPoint;
         }
 
-        private AsteroidController GetAsteroidController()
+        private AsteroidController CreateAsteroidController()
         {
             AsteroidController controller = null;
 
@@ -614,10 +783,11 @@ namespace com.hive.projectr
             {
                 controller = _inactiveAsteroids.Pop();
             }
-            
+
+            controller.Activate(_endedAsteroidCount + 1);
+
             _activeAsteroids[controller.Id] = controller;
 
-            controller.Activate();
             return controller;
         }
 

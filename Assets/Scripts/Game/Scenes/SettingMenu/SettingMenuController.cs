@@ -169,6 +169,9 @@ namespace com.hive.projectr
 
         private void OnLockButtonClick()
         {
+            _settingsWidgetController.SaveSettings();
+            _unlockWidgetController.Reset();
+
             ShowWidget(SettingMenuWidgetType.Unlock);
         }
 

@@ -15,11 +15,11 @@ namespace com.hive.projectr
         public float size;
         public float lifeTime;
         public AnimationCurve movementCurve;
-        public Action<int> onEnterVacuumAir;
+        public Action<int, GameObject> onEnterVacuumAir;
         public Action<int> onLifetimeRunOut;
         public Action<int> onCaptured;
 
-        public AsteroidData(Vector3 startWorldPos, Vector3 startDirection, float speed, float size, float lifeTime, AnimationCurve movementCurve, Action<int> onEnterVacuumAir, Action<int> onLifetimeRunOut, Action<int> onCaptured)
+        public AsteroidData(Vector3 startWorldPos, Vector3 startDirection, float speed, float size, float lifeTime, AnimationCurve movementCurve, Action<int, GameObject> onEnterVacuumAir, Action<int> onLifetimeRunOut, Action<int> onCaptured)
         {
             this.startWorldPos = startWorldPos;
             this.startDirection = startDirection;
@@ -41,18 +41,15 @@ namespace com.hive.projectr
         private bool _isRunning;
         private Transform _capturingOwner;
         private Vector3 _offsetFromOwner;
-        private Action<int> _onEnterVacuumAir;
+        private Action<int, GameObject> _onEnterVacuumAir;
         private Action<int> _onLifetimeRunOut;
         private Action<int> _onCaptured;
         private float _remainingLifetime;
         private float _totalLifetime;
 
-        private static int UId = 0;
-
         public AsteroidController(AsteroidConfig config)
         {
             _config = config;
-            Id = ++UId;
         }
 
         public void Start(AsteroidData data)
@@ -103,8 +100,10 @@ namespace com.hive.projectr
                 });
         }
 
-        public void Activate()
+        public void Activate(int id)
         {
+            Id = id;
+
             _config.onCollisionEnter2D += OnCollisionEnter2D;
             _config.onTriggerEnter2D += OnTriggerEnter2D;
 
@@ -124,6 +123,8 @@ namespace com.hive.projectr
 
         public void Deactivate()
         {
+            Id = 0;
+
             SoundManager.Instance.StopSound(SoundType.AsteroidWarning);
 
             _config.onCollisionEnter2D -= OnCollisionEnter2D;
@@ -138,6 +139,16 @@ namespace com.hive.projectr
         {
             if (!_isRunning)
                 return;
+        }
+
+        public Vector3 GetWorldPos()
+        {
+            return _config.transform.position;
+        }
+
+        public float GetLivingTime()
+        {
+            return Mathf.Clamp(_totalLifetime - _remainingLifetime, 0, _totalLifetime);
         }
 
         public float GetLifetimeProgress()
@@ -157,7 +168,7 @@ namespace com.hive.projectr
 
             if (collision.gameObject.CompareTag(TagNames.VacuumAir) && IsCaptured())
             {
-                _onEnterVacuumAir?.Invoke(Id);
+                _onEnterVacuumAir?.Invoke(Id, collision.gameObject);
             }
             else if (collision.gameObject.CompareTag(TagNames.Spacecraft) && !IsCaptured())
             {

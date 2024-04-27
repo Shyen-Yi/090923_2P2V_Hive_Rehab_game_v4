@@ -153,7 +153,7 @@ namespace com.hive.projectr
                 }
                 else
                 {
-                    Debug.LogError($"No defined performance data for type: {PerformanceType}");
+                    Logger.LogError($"No defined performance data for type: {PerformanceType}");
                 }
             }
         }
@@ -197,7 +197,7 @@ namespace com.hive.projectr
             }
             else
             {
-                Debug.LogError($"No performance data defined for performance type: {performance}");
+                Logger.LogError($"No performance data defined for performance type: {performance}");
             }
 
             _lastCollectedCount = stats.collectedCount;

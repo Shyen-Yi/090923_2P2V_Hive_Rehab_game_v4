@@ -44,7 +44,7 @@ namespace com.hive.projectr
                 // Apply this scale factor to the sprite's local scale
                 transform.localScale = new Vector3(scaleFactor, transform.localScale.y, transform.localScale.z);
 
-                Debug.LogError($"textureWidth: {textureWidth} | spriteSizeInUnits: {spriteSizeInUnits} | worldScreenHeight: {worldScreenHeight} | worldScreenWidth: {worldScreenWidth} | scaleFactor: {scaleFactor}");
+                Logger.LogError($"textureWidth: {textureWidth} | spriteSizeInUnits: {spriteSizeInUnits} | worldScreenHeight: {worldScreenHeight} | worldScreenWidth: {worldScreenWidth} | scaleFactor: {scaleFactor}");
             }
         }
     }

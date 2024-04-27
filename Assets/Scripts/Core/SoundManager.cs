@@ -229,7 +229,7 @@ namespace com.hive.projectr
             var soundData = SoundConfig.GetData(soundType);
             if (soundData == null)
             {
-                Debug.LogError($"Invalid sound type: {soundType}");
+                Logger.LogError($"Invalid sound type: {soundType}");
                 return null;
             }
 
@@ -292,7 +292,7 @@ namespace com.hive.projectr
                                 source = CreateSource();
                                 wasActiveSource = false;
                                 needNewPlayback = true;
-                                Debug.LogError($"Undefined play type: {soundData.PlayType}");
+                                Logger.LogError($"Undefined play type: {soundData.PlayType}");
                                 break;
                         }
                     }
@@ -320,7 +320,7 @@ namespace com.hive.projectr
                 }
                 else
                 {
-                    Debug.LogError($"Failed to get a valid AudioSource with sound type: {soundData.Type}!");
+                    Logger.LogError($"Failed to get a valid AudioSource with sound type: {soundData.Type}!");
                 }
             }
 
