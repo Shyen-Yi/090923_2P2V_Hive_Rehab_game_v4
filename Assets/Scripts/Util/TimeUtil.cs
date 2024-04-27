@@ -7,7 +7,7 @@ namespace com.hive.projectr
 {
     public static class TimeUtil
     {
-        public static DateTime Now => DateTime.Now;
+        public static DateTime Now => TimeManager.Instance.GetCurrentDateTime();
 
         public static string GetMonthName(int month)
         {

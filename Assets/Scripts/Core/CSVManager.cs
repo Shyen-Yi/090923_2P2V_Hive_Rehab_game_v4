@@ -236,7 +236,7 @@ namespace com.hive.projectr
         #region Lifecycle
         public void OnInit()
         {
-            SetupDayFolder(TimeUtil.Now);
+            TrySetupDayFolder(TimeUtil.Now, out var dayFolderPath);
 
             MonoBehaviourUtil.OnApplicationQuitEvent += OnApplicationQuit;
         }
@@ -334,9 +334,18 @@ namespace com.hive.projectr
         #endregion
 
         #region Private
-        private string SetupDayFolder(DateTime time)
+        private bool TrySetupDayFolder(DateTime time, out string dayFolderPath)
         {
-            var dayFolderPath = GetDayFolderPath(time, SettingManager.Instance.DisplayName);
+            dayFolderPath = "";
+
+            if (SettingManager.Instance.IsDefaultUser)
+            {
+                return false;
+            }
+
+            dayFolderPath = GetDayFolderPath(time, SettingManager.Instance.DisplayName);
+
+            Logger.Log($"CSVManager::SetupDayFolder - dayFolderPath: {dayFolderPath}");
 
             try
             {
@@ -345,11 +354,10 @@ namespace com.hive.projectr
             catch (Exception e)
             {
                 Logger.LogException(e);
+                return false;
             }
 
-            Logger.Log($"CSVManager::SetupDayFolder - dayFolderPath: {dayFolderPath}");
-
-            return dayFolderPath;
+            return true;
         }
 
         private string GetDayFolderName(DateTime time, string username)
@@ -562,9 +570,15 @@ namespace com.hive.projectr
         /// <returns>If success</returns>
         private bool StartLog(DateTime logTime)
         {
-            var isSuccess = true;
-
             TryEndLog();
+
+            if (SettingManager.Instance.IsDefaultUser)
+            {
+                Logger.Log($"CSVManager::StartLog - No log is generated for default user");
+                return false;
+            }
+
+            var isSuccess = true;
 
             _isLogging = true;
 

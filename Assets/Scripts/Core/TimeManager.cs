@@ -21,12 +21,12 @@ namespace com.hive.projectr
 
         public GameDay GetCurrentGameDay()
         {
-            return new GameDay(DateTime.UtcNow);
+            return new GameDay(GetCurrentDateTime());
         }
 
         public DateTime GetCurrentDateTime()
         {
-            return DateTime.UtcNow;
+            return DateTime.Now;
         }
     }
 }

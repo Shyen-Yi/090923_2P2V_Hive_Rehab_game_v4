@@ -30,6 +30,7 @@ namespace com.hive.projectr
         {
             LevelUp = 0,
             LevelDown = 1,
+            Reset = 2,
         }
 
         private enum ExtraObj
@@ -43,6 +44,7 @@ namespace com.hive.projectr
 
         private HiveButton _levelUpButton;
         private HiveButton _levelDownButton;
+        private HiveButton _resetButton;
 
         private TMP_InputField _nameInputField;
         private TMP_InputField _goalInputField;
@@ -67,6 +69,7 @@ namespace com.hive.projectr
 
             _levelUpButton = _config.ExtraButtons[(int)ExtraBtn.LevelUp];
             _levelDownButton = _config.ExtraButtons[(int)ExtraBtn.LevelDown];
+            _resetButton = _config.ExtraButtons[(int)ExtraBtn.Reset];
 
             _nameInputField = _config.ExtraObjects[(int)ExtraObj.NameInputField].GetComponent<TMP_InputField>();
             _goalInputField = _config.ExtraObjects[(int)ExtraObj.GoalInputField].GetComponent<TMP_InputField>();
@@ -111,6 +114,7 @@ namespace com.hive.projectr
         {
             _levelUpButton.onClick.AddListener(OnLevelUpButtonClick);
             _levelDownButton.onClick.AddListener(OnLevelDownButtonClick);
+            _resetButton.onClick.AddListener(OnResetButtonClick);
 
             _nameInputField.onEndEdit.AddListener(OnNameEndEdit);
             _goalInputField.onSelect.AddListener(OnGoalSelect);
@@ -121,6 +125,7 @@ namespace com.hive.projectr
         {
             _levelUpButton.onClick.RemoveAllListeners();
             _levelDownButton.onClick.RemoveAllListeners();
+            _resetButton.onClick.RemoveAllListeners();
 
             _nameInputField.onEndEdit.RemoveAllListeners();
             _goalInputField.onSelect.RemoveAllListeners();
@@ -143,31 +148,27 @@ namespace com.hive.projectr
 
         private void RefreshName(string name)
         {
-            if (_name == null || !_name.Equals(name))
-            {
-                _name = name;
-                _nameInputField.text = _name;
-            }
+            _name = name;
+            _nameInputField.text = _name;
         }
 
         private void RefreshLevel(int level)
         {
-            if (_level != level)
-            {
-                _level = level;
-                _levelText.text = $"{_level}";
-
-                OnLevelUpdate(level);
-            }
+            _level = level;
+            _levelText.text = $"{_level}";
         }
 
         private void RefreshGoal(int goal)
         {
-            if (_goal != goal)
-            {
-                _goal = goal;
-                _goalInputField.text = $"{_goal}";
-            }
+            _goal = goal;
+            _goalInputField.text = $"{_goal}";
+        }
+
+        public void SaveSettings()
+        {
+            SettingManager.Instance.UpdateDisplayName(_name, true);
+            SettingManager.Instance.UpdateLevel(_level, true);
+            SettingManager.Instance.UpdateDailyBlock(_goal, true);
         }
         #endregion
 
@@ -188,9 +189,17 @@ namespace com.hive.projectr
             RefreshLevel(level);
         }
 
+        private void OnResetButtonClick()
+        {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
+            SettingManager.Instance.Reset();
+            Show();
+        }
+
         private void OnNameEndEdit(string displayName)
         {
-            SettingManager.Instance.UpdateDisplayName(displayName, true);
+            RefreshName(displayName);
         }
 
         private void OnGoalSelect(string txt)
@@ -204,9 +213,7 @@ namespace com.hive.projectr
             {
                 dailyBlock = Mathf.Clamp(dailyBlock, GameGeneralConfig.GetData().MinGoal, GameGeneralConfig.GetData().MaxGoal);
 
-                SettingManager.Instance.UpdateDailyBlock(dailyBlock, true);
-
-                _goalInputField.text = $"{dailyBlock}";
+                RefreshGoal(dailyBlock);
             }
             else
             {
@@ -214,11 +221,6 @@ namespace com.hive.projectr
             }
 
             _goalInputCache = null;
-        }
-
-        private void OnLevelUpdate(int level)
-        {
-            SettingManager.Instance.UpdateLevel(level, true);
         }
         #endregion
     }

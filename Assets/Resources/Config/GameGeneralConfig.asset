@@ -19,4 +19,6 @@ MonoBehaviour:
     coreGameTransitionSec: 2
     calibrationTransitionSec: 5
     passingStreakToNextLevel: 1
-    defaultUserName: NewPlayer
+    defaultUserName: 
+    adminUsername: Hive
+    adminPassword: Hive

@@ -68,6 +68,8 @@ namespace com.hive.projectr
 		public Single CalibrationTransitionSec => _item.CalibrationTransitionSec;
 		public Int32 PassingStreakToNextLevel => _item.PassingStreakToNextLevel;
 		public String DefaultUserName => _item.DefaultUserName;
+		public String AdminUsername => _item.AdminUsername;
+		public String AdminPassword => _item.AdminPassword;
 
 		public GameGeneralConfigData(GameGeneralSOItem item)
 		{

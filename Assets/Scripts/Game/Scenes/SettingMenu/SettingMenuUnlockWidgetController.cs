@@ -6,21 +6,12 @@ using Newtonsoft.Json;
 
 namespace com.hive.projectr
 {
-    public class SettingUserInfoStorage
-    {
-        public Dictionary<string, string> dict;
-
-        //public SettingUserInfoStorage(string username, string password)
-        //{
-        //    dict = new Dictionary<string, string>();
-        //    dict.Add(username, password);
-        //}
-    }
-
     public class SettingMenuUnlockWidgetController
     {
         #region Fields
         private GeneralWidgetConfig _config;
+        private string _username;
+        private string _password;
         #endregion
 
         #region Extra
@@ -62,7 +53,8 @@ namespace com.hive.projectr
 
         public void Show()
         {
-            RefreshNotice("");
+            Reset();
+            RefreshNotice("Unlock the Settings with authorized user information.");
 
             _config.CanvasGroup.CanvasGroupOn();
         }
@@ -79,6 +71,12 @@ namespace com.hive.projectr
         #endregion
 
         #region Content
+        public void Reset()
+        {
+            _usernameInputField.text = "";
+            _passwordInputField.text = "";
+        }
+
         private void InitExtra()
         {
             _noticeCanvasGroup = _config.ExtraCanvasGroups[(int)ExtraCG.Notice];
@@ -107,12 +105,12 @@ namespace com.hive.projectr
         #region Event
         private void OnUsernameValueChanged(string username)
         {
-            RefreshNotice("");
+            RefreshNotice("Unlock the Settings with authorized user information.");
         }
 
         private void OnPasswordValueChanged(string password)
         {
-            RefreshNotice("");
+            RefreshNotice("Unlock the Settings with authorized user information.");
         }
         #endregion
 
@@ -122,64 +120,26 @@ namespace com.hive.projectr
             var username = _usernameInputField.text;
             if (string.IsNullOrEmpty(username))
             {
-                RefreshNotice("Invalid username");
+                RefreshNotice("Username cannot be empty.");
                 return false;
             }
 
             var password = _passwordInputField.text;
             if (string.IsNullOrEmpty(password))
             {
-                RefreshNotice("Invalid password");
+                RefreshNotice("Password cannot be empty.");
                 return false;
             }
 
-            if (PlayerPrefs.HasKey(PlayerPrefKeys.UserInfoStorage))
+            if (username.Equals(GameGeneralConfig.GetData().AdminUsername) &&
+                password.Equals(GameGeneralConfig.GetData().AdminPassword))
             {
-                var prevUserInfoStorageJson = PlayerPrefs.GetString(PlayerPrefKeys.UserInfoStorage);
-                var prevUserInfoStorage = JsonConvert.DeserializeObject<SettingUserInfoStorage>(prevUserInfoStorageJson);
-
-                if (prevUserInfoStorage != null && prevUserInfoStorage.dict != null)
-                {
-                    // check
-                    if (prevUserInfoStorage.dict.TryGetValue(username, out var prevPassword))
-                    {
-                        if (prevPassword.Equals(password))
-                        {
-                            RefreshNotice("");
-                            return true;
-                        }
-                        else
-                        {
-                            RefreshNotice("Wrong password!");
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        RefreshNotice("Username not found!");
-                        return false;
-                    }
-                }
-                else
-                {
-                    RefreshNotice("Found user info storage. Parse failed.");
-                    return false;
-                }
-            }
-            else
-            {
-                // save & pass
-                var storage = new SettingUserInfoStorage() { 
-                    dict = new Dictionary<string, string>()
-                    {
-                        { username, password }
-                    }
-                };
-                var storageJson = JsonConvert.SerializeObject(storage);
-                PlayerPrefs.SetString(PlayerPrefKeys.UserInfoStorage, storageJson);
-
                 return true;
             }
+
+            RefreshNotice("Invalid username or password.");
+
+            return false;
         }
 
         private void RefreshNotice(string notice)
