@@ -329,8 +329,6 @@ namespace com.hive.projectr
 
             _nextCanHoldTime = Time.time + currentStageData.CooldownTime;
 
-            StopHolding();
-
             // mark
             if (_markDict.TryGetValue(currentStageData.Stage, out var markController))
             {
@@ -365,6 +363,8 @@ namespace com.hive.projectr
                 _marker.OnSuccess();
                 ++_stageIndex;
             }
+
+            StopHolding();
         }
 
         private Vector3 GetSpacecraftScreenPos()
