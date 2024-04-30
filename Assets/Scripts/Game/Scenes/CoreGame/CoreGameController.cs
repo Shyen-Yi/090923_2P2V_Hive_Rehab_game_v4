@@ -675,6 +675,9 @@ namespace com.hive.projectr
 
             while (num > 0)
             {
+                if (_countdownAnimator == null)
+                    yield break;
+
                 if (!_countdownAnimator.GetCurrentAnimatorStateInfo(0).IsName(countNumAnimStateName) &&
                     num == currentNum)
                 {

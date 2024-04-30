@@ -40,7 +40,7 @@ namespace com.hive.projectr
         {
             if (controller != null)
             {
-                controller.Hide(GameSceneHideState.Remove);
+                controller.Hide(GameSceneHideState.Removed);
                 controller.Dispose();
             }
         }
@@ -77,7 +77,27 @@ namespace com.hive.projectr
         #region Callback
         private void Tick()
         {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if (InputManager.GetKeyDown(KeyCode.Escape))
+            {
+                if (!IsLoading())
+                {
+                    if (_sceneDataDict.Count > 1)
+                    {
+                        GoBack();
+                    }
+                    else
+                    {
+                        ShowScene(SceneNames.Confirm, new ConfirmData("Confirm", "Are you sure you want to quit the game?", "Yes", ConfirmQuit, null));
+                    }
+                }
+            }
 
+            void ConfirmQuit()
+            {
+                Application.Quit();
+            }
+#endif
         }
         #endregion
 

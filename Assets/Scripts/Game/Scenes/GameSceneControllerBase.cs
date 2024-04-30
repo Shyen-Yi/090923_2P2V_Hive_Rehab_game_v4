@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.IO.LowLevel.Unsafe;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -31,7 +29,7 @@ namespace com.hive.projectr
 
     public enum GameSceneHideState
     {
-        Remove,
+        Removed,
         Covered,
     }
 

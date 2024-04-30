@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -347,7 +346,7 @@ namespace com.hive.projectr
 
         private AudioSource CreateSource()
         {
-            var source = _sourceRoot.AddComponent<AudioSource>();
+            var source = _sourceRoot.gameObject.AddComponent<AudioSource>();
             source.playOnAwake = false;
             source.enabled = true;
             return source;

@@ -23,6 +23,17 @@ namespace com.hive.projectr
 
         private void Awake()
         {
+            if (SystemInfo.systemMemorySize >= 1024)
+            {
+                Application.targetFrameRate = 120;
+            }
+            else
+            {
+                Application.targetFrameRate = 60;
+            }
+
+            QualitySettings.vSyncCount = 0;
+
             _isGameInitialized = false;
             DontDestroyOnLoad(gameObject);
         }
