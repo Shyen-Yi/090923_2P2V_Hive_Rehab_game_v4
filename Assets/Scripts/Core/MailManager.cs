@@ -81,11 +81,11 @@ namespace com.hive.projectr
                 {
                     if (e.Error == null)
                     {
-                        Console.WriteLine("Email sent successfully!");
+                        Logger.Log("Email sent successfully!");
                     }
                     else
                     {
-                        Console.WriteLine("Failed to send email. Error: " + e.Error.Message);
+                        Logger.LogError("Failed to send email. Error: " + e.Error.Message);
                     }
                 }
                 finally
