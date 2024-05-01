@@ -360,6 +360,16 @@ namespace com.hive.projectr
             return true;
         }
 
+        private string GetRootPath()
+        {
+#if UNITY_EDITOR
+            var rootPath = Path.Combine(Application.dataPath, "CSVFiles");
+#else
+            var rootPath = Path.Combine(Application.persistentDataPath, "CSVFiles");
+#endif
+            return rootPath;
+        }
+
         private string GetDayFolderName(DateTime time, string username)
         {
             return string.Format(DayFolderTemplate, time.Month, time.Day, time.Year, username);
@@ -367,11 +377,7 @@ namespace com.hive.projectr
 
         private string GetDayFolderPath(DateTime time, string username)
         {
-#if UNITY_EDITOR
-            var dayFolderPath = Path.Combine(Application.dataPath, "CSVFiles", GetDayFolderName(time, username));
-#else
-            var dayFolderPath = Path.Combine(Application.persistentDataPath, "CSVFiles", GetDayFolderName(time, username));
-#endif
+            var dayFolderPath = Path.Combine(GetRootPath(), GetDayFolderName(time, username));
             return dayFolderPath;
         }
 
@@ -504,7 +510,7 @@ namespace com.hive.projectr
 
         private void SaveLog(CSVType type, string content)
         {
-            Logger.Log($"CSVManager::SaveLog - type: {type} | content: {content}");
+            Logger.Log($"CSVManager::SaveLog - type: {type} | content: {content} | _coordinatePosFilePath: {_coordinatePosFilePath} | _summaryFilePath: {_summaryFilePath} | _coordinatesFilePath: {_coordinatesFilePath}");
 
             try
             {
@@ -696,6 +702,29 @@ namespace com.hive.projectr
             {
                 Logger.LogError($"Cannot append log when _logSb is null!");
             }
+        }
+        #endregion
+
+        #region Public
+        public List<string> GetCSVDirectoriesForUser(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                Logger.LogError($"Invalid username: {username}");
+                return null;
+            }
+
+            var directories = new List<string>();
+            var allDirectories = Directory.GetDirectories(GetRootPath());
+            foreach (var dir in allDirectories)
+            {
+                if (dir.Contains(username))
+                {
+                    directories.Add(dir);
+                }
+            }
+
+            return directories;
         }
         #endregion
     }

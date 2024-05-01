@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System.IO;
 
 namespace com.hive.projectr
 {
@@ -90,10 +91,38 @@ namespace com.hive.projectr
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-            GameSceneManager.Instance.ShowScene(SceneNames.ShareMenu, null, ()=>
+            var targetFile = Path.Combine(Application.temporaryCachePath, $"GameData_{SettingManager.Instance.DisplayName}.zip");
+
+            if (!SettingManager.Instance.IsDefaultUser)
             {
-                GameSceneManager.Instance.HideScene(SceneName);
-            });
+                var csvDirectories = CSVManager.Instance.GetCSVDirectoriesForUser(SettingManager.Instance.DisplayName);
+
+                if (FileUtil.CreateZipFromDirectories(csvDirectories.ToArray(), targetFile, new HashSet<string>()
+                {
+                    ".txt", ".meta",
+                }))
+                {
+                    var mailConfigData = MailConfig.GetData();
+                    MailManager.Instance.SendData(mailConfigData.DataSenderAccount, mailConfigData.DataSenderPassword, new List<string>() { mailConfigData.DataReceiverAccount }, new List<string>() { targetFile }, $"Projec R Game Data - {SettingManager.Instance.DisplayName}", "Sent in game", () =>
+                    {
+                        if (File.Exists(targetFile))
+                        {
+                            File.Delete(targetFile);
+                        }
+                    });
+                }
+            }
+            else
+            {
+                Logger.LogError($"Cannot share as default user");
+            }
+
+            GameSceneManager.Instance.GoBack();
+
+            //GameSceneManager.Instance.ShowScene(SceneNames.ShareMenu, null, ()=>
+            //{
+            //    GameSceneManager.Instance.HideScene(SceneName);
+            //});
         }
         #endregion
     }

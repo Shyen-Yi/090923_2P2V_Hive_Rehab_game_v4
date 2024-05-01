@@ -16,6 +16,7 @@ namespace com.hive.projectr
         private StatsManager _statsManager;
         private TimeManager _timeManager;
         private SoundManager _soundManager;
+        private MailManager _mailManager;
 
         private MonoBehaviourUtil _monoBehaviourUtil;
 
@@ -70,6 +71,9 @@ namespace com.hive.projectr
             _soundManager = new SoundManager();
             _soundManager.OnInit();
 
+            _mailManager = new MailManager();
+            _mailManager.OnInit();
+
             _monoBehaviourUtil = FindObjectOfType<MonoBehaviourUtil>();
             if (_monoBehaviourUtil == null)
             {
@@ -116,6 +120,9 @@ namespace com.hive.projectr
 
             _soundManager.OnDispose();
             _soundManager = null;
+
+            _mailManager.OnDispose();
+            _mailManager = null;
 
             _monoBehaviourUtil = null;
         }
