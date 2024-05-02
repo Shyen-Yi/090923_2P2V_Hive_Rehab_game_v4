@@ -10,11 +10,9 @@ namespace com.hive.projectr
         [SerializeField] private HandModelManager _handModelManager;
         [SerializeField, Range(.1f, 10f)] private float _sensitivity;
         [SerializeField] private float _baseSensitivityScale;
-        [SerializeField] private Vector3 _offset;
 
         public HandModelManager HandModelManager => _handModelManager;
         public float Sensitivity => _sensitivity;
         public float BaseSensitivityScale => _baseSensitivityScale;
-        public Vector3 Offset => _offset;
     }
 }

@@ -15,5 +15,5 @@ MonoBehaviour:
   _items:
   - arrowWorldDistanceFromCenter: 1
     stageErrorProtectionTriggerTime: 30
-    holdingMaxScreenOffset: 40
+    holdingMaxScreenOffset: 90
     pendingMarkerAlpha: 0.2

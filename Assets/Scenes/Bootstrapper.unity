@@ -317,7 +317,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 1388573325}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -9915,7 +9915,6 @@ MonoBehaviour:
   _handModelManager: {fileID: 862310537}
   _sensitivity: 6
   _baseSensitivityScale: 1000
-  _offset: {x: -0.05, y: -0.55, z: 0}
 --- !u!1 &1044648550
 GameObject:
   m_ObjectHideFlags: 0
@@ -10164,7 +10163,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24c5487cbaa13554e9c408a2b96c0628, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rectTransform: {fileID: 1163880746}
 --- !u!1 &1388573323
 GameObject:
   m_ObjectHideFlags: 0

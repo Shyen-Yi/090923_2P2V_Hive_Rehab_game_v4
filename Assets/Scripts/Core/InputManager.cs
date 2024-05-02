@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Leap;
 
 namespace com.hive.projectr
 {
@@ -14,16 +15,12 @@ namespace com.hive.projectr
             {
                 if (UICursor != null)
                 {
-                    return UICursor.GetScreenPosition();
+                    return UICursor.GetPosition();
                 }
 
                 return Vector3.zero;
             }
         }
-
-        private Vector3 _cursorPos;
-        private Vector3 _initCursorPos;
-        private bool _isCursorInitialized;
 
         public MotionTracker MotionTracker
         {
@@ -50,14 +47,21 @@ namespace com.hive.projectr
             }
         }
         private UICursor _uiCursor;
+        private Vector3 _cursorPos;
+        private Vector3 _initCursorPos;
+        private bool _isCursorInitialized;
+        private PointerEventData _pointerEventData;
+        private EventSystem _eventSystem;
+        private GameObject _currentTarget;
+        private Hand _currentHand;
 
-        private PointerEventData pointerEventData;
-        private EventSystem eventSystem;
+        private bool _isPinching;
 
         #region Lifecycle
         public void OnInit()
         {
-            eventSystem = EventSystem.current;
+            _eventSystem = EventSystem.current;
+            _pointerEventData = new PointerEventData(_eventSystem);
 
             MonoBehaviourUtil.OnUpdate += Tick;
         }
@@ -69,81 +73,160 @@ namespace com.hive.projectr
 
         private void Tick()
         {
-            if (UICursor != null && UICursor.IsEnabled && MotionTracker != null)
-            {
-                CursorMovementTick();
-                CursorInputTick();
-            }
+            CursorTick();
         }
 
-        private void CursorMovementTick()
+        private void CursorTick()
         {
-            if (TryGetHandRelativeWorldPos(out var worldPos))
+            if (UICursor != null && MotionTracker != null)
             {
-                var cursorPos = worldPos * MotionTracker.Sensitivity * MotionTracker.BaseSensitivityScale;
+                _currentHand = null;
 
-                if (!_isCursorInitialized)
+                var position = Vector3.zero;
+
+                if (MotionTracker != null)
                 {
-                    _isCursorInitialized = true;
-                    _initCursorPos = cursorPos;
+                    var handModelManager = MotionTracker.HandModelManager;
+                    if (handModelManager != null)
+                    {
+                        if (handModelManager.HandModelPairs != null && handModelManager.HandModelPairs.Count > 0)
+                        {
+                            var handModelPair = handModelManager.HandModelPairs[0];
+                            var rightHand = handModelPair.Right.GetLeapHand();
+                            if (rightHand != null)
+                            {
+                                if (HasValidHandRelativeWorldPosition(rightHand, out position))
+                                {
+                                    _currentHand = rightHand;
+                                }
+                            }
+                            else
+                            {
+                                var leftHand = handModelPair.Left.GetLeapHand();
+                                if (HasValidHandRelativeWorldPosition(leftHand, out position))
+                                {
+                                    _currentHand = leftHand;
+                                }
+                            }
+                        }
+                    }
                 }
 
-                _cursorPos = cursorPos - _initCursorPos + MotionTracker.Offset * MotionTracker.BaseSensitivityScale;
-            }
+                if (_currentHand != null)
+                {
+                    var cursorPos = position * MotionTracker.Sensitivity * MotionTracker.BaseSensitivityScale;
 
-            UICursor.SetScaledAndCenteredPosition(_cursorPos);
+                    if (!_isCursorInitialized)
+                    {
+                        _isCursorInitialized = true;
+                        _initCursorPos = cursorPos - new Vector3(Screen.width / 2, 0);
+                    }
+
+                    _cursorPos = cursorPos - _initCursorPos;
+
+                    UICursor.SetPosition(_cursorPos);
+
+                    CursorInputTick();
+                }
+            }
         }
 
         private void CursorInputTick()
         {
-            if (GetKeyDown(KeyCode.Space))
+            _pointerEventData.position = UICursor.GetPosition();
+
+            // do raycasts and find all objects beneath the cursor
+            List<RaycastResult> raycastResults = new List<RaycastResult>();
+            _eventSystem.RaycastAll(_pointerEventData, raycastResults);
+            GameObject newTarget = raycastResults.Count > 0 ? raycastResults[0].gameObject : null;
+
+            if (newTarget != _currentTarget)
             {
-                pointerEventData = new PointerEventData(eventSystem);
-                pointerEventData.position = UICursor.GetScreenPosition();
-                ExecuteEvents.Execute(UICursor.gameObject, pointerEventData, ExecuteEvents.pointerDownHandler);
-
-                Logger.LogError($"Press down - cursor world: {UICursor.GetWorldPosition()} | cursor screen: {UICursor.GetScreenPosition()}");
-            }
-
-            if (GetKeyUp(KeyCode.Space))
-            {
-                ExecuteEvents.Execute(UICursor.gameObject, pointerEventData, ExecuteEvents.pointerUpHandler);
-
-                Logger.LogError($"Press up - cursor world: {UICursor.GetWorldPosition()} | cursor screen: {UICursor.GetScreenPosition()}");
-            }
-        }
-        #endregion
-
-        #region Private
-        private bool TryGetHandRelativeWorldPos(out Vector3 position)
-        {
-            if (MotionTracker != null)
-            {
-                var handModelManager = MotionTracker.HandModelManager;
-                if (handModelManager != null)
+                if (_currentTarget != null)
                 {
-                    if (handModelManager.HandModelPairs != null && handModelManager.HandModelPairs.Count > 0)
-                    {
-                        var handModelPair = handModelManager.HandModelPairs[0];
+                    ExecuteEvents.Execute(_currentTarget, _pointerEventData, ExecuteEvents.pointerExitHandler);
+                    //Logger.LogError($"### Pointer Exit - _currentTarget: {_currentTarget.name}");
+                }
+                if (newTarget != null)
+                {
+                    ExecuteEvents.Execute(newTarget, _pointerEventData, ExecuteEvents.pointerEnterHandler);
+                    //Logger.LogError($"### Pointer Enter - _currentTarget: {newTarget.name}");
+                }
+                _currentTarget = newTarget;
+            }
 
-                        var rightHand = handModelPair.Right.GetLeapHand();
-                        if (rightHand != null)
+            var thumb = _currentHand.Fingers[0];
+            var index = _currentHand.Fingers[1];
+            var isPinching = IsPinching();
+            if (isPinching)
+            {
+                if (!_isPinching) // press down
+                {
+                    if (raycastResults.Count > 0)
+                    {
+                        _pointerEventData.pressPosition = _pointerEventData.position;
+                        _pointerEventData.pointerPressRaycast = raycastResults[0];
+                        if (_currentTarget != null)
                         {
-                            position = rightHand.WristPosition - MotionTracker.transform.position;
-                            return true;
-                        }
-                        var leftHand = handModelPair.Left.GetLeapHand();
-                        if (leftHand != null)
-                        {
-                            position = leftHand.WristPosition - MotionTracker.transform.position;
-                            return true;
+                            var pressObject = ExecuteEvents.ExecuteHierarchy(_currentTarget, _pointerEventData, ExecuteEvents.pointerDownHandler);
+                            _pointerEventData.pointerPress = pressObject;
+
+                            //Logger.LogError($"### Pointer Down - _currentTarget: {_currentTarget.name} | pressObject: {pressObject?.name ?? "NONE"}");
                         }
                     }
                 }
             }
+            else
+            {
+                if (_isPinching) // release
+                {
+                    if (_pointerEventData.pointerPress != null)
+                    {
+                        ExecuteEvents.Execute(_pointerEventData.pointerPress, _pointerEventData, ExecuteEvents.pointerUpHandler);
+                        //Logger.LogError($"### Pointer Up - {_pointerEventData.pointerPress.name}");
 
+                        var clickObject = ExecuteEvents.ExecuteHierarchy(_currentTarget, _pointerEventData, ExecuteEvents.pointerClickHandler);
+                        if (clickObject != null && clickObject == _pointerEventData.pointerPress)
+                        {
+                            //Logger.LogError($"### Pointer Click - {_pointerEventData.pointerPress.name}");
+                        }
+                    }
+
+                    _pointerEventData.pointerPress = null;
+                }
+            }
+
+            _isPinching = isPinching;
+        }
+        #endregion
+
+        #region Private
+        private bool IsPinching()
+        {
+            if (_currentHand == null)
+                return false;
+
+            var pinchStrength = _currentHand.PinchStrength;
+            var isPinching = pinchStrength > GameGeneralConfig.GetData().PinchStrengthThreshold;
+            return isPinching;
+        }
+
+        private bool HasValidHandRelativeWorldPosition(Hand hand, out Vector3 position)
+        {
             position = Vector3.zero;
-            return false;
+
+            if (hand == null)
+                return false;
+
+            position = hand.WristPosition - MotionTracker.transform.position;
+
+            if (position == Vector3.zero)
+                return false;
+
+            if (position.sqrMagnitude > 1000)
+                return false;
+
+            return true;
         }
         #endregion
 

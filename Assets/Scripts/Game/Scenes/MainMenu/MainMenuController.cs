@@ -35,9 +35,11 @@ namespace com.hive.projectr
 
         protected override void OnShow(ISceneData data, GameSceneShowState showState)
         {
-            SoundManager.Instance.PlaySound(SoundType.MenuBackground);
             SoundManager.Instance.StopSound(SoundType.CalibrationBackground);
             SoundManager.Instance.StopSound(SoundType.CoreGameBackground);
+            SoundManager.Instance.StopSound(SoundType.CoreGameLevelEnd);
+            SoundManager.Instance.StopSound(SoundType.CoreGameLevelEndShowReport);
+            SoundManager.Instance.PlaySound(SoundType.MenuBackground);
 
             base.OnShow(data, showState);
         }

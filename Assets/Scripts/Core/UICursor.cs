@@ -9,35 +9,37 @@ namespace com.hive.projectr
     {
         public bool IsEnabled { get; private set; } = true;
 
-        public Vector3 GetWorldPosition()
+        private RectTransform _rt;
+
+        private void Awake()
         {
-            return transform.position;
+            _rt = (RectTransform)transform;
         }
 
-        public Vector2 GetScreenPosition()
+        /// <summary>
+        /// For the cursor on Canvas - Overlay, all positions are equal.
+        /// </summary>
+        /// <returns></returns>
+        public Vector3 GetPosition()
         {
-            var screenPos = CameraManager.Instance.UICamera.WorldToScreenPoint(transform.position);
-            return screenPos;
+            return _rt.position;
         }
 
-        public void SetScaledAndCenteredPosition(Vector2 position)
+        public void SetPosition(Vector2 position)
         {
-            if (IsEnabled)
-            {
-                ((RectTransform)transform).anchoredPosition = new Vector2(position.x, position.y);
-            }
+            _rt.position = new Vector2(position.x, position.y);
         }
 
         public void Enable()
         {
             IsEnabled = true;
-            transform.gameObject.SetActive(true);
+            _rt.gameObject.SetActive(true);
         }
 
         public void Disable()
         {
             IsEnabled = false;
-            transform.gameObject.SetActive(false);
+            _rt.gameObject.SetActive(false);
         }
     }
 }

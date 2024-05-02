@@ -108,7 +108,6 @@ namespace com.hive.projectr
 
         protected override void OnHide(GameSceneHideState hideState)
         {
-            SoundManager.Instance.StopSound(SoundType.MenuBackground);
         }
 
         protected override void OnDispose()

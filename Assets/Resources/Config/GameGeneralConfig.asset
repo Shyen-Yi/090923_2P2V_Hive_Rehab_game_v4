@@ -22,3 +22,4 @@ MonoBehaviour:
     defaultUserName: 
     adminUsername: Hive
     adminPassword: Hive
+    pinchStrengthThreshold: 0.8

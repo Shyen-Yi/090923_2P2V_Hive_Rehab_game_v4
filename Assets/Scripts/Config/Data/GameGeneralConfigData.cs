@@ -70,6 +70,7 @@ namespace com.hive.projectr
 		public String DefaultUserName => _item.DefaultUserName;
 		public String AdminUsername => _item.AdminUsername;
 		public String AdminPassword => _item.AdminPassword;
+		public Single PinchStrengthThreshold => _item.PinchStrengthThreshold;
 
 		public GameGeneralConfigData(GameGeneralSOItem item)
 		{

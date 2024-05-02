@@ -26,6 +26,7 @@ namespace com.hive.projectr
 		[SerializeField] private String defaultUserName;
 		[SerializeField] private String adminUsername;
 		[SerializeField] private String adminPassword;
+		[SerializeField] private Single pinchStrengthThreshold;
 
 		public Int32 DefaultGoal => defaultGoal;
 		public Int32 MinGoal => minGoal;
@@ -36,5 +37,6 @@ namespace com.hive.projectr
 		public String DefaultUserName => defaultUserName;
 		public String AdminUsername => adminUsername;
 		public String AdminPassword => adminPassword;
+		public Single PinchStrengthThreshold => pinchStrengthThreshold;
     }
 }
