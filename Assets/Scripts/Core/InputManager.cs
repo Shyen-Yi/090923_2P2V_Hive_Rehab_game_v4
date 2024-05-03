@@ -56,6 +56,7 @@ namespace com.hive.projectr
         private GameObject _currentClickable;
         private HashSet<GameObject> _currentPressing = new HashSet<GameObject>();
         private HashSet<GameObject> _currentHovering = new HashSet<GameObject>();
+        private HashSet<GameObject> _currentClicking = new HashSet<GameObject>();
         private Hand _currentHand;
 
         private bool _isPinching;
@@ -67,6 +68,7 @@ namespace com.hive.projectr
             _pointerEventData = new PointerEventData(_eventSystem);
 
             MonoBehaviourUtil.OnUpdate += Tick;
+            UICursor.OnClick += OnClick;
 
             Cursor.visible = false;
         }
@@ -74,6 +76,12 @@ namespace com.hive.projectr
         public void OnDispose()
         {
             MonoBehaviourUtil.OnUpdate -= Tick;
+            UICursor.OnClick -= OnClick;
+        }
+
+        private void OnClick()
+        {
+            ExecuteEvents.ExecuteHierarchy(UICursor.gameObject, _pointerEventData, ExecuteEvents.pointerClickHandler);
         }
 
         private void Tick()
@@ -134,6 +142,13 @@ namespace com.hive.projectr
                     CursorInputTick();
                 }
             }
+
+            var horizontal = Input.GetAxisRaw("Horizontal");
+            var vertical = Input.GetAxisRaw("Vertical");
+            _cursorPos += new Vector3(horizontal, vertical, 0) * MotionTracker.Sensitivity;
+            UICursor.SetPosition(_cursorPos);
+
+            CursorInputTick();
         }
 
         private void CursorInputTick()
@@ -161,28 +176,23 @@ namespace com.hive.projectr
             }
 
             var newClickable = GetPointerClickableObject(raycastResults);
-            if (newClickable != _currentClickable)
+            if (newClickable != null && _currentClickable == null)
             {
-                if (_currentClickable != null)
-                {
-                    TryTriggerPointerExit(_currentClickable, _pointerEventData);
-                }
-
-                if (newTarget != null)
-                {
-                    TryTriggerPointerEnter(newTarget, _pointerEventData);
-                }
-
-                _currentClickable = newClickable;
+                UICursor.OnEnterClickable();
+                TryTriggerPointerEnter(newTarget, _pointerEventData);
+            }
+            else if (newClickable == null && _currentClickable != null)
+            {
+                UICursor.OnLeaveClickable();
+                TryTriggerPointerExit(_currentClickable, _pointerEventData);
             }
 
-            // clear clicking
-            var currentClicking = new HashSet<GameObject>();
+            _currentClickable = newClickable;
 
-            if (_currentHand != null && _currentHand.Fingers.Count >= 2)
+            _currentClicking.Clear();
+
+            if (_currentHand != null)
             {
-                var thumb = _currentHand.Fingers[0];
-                var index = _currentHand.Fingers[1];
                 var isPinching = IsPinching();
                 if (isPinching)
                 {
@@ -248,46 +258,6 @@ namespace com.hive.projectr
                 _currentPressing.Clear();
                 _pointerEventData.pointerPress = null;
             }
-
-            void TryTriggerPointerEnter(GameObject obj, PointerEventData pointerEventData)
-            {
-                if (_currentHovering.Add(obj))
-                {
-                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerEnterHandler);
-                }
-            }
-
-            void TryTriggerPointerExit(GameObject obj, PointerEventData pointerEventData)
-            {
-                if (_currentHovering.Remove(obj))
-                {
-                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerExitHandler);
-                }
-            }
-
-            void TryTriggerPointerDown(GameObject obj, PointerEventData pointerEventData)
-            {
-                if (_currentPressing != null && _currentPressing.Add(obj))
-                {
-                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerDownHandler);
-                }
-            }
-
-            void TryTriggerPointerUp(GameObject obj, PointerEventData pointerEventData)
-            {
-                if (_currentPressing != null && _currentPressing.Remove(obj))
-                {
-                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerUpHandler);
-                }
-            }
-
-            void TryTriggerPointerClick(GameObject obj, PointerEventData pointerEventData)
-            {
-                if (currentClicking != null && currentClicking.Add(obj))
-                {
-                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerClickHandler);
-                }
-            }
         }
 
         private GameObject GetPointerPressableObject(List<RaycastResult> results)
@@ -325,9 +295,57 @@ namespace com.hive.projectr
         }
         #endregion
 
+        #region Pointer Event Trigger
+        private void TryTriggerPointerEnter(GameObject obj, PointerEventData pointerEventData)
+        {
+            if (_currentHovering.Add(obj))
+            {
+                ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerEnterHandler);
+            }
+        }
+
+        private void TryTriggerPointerExit(GameObject obj, PointerEventData pointerEventData)
+        {
+            if (_currentHovering.Remove(obj))
+            {
+                ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerExitHandler);
+            }
+        }
+
+        private void TryTriggerPointerDown(GameObject obj, PointerEventData pointerEventData)
+        {
+            if (_currentPressing != null && _currentPressing.Add(obj))
+            {
+                ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerDownHandler);
+            }
+        }
+
+        private void TryTriggerPointerUp(GameObject obj, PointerEventData pointerEventData)
+        {
+            if (_currentPressing != null && _currentPressing.Remove(obj))
+            {
+                ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerUpHandler);
+            }
+        }
+
+        private void TryTriggerPointerClick(GameObject obj, PointerEventData pointerEventData)
+        {
+            if (_currentClicking != null && _currentClicking.Add(obj))
+            {
+                ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerClickHandler);
+            }
+        }
+        #endregion
+
         #region Private
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <returns></returns>
         private bool IsPinching()
         {
+            return false;
+
             if (_currentHand == null)
                 return false;
 

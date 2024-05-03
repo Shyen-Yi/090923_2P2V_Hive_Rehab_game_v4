@@ -1,7 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 namespace com.hive.projectr
 {
@@ -9,11 +10,126 @@ namespace com.hive.projectr
     {
         public bool IsEnabled { get; private set; } = true;
 
+        public static Action OnClick;
+
+        [SerializeField] private Image _cursor;
+        [SerializeField] private Image _circle;
+
         private RectTransform _rt;
+        private float _nextCanHoldTime;
+        private bool _isOnClickable;
+        private float _idleDuration;
+        private bool _isHolding;
+        private float _holdingTime;
+        private Vector3 _holdingStartPosition;
+        private Vector3 _lastTickPosition;
+
+        private static readonly float PreHoldingCooldownTime = .2f;
+        private static readonly float ClickHoldingTimeMax = 1f;
+        private static readonly float HoldingMaxScreenOffset = 90;
 
         private void Awake()
         {
             _rt = (RectTransform)transform;
+        }
+
+        private void Update()
+        {
+            var tickPosition = GetPosition();
+            var deltaTickPosition = tickPosition - _lastTickPosition;
+            _lastTickPosition = tickPosition;
+            var isIdle = deltaTickPosition.sqrMagnitude < HoldingMaxScreenOffset;
+            if (isIdle && _isOnClickable)
+            {
+                if (_idleDuration < -.5f)
+                {
+                    _idleDuration = 0;
+                }
+
+                _idleDuration += Time.deltaTime;
+            }
+            else
+            {
+                _idleDuration = -1;
+            }
+
+            var isHolding = _idleDuration >= PreHoldingCooldownTime && Time.time >= _nextCanHoldTime;
+            var isInterrupted = _isHolding && (!IsIdle() || Vector3.Magnitude(_holdingStartPosition - GetPosition()) > HoldingMaxScreenOffset);
+            if (isInterrupted)
+            {
+                isHolding = false;
+                _nextCanHoldTime = Time.time + PreHoldingCooldownTime; // holding interrupted, need cooldown
+            }
+
+            if (!_isHolding && isHolding)
+            {
+                StartHolding();
+            }
+            else if (_isHolding && !isHolding)
+            {
+                StopHolding();
+            }
+
+            _isHolding = isHolding;
+
+            if (_isHolding)
+            {
+                _cursor.enabled = false;
+                _circle.enabled = true;
+
+                _holdingTime += Time.deltaTime;
+
+                if (_holdingTime < ClickHoldingTimeMax)
+                {
+                    var heldCircleFill = (_holdingTime % ClickHoldingTimeMax) / ClickHoldingTimeMax;
+                    _circle.fillAmount = Mathf.Clamp01(heldCircleFill);
+                }
+                else
+                {
+                    _holdingTime = 0;
+                    _idleDuration = -1;
+                    _nextCanHoldTime = Time.time + PreHoldingCooldownTime;
+
+                    OnClick?.Invoke();
+                }
+            }
+            else
+            {
+                _cursor.enabled = true;
+                _circle.enabled = false;
+            }
+        }
+
+        private void StartHolding()
+        {
+            _isHolding = true;
+            _circle.fillAmount = 0;
+            _holdingStartPosition = GetPosition();
+        }
+
+        private void StopHolding()
+        {
+            _isHolding = false;
+            _circle.fillAmount = 0;
+            _holdingTime = 0;
+        }
+
+        private bool IsIdle()
+        {
+            if (_idleDuration < -.5f)
+                return false;
+
+            return true;
+        }
+
+        public void OnEnterClickable()
+        {
+            _isOnClickable = true;
+        }
+
+        public void OnLeaveClickable()
+        {
+            _isOnClickable = false;
         }
 
         /// <summary>
