@@ -53,6 +53,9 @@ namespace com.hive.projectr
         private PointerEventData _pointerEventData;
         private EventSystem _eventSystem;
         private GameObject _currentTarget;
+        private GameObject _currentClickable;
+        private HashSet<GameObject> _currentPressing = new HashSet<GameObject>();
+        private HashSet<GameObject> _currentHovering = new HashSet<GameObject>();
         private Hand _currentHand;
 
         private bool _isPinching;
@@ -64,6 +67,8 @@ namespace com.hive.projectr
             _pointerEventData = new PointerEventData(_eventSystem);
 
             MonoBehaviourUtil.OnUpdate += Tick;
+
+            Cursor.visible = false;
         }
 
         public void OnDispose()
@@ -138,65 +143,185 @@ namespace com.hive.projectr
             // do raycasts and find all objects beneath the cursor
             List<RaycastResult> raycastResults = new List<RaycastResult>();
             _eventSystem.RaycastAll(_pointerEventData, raycastResults);
-            GameObject newTarget = raycastResults.Count > 0 ? raycastResults[0].gameObject : null;
 
+            GameObject newTarget = raycastResults.Count > 0 ? raycastResults[0].gameObject : null;
             if (newTarget != _currentTarget)
             {
                 if (_currentTarget != null)
                 {
-                    ExecuteEvents.Execute(_currentTarget, _pointerEventData, ExecuteEvents.pointerExitHandler);
-                    //Logger.LogError($"### Pointer Exit - _currentTarget: {_currentTarget.name}");
+                    TryTriggerPointerExit(_currentTarget, _pointerEventData);
                 }
+
                 if (newTarget != null)
                 {
-                    ExecuteEvents.Execute(newTarget, _pointerEventData, ExecuteEvents.pointerEnterHandler);
-                    //Logger.LogError($"### Pointer Enter - _currentTarget: {newTarget.name}");
+                    TryTriggerPointerEnter(newTarget, _pointerEventData);
                 }
+
                 _currentTarget = newTarget;
             }
 
-            var thumb = _currentHand.Fingers[0];
-            var index = _currentHand.Fingers[1];
-            var isPinching = IsPinching();
-            if (isPinching)
+            var newClickable = GetPointerClickableObject(raycastResults);
+            if (newClickable != _currentClickable)
             {
-                if (!_isPinching) // press down
+                if (_currentClickable != null)
                 {
-                    if (raycastResults.Count > 0)
-                    {
-                        _pointerEventData.pressPosition = _pointerEventData.position;
-                        _pointerEventData.pointerPressRaycast = raycastResults[0];
-                        if (_currentTarget != null)
-                        {
-                            var pressObject = ExecuteEvents.ExecuteHierarchy(_currentTarget, _pointerEventData, ExecuteEvents.pointerDownHandler);
-                            _pointerEventData.pointerPress = pressObject;
+                    TryTriggerPointerExit(_currentClickable, _pointerEventData);
+                }
 
-                            //Logger.LogError($"### Pointer Down - _currentTarget: {_currentTarget.name} | pressObject: {pressObject?.name ?? "NONE"}");
-                        }
+                if (newTarget != null)
+                {
+                    TryTriggerPointerEnter(newTarget, _pointerEventData);
+                }
+
+                _currentClickable = newClickable;
+            }
+
+            // clear clicking
+            var currentClicking = new HashSet<GameObject>();
+
+            if (_currentHand != null && _currentHand.Fingers.Count >= 2)
+            {
+                var thumb = _currentHand.Fingers[0];
+                var index = _currentHand.Fingers[1];
+                var isPinching = IsPinching();
+                if (isPinching)
+                {
+                    if (!_isPinching) // pointer down
+                    {
+                        OnPointerDown();
                     }
                 }
+                else
+                {
+                    if (_isPinching) // pointer up
+                    {
+                        OnPointerUp();
+                    }
+                }
+
+                _isPinching = isPinching;
             }
             else
             {
-                if (_isPinching) // release
+                if (GetKeyDown(KeyCode.Space))
                 {
-                    if (_pointerEventData.pointerPress != null)
-                    {
-                        ExecuteEvents.Execute(_pointerEventData.pointerPress, _pointerEventData, ExecuteEvents.pointerUpHandler);
-                        //Logger.LogError($"### Pointer Up - {_pointerEventData.pointerPress.name}");
+                    OnPointerDown();
+                }
 
-                        var clickObject = ExecuteEvents.ExecuteHierarchy(_currentTarget, _pointerEventData, ExecuteEvents.pointerClickHandler);
-                        if (clickObject != null && clickObject == _pointerEventData.pointerPress)
-                        {
-                            //Logger.LogError($"### Pointer Click - {_pointerEventData.pointerPress.name}");
-                        }
-                    }
-
-                    _pointerEventData.pointerPress = null;
+                if (GetKeyUp(KeyCode.Space))
+                {
+                    OnPointerUp();
                 }
             }
 
-            _isPinching = isPinching;
+            void OnPointerDown()
+            {
+                _pointerEventData.pressPosition = _pointerEventData.position;
+                _pointerEventData.pointerPressRaycast = raycastResults[0];
+
+                var pressable = GetPointerPressableObject(raycastResults);
+                if (pressable != null)
+                {
+                    TryTriggerPointerDown(pressable, _pointerEventData);
+                }
+            }
+
+            void OnPointerUp()
+            {
+                var currentPressing = new HashSet<GameObject>(_currentPressing);
+
+                foreach (var obj in currentPressing)
+                {
+                    if (obj.GetComponent<IPointerUpHandler>() != null)
+                    {
+                        TryTriggerPointerUp(obj, _pointerEventData);
+                    }
+                    if (obj.GetComponent<IPointerClickHandler>() != null)
+                    {
+                        if (_currentHovering.Contains(obj))
+                        {
+                            TryTriggerPointerClick(obj, _pointerEventData);
+                        }
+                    }
+                }
+
+                _currentPressing.Clear();
+                _pointerEventData.pointerPress = null;
+            }
+
+            void TryTriggerPointerEnter(GameObject obj, PointerEventData pointerEventData)
+            {
+                if (_currentHovering.Add(obj))
+                {
+                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerEnterHandler);
+                }
+            }
+
+            void TryTriggerPointerExit(GameObject obj, PointerEventData pointerEventData)
+            {
+                if (_currentHovering.Remove(obj))
+                {
+                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerExitHandler);
+                }
+            }
+
+            void TryTriggerPointerDown(GameObject obj, PointerEventData pointerEventData)
+            {
+                if (_currentPressing != null && _currentPressing.Add(obj))
+                {
+                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerDownHandler);
+                }
+            }
+
+            void TryTriggerPointerUp(GameObject obj, PointerEventData pointerEventData)
+            {
+                if (_currentPressing != null && _currentPressing.Remove(obj))
+                {
+                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerUpHandler);
+                }
+            }
+
+            void TryTriggerPointerClick(GameObject obj, PointerEventData pointerEventData)
+            {
+                if (currentClicking != null && currentClicking.Add(obj))
+                {
+                    ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerClickHandler);
+                }
+            }
+        }
+
+        private GameObject GetPointerPressableObject(List<RaycastResult> results)
+        {
+            if (results == null || results.Count < 1)
+                return null;
+
+            foreach (var result in results)
+            {
+                var obj = result.gameObject;
+                if (obj.GetComponent<IPointerDownHandler>() != null)
+                {
+                    return obj;
+                }
+            }
+
+            return null;
+        }
+
+        private GameObject GetPointerClickableObject(List<RaycastResult> results)
+        {
+            if (results == null || results.Count < 1)
+                return null;
+
+            foreach (var result in results)
+            {
+                var obj = result.gameObject;
+                if (obj.GetComponent<IPointerClickHandler>() != null)
+                {
+                    return obj;
+                }
+            }
+
+            return null;
         }
         #endregion
 
