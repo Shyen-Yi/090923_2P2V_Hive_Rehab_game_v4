@@ -70,6 +70,7 @@ namespace com.hive.projectr
 		public String DefaultUserName => _item.DefaultUserName;
 		public String AdminUsername => _item.AdminUsername;
 		public String AdminPassword => _item.AdminPassword;
+		public Int32 SoundVolumePercentageWhenInBackground => _item.SoundVolumePercentageWhenInBackground;
 
 		public GameGeneralConfigData(GameGeneralSOItem item)
 		{

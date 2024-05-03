@@ -270,8 +270,7 @@ namespace com.hive.projectr
             SoundManager.Instance.StopSound(SoundType.MenuBackground);
             SoundManager.Instance.StopSound(SoundType.CalibrationBackground);
 
-            InputManager.HideCursor();
-            InputManager.SetCursorLockMode(CursorLockMode.None);
+            InputManager.Instance.HideCursor();
         }
 
         protected override void OnHide(GameSceneHideState hideState)
@@ -287,8 +286,7 @@ namespace com.hive.projectr
 
             SoundManager.Instance.StopSound(SoundType.CoreGameBackground);
 
-            InputManager.ShowCursor();
-            InputManager.SetCursorLockMode(CursorLockMode.Confined);
+            InputManager.Instance.ShowCursor();
         }
 
         protected override void OnDispose()
@@ -304,11 +302,13 @@ namespace com.hive.projectr
         private void BindActions()
         {
             MonoBehaviourUtil.OnUpdate += Tick;
+            MonoBehaviourUtil.OnApplicationFocusLost += Pause;
         }
 
         private void UnbindActions()
         {
             MonoBehaviourUtil.OnUpdate -= Tick;
+            MonoBehaviourUtil.OnApplicationFocusLost -= Pause;
         }
         #endregion
 
@@ -600,6 +600,11 @@ namespace com.hive.projectr
             }));
         }
 
+        private void OnFocusLost()
+        {
+            Pause();
+        }
+
         private void Pause()
         {
             UpdateState(CoreGameState.Paused);
@@ -704,7 +709,7 @@ namespace com.hive.projectr
 
         private Vector3 GetSpacecraftScreenPosRaw()
         {
-            return InputManager.Instance.CursorScreenPos + _spacecraftScreenOffsetFromCursor;
+            return InputManager.Instance.CursorScreenPosition + _spacecraftScreenOffsetFromCursor;
         }
 
         private Vector3 GetSpacecraftScreenPos()
@@ -720,7 +725,7 @@ namespace com.hive.projectr
 
         private void CenterSpacecraft()
         {
-            _spacecraftScreenOffsetFromCursor = _centerScreenPos - InputManager.Instance.CursorScreenPos;
+            _spacecraftScreenOffsetFromCursor = _centerScreenPos - InputManager.Instance.CursorScreenPosition;
         }
         #endregion
 

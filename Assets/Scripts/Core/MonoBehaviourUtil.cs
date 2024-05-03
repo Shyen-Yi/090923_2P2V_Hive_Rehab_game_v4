@@ -14,8 +14,11 @@ namespace com.hive.projectr
         public static Action OnUpdatePerSec;
         public static Action OnFixedUpdate;
         public static Action OnApplicationQuitEvent;
+        public static Action OnApplicationFocusLost;
+        public static Action OnApplicationFocusBack;
 
         private Coroutine _tickPerSecRoutine;
+        private bool _isFocused = true;
 
         private void OnEnable()
         {
@@ -78,6 +81,54 @@ namespace com.hive.projectr
         private void OnApplicationQuit()
         {
             OnApplicationQuitEvent?.Invoke();
+        }
+
+        private void OnApplicationPause(bool pause)
+        {
+            if (pause)
+            {
+                if (_isFocused)
+                {
+                    OnApplicationFocusLost?.Invoke();
+                    _isFocused = false;
+
+                    Logger.Log($"Focus Lost");
+                }
+            }
+            else
+            {
+                if (!_isFocused)
+                {
+                    OnApplicationFocusBack?.Invoke();
+                    _isFocused = true;
+                }
+            }
+
+            _isFocused = !pause;
+        }
+
+        private void OnApplicationFocus(bool focus)
+        {
+            if (!focus)
+            {
+                if (_isFocused)
+                {
+                    OnApplicationFocusLost?.Invoke();
+
+                    Logger.Log($"Focus Lost");
+                }
+            }
+            else
+            {
+                if (!_isFocused)
+                {
+                    OnApplicationFocusBack?.Invoke();
+
+                    Logger.Log($"Focus Back");
+                }
+            }
+
+            _isFocused = focus;
         }
     }
 }

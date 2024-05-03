@@ -22,11 +22,13 @@ namespace com.hive.projectr
 		[SerializeField] private SoundPlayType playType;
 		[SerializeField] private Boolean isLoop;
 		[SerializeField] private Boolean needCache;
+		[SerializeField] private AudioMixerGroupType mixerGroup;
 
 		public SoundType Type => type;
 		public AssetReference Clip => clip;
 		public SoundPlayType PlayType => playType;
 		public Boolean IsLoop => isLoop;
 		public Boolean NeedCache => needCache;
+		public AudioMixerGroupType MixerGroup => mixerGroup;
     }
 }

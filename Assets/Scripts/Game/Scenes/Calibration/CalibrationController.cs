@@ -180,8 +180,7 @@ namespace com.hive.projectr
             SoundManager.Instance.PlaySound(SoundType.CalibrationBackground);
             SoundManager.Instance.StopSound(SoundType.MenuBackground);
 
-            InputManager.HideCursor();
-            InputManager.SetCursorLockMode(CursorLockMode.None);
+            InputManager.Instance.HideCursor();
         }
 
         protected override void OnHide(GameSceneHideState hideState)
@@ -191,8 +190,7 @@ namespace com.hive.projectr
                 Pause();
             }
 
-            InputManager.ShowCursor();
-            InputManager.SetCursorLockMode(CursorLockMode.Confined);
+            InputManager.Instance.ShowCursor();
         }
 
         protected override void OnDispose()
@@ -221,6 +219,7 @@ namespace com.hive.projectr
             _questionButton.onClick.AddListener(OnQuestionButtonClick);
 
             MonoBehaviourUtil.OnUpdate += Tick;
+            MonoBehaviourUtil.OnApplicationFocusLost += OnFocusLost;
         }
 
         private void UnbindActions()
@@ -231,6 +230,7 @@ namespace com.hive.projectr
             _questionButton.onClick.RemoveAllListeners();
 
             MonoBehaviourUtil.OnUpdate -= Tick;
+            MonoBehaviourUtil.OnApplicationFocusLost -= OnFocusLost;
         }
         #endregion
 
@@ -309,7 +309,7 @@ namespace com.hive.projectr
 
         private void CenterSpacecraft()
         {
-            _spacecraftScreenOffsetFromCursor = GetCenterScreenPos() - InputManager.Instance.CursorScreenPos;
+            _spacecraftScreenOffsetFromCursor = GetCenterScreenPos() - InputManager.Instance.CursorScreenPosition;
         }
 
         private Vector3 GetCenterScreenPos()
@@ -369,7 +369,7 @@ namespace com.hive.projectr
 
         private Vector3 GetSpacecraftScreenPos()
         {
-            return InputManager.Instance.CursorScreenPos + _spacecraftScreenOffsetFromCursor;
+            return InputManager.Instance.CursorScreenPosition + _spacecraftScreenOffsetFromCursor;
         }
 
         private IEnumerator EndRoutine()
@@ -623,8 +623,9 @@ namespace com.hive.projectr
 
         private void IdleTick()
         {
-            var deltaCursorScreenPos = InputManager.Instance.CursorScreenPos - _lastCursorScreenPos;
-            _lastCursorScreenPos = InputManager.Instance.CursorScreenPos;
+            var cursorScreenPos = InputManager.Instance.CursorScreenPosition;
+            var deltaCursorScreenPos = cursorScreenPos - _lastCursorScreenPos;
+            _lastCursorScreenPos = cursorScreenPos;
             var isIdle = IsCurrentPositionMatchingStage() &&
                 deltaCursorScreenPos.sqrMagnitude < CalibrationConfig.GetData().HoldingMaxScreenOffset;
             if (isIdle)
@@ -640,6 +641,11 @@ namespace com.hive.projectr
             {
                 _idleDuration = -1;
             }
+        }
+
+        private void OnFocusLost()
+        {
+            Pause();
         }
 
         private void Tick()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Audio;
 
 namespace com.hive.projectr
 {
@@ -92,8 +93,14 @@ namespace com.hive.projectr
 
         private List<SoundPlayback> _playbackRequests;
         private Dictionary<SoundType, List<SoundPlayback>> _activePlaybackDict;
+        private Dictionary<AudioMixerGroupType, AudioMixerGroup> _mixerGroupDict;
 
         private Transform _sourceRoot;
+        private AudioMixer _mainMixer;
+        private AudioMixerGroup _backgroundGroup;
+        private AudioMixerGroup _effectsGroup;
+
+        private static readonly string MixerGroupResourcePath = "AudioMixers/Main/MainMixer";
 
         #region Lifecycle
         public void OnInit()
@@ -104,8 +111,13 @@ namespace com.hive.projectr
             _activeSourceDict = new Dictionary<SoundType, List<AudioSource>>();
             _inactiveSourceDict = new Dictionary<SoundType, Queue<AudioSource>>();
             _activePlaybackDict = new Dictionary<SoundType, List<SoundPlayback>>();
+            _mixerGroupDict = new Dictionary<AudioMixerGroupType, AudioMixerGroup>();
+
+            _mainMixer = Resources.Load<AudioMixer>(MixerGroupResourcePath);
 
             MonoBehaviourUtil.OnUpdate += Tick;
+            MonoBehaviourUtil.OnApplicationFocusLost += OnFocusLost;
+            MonoBehaviourUtil.OnApplicationFocusBack += OnFocusBack;
         }
 
         public void OnDispose()
@@ -129,6 +141,9 @@ namespace com.hive.projectr
             _activePlaybackDict.Clear();
             _activePlaybackDict = null;
 
+            _mixerGroupDict.Clear();
+            _mixerGroupDict = null;
+
             foreach (var clip in _clipCacheDict.Values)
             {
                 Addressables.Release(clip);
@@ -143,10 +158,24 @@ namespace com.hive.projectr
             _inactiveSourceDict = null;
 
             MonoBehaviourUtil.OnUpdate -= Tick;
+            MonoBehaviourUtil.OnApplicationFocusLost -= OnFocusLost;
+            MonoBehaviourUtil.OnApplicationFocusBack -= OnFocusBack;
         }
         #endregion
 
         #region Event
+        private void OnFocusBack()
+        {
+            var volume = 1f;
+            SetAudioMixerGroupVolume(AudioMixerGroupType.Background, volume);
+        }
+
+        private void OnFocusLost()
+        {
+            var volume = GameGeneralConfig.GetData().SoundVolumePercentageWhenInBackground / 100f;
+            SetAudioMixerGroupVolume(AudioMixerGroupType.Background, volume);
+        }
+
         private void Tick()
         {
             if (_playbackRequests.Count > 0)
@@ -180,6 +209,59 @@ namespace com.hive.projectr
             }
         }
         #endregion
+
+        private AudioMixerGroup GetAudioMixerGroup(AudioMixerGroupType type)
+        {
+            if (_mixerGroupDict.TryGetValue(type, out var group))
+            {
+                return group;
+            }
+
+            if (_mainMixer != null)
+            {
+                var groups = _mainMixer.FindMatchingGroups(type.ToString());
+                if (groups != null && groups.Length > 0)
+                {
+                    group = groups[0];
+                    _mixerGroupDict[type] = group;
+
+                    return group;
+                }
+            }
+            else
+            {
+                Logger.LogError($"_mainMixer is null");
+            }
+
+            Logger.LogError($"Failed to get AudioMixerGroup of type: {type}");
+
+            return group;
+        }
+
+        private void SetAudioMixerGroupVolume(AudioMixerGroupType groupType, float volume)
+        {
+            var group = GetAudioMixerGroup(groupType);
+            if (group != null)
+            {
+                var db = volume > 0
+                    ? 20 * Mathf.Log10(volume)
+                    : -80;
+
+                _mainMixer.SetFloat($"{group.name}Volume", db);
+            }
+        }
+
+        private void AssignAudioSourceToAudioMixerGroup(AudioSource source, AudioMixerGroupType groupType)
+        {
+            if (source == null)
+                return;
+
+            var mixerGroup = GetAudioMixerGroup(groupType);
+            if (mixerGroup != null)
+            {
+                source.outputAudioMixerGroup = mixerGroup;
+            }
+        }
 
         private void StopPlayback(SoundPlayback playback)
         {
@@ -299,6 +381,8 @@ namespace com.hive.projectr
 
                 if (source != null)
                 {
+                    AssignAudioSourceToAudioMixerGroup(source, soundData.MixerGroup);
+
                     source.clip = clip;
                     source.pitch = 1;
 

@@ -66,6 +66,7 @@ namespace com.hive.projectr
 		public SoundPlayType PlayType => _item.PlayType;
 		public Boolean IsLoop => _item.IsLoop;
 		public Boolean NeedCache => _item.NeedCache;
+		public AudioMixerGroupType MixerGroup => _item.MixerGroup;
 
 		public SoundConfigData(SoundSOItem item)
 		{

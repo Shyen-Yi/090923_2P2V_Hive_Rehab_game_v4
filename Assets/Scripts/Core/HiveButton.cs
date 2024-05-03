@@ -18,6 +18,23 @@ namespace com.hive.projectr
         private Vector3 _initialScale = DefaultScale;
         private bool _isPointerOnTop;
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+
+            var nav = navigation;
+            var useDefaultButtonNavigation = false;
+            if (useDefaultButtonNavigation)
+            {
+                nav.mode = Navigation.Mode.Automatic;
+            }
+            else
+            {
+                nav.mode = Navigation.Mode.None;
+            }
+            navigation = nav;
+        }
+
         public override void OnPointerEnter(PointerEventData eventData)
         {
             _isPointerOnTop = true;
