@@ -141,19 +141,19 @@ namespace com.hive.projectr
                     }
 
                     _cursorPos = cursorPos - _initCursorPos;
-
-                    UICursor.SetPosition(_cursorPos);
-
-                    CursorInputTick();
                 }
+
+                if (DebugConfig.GetData().EnableKeyboardCursorControl)
+                {
+                    var horizontal = Input.GetAxisRaw("Horizontal");
+                    var vertical = Input.GetAxisRaw("Vertical");
+                    _cursorPos += new Vector3(horizontal, vertical, 0) * MotionTracker.Sensitivity;
+                }
+
+                UICursor.SetPosition(_cursorPos);
+
+                CursorInputTick();
             }
-
-            var horizontal = Input.GetAxisRaw("Horizontal");
-            var vertical = Input.GetAxisRaw("Vertical");
-            _cursorPos += new Vector3(horizontal, vertical, 0) * MotionTracker.Sensitivity;
-            UICursor.SetPosition(_cursorPos);
-
-            CursorInputTick();
         }
 
         private void CursorInputTick()
