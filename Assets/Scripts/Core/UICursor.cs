@@ -24,10 +24,6 @@ namespace com.hive.projectr
         private Vector3 _holdingStartPosition;
         private Vector3 _lastTickPosition;
 
-        private static readonly float PreHoldingCooldownTime = .2f;
-        private static readonly float ClickHoldingTimeMax = 1f;
-        private static readonly float HoldingMaxScreenOffset = 90;
-
         private void Awake()
         {
             _rt = (RectTransform)transform;
@@ -38,7 +34,7 @@ namespace com.hive.projectr
             var tickPosition = GetPosition();
             var deltaTickPosition = tickPosition - _lastTickPosition;
             _lastTickPosition = tickPosition;
-            var isIdle = deltaTickPosition.sqrMagnitude < HoldingMaxScreenOffset;
+            var isIdle = deltaTickPosition.sqrMagnitude < InputConfig.GetData().CursorHoldingMaxScreenOffset;
             if (isIdle && _isOnClickable)
             {
                 if (_idleDuration < -.5f)
@@ -53,12 +49,12 @@ namespace com.hive.projectr
                 _idleDuration = -1;
             }
 
-            var isHolding = _idleDuration >= PreHoldingCooldownTime && Time.time >= _nextCanHoldTime;
-            var isInterrupted = _isHolding && (!IsIdle() || Vector3.Magnitude(_holdingStartPosition - GetPosition()) > HoldingMaxScreenOffset);
+            var isHolding = _idleDuration >= InputConfig.GetData().CursorPreHoldingCooldownTime && Time.time >= _nextCanHoldTime;
+            var isInterrupted = _isHolding && (!IsIdle() || Vector3.Magnitude(_holdingStartPosition - GetPosition()) > InputConfig.GetData().CursorHoldingMaxScreenOffset);
             if (isInterrupted)
             {
                 isHolding = false;
-                _nextCanHoldTime = Time.time + PreHoldingCooldownTime; // holding interrupted, need cooldown
+                _nextCanHoldTime = Time.time + InputConfig.GetData().CursorPreHoldingCooldownTime; // holding interrupted, need cooldown
             }
 
             if (!_isHolding && isHolding)
@@ -79,16 +75,17 @@ namespace com.hive.projectr
 
                 _holdingTime += Time.deltaTime;
 
-                if (_holdingTime < ClickHoldingTimeMax)
+                var cursorClickHoldingTimeMax = InputConfig.GetData().CursorClickHoldingTimeMax;
+                if (_holdingTime < cursorClickHoldingTimeMax)
                 {
-                    var heldCircleFill = (_holdingTime % ClickHoldingTimeMax) / ClickHoldingTimeMax;
+                    var heldCircleFill = (_holdingTime % cursorClickHoldingTimeMax) / cursorClickHoldingTimeMax;
                     _circle.fillAmount = Mathf.Clamp01(heldCircleFill);
                 }
                 else
                 {
                     _holdingTime = 0;
                     _idleDuration = -1;
-                    _nextCanHoldTime = Time.time + PreHoldingCooldownTime;
+                    _nextCanHoldTime = Time.time + InputConfig.GetData().CursorPreHoldingCooldownTime;
 
                     OnClick?.Invoke();
                 }
@@ -122,14 +119,9 @@ namespace com.hive.projectr
             return true;
         }
 
-        public void OnEnterClickable()
+        public void SetOnClickable(bool isOnClickable)
         {
-            _isOnClickable = true;
-        }
-
-        public void OnLeaveClickable()
-        {
-            _isOnClickable = false;
+            _isOnClickable = isOnClickable;
         }
 
         /// <summary>
