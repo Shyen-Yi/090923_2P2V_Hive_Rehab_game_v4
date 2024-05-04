@@ -22,11 +22,13 @@ namespace com.hive.projectr
 		[SerializeField] private Int32 infoTextUpdateSec;
 		[SerializeField] private Single gameProgressFillSec;
 		[SerializeField] private Single asteroidWarningSec;
+		[SerializeField] private Single arrowDistanceFromScreenEdge;
 
 		public Single AsteroidSpinRoundPerSec => asteroidSpinRoundPerSec;
 		public Int32 StartCountdownSec => startCountdownSec;
 		public Int32 InfoTextUpdateSec => infoTextUpdateSec;
 		public Single GameProgressFillSec => gameProgressFillSec;
 		public Single AsteroidWarningSec => asteroidWarningSec;
+		public Single ArrowDistanceFromScreenEdge => arrowDistanceFromScreenEdge;
     }
 }

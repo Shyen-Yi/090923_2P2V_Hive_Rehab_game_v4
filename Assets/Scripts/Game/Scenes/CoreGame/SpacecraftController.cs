@@ -67,6 +67,15 @@ namespace com.hive.projectr
             SetCapturing(false);
         }
 
+        public bool IsVisibleByCamera(Camera cam)
+        {
+            if (cam == null)
+                return false;
+
+            var planes = GeometryUtility.CalculateFrustumPlanes(cam);
+            return GeometryUtility.TestPlanesAABB(planes, _config.MovingRenderer.bounds);
+        }
+
         public float GetWorldSpaceCaptureRadius()
         {
             return _config.CircleCollider.radius * _config.transform.lossyScale.x;

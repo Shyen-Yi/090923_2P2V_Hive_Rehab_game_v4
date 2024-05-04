@@ -45,6 +45,8 @@ namespace com.hive.projectr
         private Action<int> _onCaptured;
         private float _remainingLifetime;
         private float _totalLifetime;
+        private bool _isWarning;
+        private Vector2 _velocityCache;
 
         public AsteroidController(AsteroidConfig config)
         {
@@ -73,6 +75,20 @@ namespace com.hive.projectr
             _config.Renderer.color = Color.white;
 
             _isRunning = true;
+            _isWarning = false;
+        }
+
+        public void Pause()
+        {
+            _isRunning = false;
+            _velocityCache = _config.Rigidbody2D.velocity;
+            _config.Rigidbody2D.velocity = Vector2.zero;
+        }
+
+        public void Resume()
+        {
+            _isRunning = true;
+            _config.Rigidbody2D.velocity = _velocityCache;
         }
 
         public void Stop(Action onFinished)
@@ -105,7 +121,6 @@ namespace com.hive.projectr
 
             _config.onCollisionEnter2D += OnCollisionEnter2D;
             _config.onTriggerEnter2D += OnTriggerEnter2D;
-
             MonoBehaviourUtil.OnUpdate += Tick;
 
             _config.gameObject.SetActive(true);
@@ -128,7 +143,6 @@ namespace com.hive.projectr
 
             _config.onCollisionEnter2D -= OnCollisionEnter2D;
             _config.onTriggerEnter2D -= OnTriggerEnter2D;
-
             MonoBehaviourUtil.OnUpdate -= Tick;
 
             _config.gameObject.SetActive(false);
@@ -216,7 +230,11 @@ namespace com.hive.projectr
 
             if (_remainingLifetime < CoreGameConfig.GetData().AsteroidWarningSec)
             {
-                SoundManager.Instance.PlaySound(SoundType.AsteroidWarning);
+                if (!_isWarning)
+                {
+                    _isWarning = true;
+                    SoundManager.Instance.PlaySound(SoundType.AsteroidWarning);
+                }
             }
 
             if (_remainingLifetime < 0)

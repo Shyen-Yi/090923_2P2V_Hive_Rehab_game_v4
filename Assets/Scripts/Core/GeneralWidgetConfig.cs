@@ -29,6 +29,7 @@ namespace com.hive.projectr
         [SerializeField] private List<TMP_ColorGradient> _extraColorGradients;
         [SerializeField] private List<Animator> _extraAnimators;
         [SerializeField] private List<Renderer> _extraRenderers;
+        [SerializeField] private List<Canvas> _extraCanvases;
 
         public CanvasGroup CanvasGroup => _canvasGroup;
 
@@ -50,5 +51,6 @@ namespace com.hive.projectr
         public List<TMP_ColorGradient> ExtraColorGradients => _extraColorGradients;
         public List<Animator> ExtraAnimators => _extraAnimators;
         public List<Renderer> ExtraRenderers => _extraRenderers;
+        public List<Canvas> ExtraCanvases => _extraCanvases;
     }
 }

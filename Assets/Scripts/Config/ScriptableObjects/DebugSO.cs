@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.AddressableAssets;
 
 namespace com.hive.projectr
 {
@@ -17,7 +18,9 @@ namespace com.hive.projectr
     {
         
 		[SerializeField] private Boolean enableCalibration;
+		[SerializeField] private Boolean enableKeyboardCursorControl;
 
 		public Boolean EnableCalibration => enableCalibration;
+		public Boolean EnableKeyboardCursorControl => enableKeyboardCursorControl;
     }
 }

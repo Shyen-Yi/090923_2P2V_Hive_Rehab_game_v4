@@ -166,6 +166,18 @@ namespace com.hive.projectr
             RaycastBlocker = 2,
         }
 
+        private enum ExtraRT
+        {
+            Arrow = 0,
+            ArrowRot = 1,
+            VisibleArea = 2,
+        }
+
+        private enum ExtraCG
+        {
+            Arrow = 0,
+        }
+
         private enum ExtraTMP
         {
             Countdown = 0,
@@ -194,6 +206,12 @@ namespace com.hive.projectr
         private Dictionary<VacuumType, VacuumController> _vacuumControllers;
         private Transform _asteroidContainer;
         private Transform _raycastBlocker;
+
+        private RectTransform _arrowRT;
+        private RectTransform _arrowRotRT;
+        private RectTransform _visibleAreaRT;
+
+        private CanvasGroup _arrowCG;
 
         private TMP_Text _countdownText;
         private TMP_Text _infoText;
@@ -234,6 +252,12 @@ namespace com.hive.projectr
             _asteroidContainer = Config.ExtraObjects[(int)ExtraObj.AsteroidContainer];
             _raycastBlocker = Config.ExtraObjects[(int)ExtraObj.RaycastBlocker];
 
+            _arrowRT = Config.ExtraRectTransforms[(int)ExtraRT.Arrow];
+            _arrowRotRT = Config.ExtraRectTransforms[(int)ExtraRT.ArrowRot];
+            _visibleAreaRT = Config.ExtraRectTransforms[(int)ExtraRT.VisibleArea];
+
+            _arrowCG = Config.ExtraCanvasGroups[(int)ExtraCG.Arrow];
+
             _countdownText = Config.ExtraTextMeshPros[(int)ExtraTMP.Countdown];
             _infoText = Config.ExtraTextMeshPros[(int)ExtraTMP.Info];
 
@@ -261,34 +285,17 @@ namespace com.hive.projectr
                 Reset();
                 Start();
             }
-            else
-            {
-                Resume();
-            }
 
             SoundManager.Instance.PlaySound(SoundType.CoreGameBackground);
             SoundManager.Instance.StopSound(SoundType.MenuBackground);
             SoundManager.Instance.StopSound(SoundType.CalibrationBackground);
 
-            InputManager.HideCursor();
-            InputManager.SetCursorLockMode(CursorLockMode.None);
+            InputManager.Instance.HideCursor();
         }
 
         protected override void OnHide(GameSceneHideState hideState)
         {
-            if (hideState == GameSceneHideState.Covered)
-            {
-                Pause();
-            }
-            else
-            {
-                End();
-            }
-
-            SoundManager.Instance.StopSound(SoundType.CoreGameBackground);
-
-            InputManager.ShowCursor();
-            InputManager.SetCursorLockMode(CursorLockMode.Confined);
+            InputManager.Instance.ShowCursor();
         }
 
         protected override void OnDispose()
@@ -317,6 +324,12 @@ namespace com.hive.projectr
         {
             if (_state == CoreGameState.Running)
             {
+                if (!GameManager.Instance.IsFocused)
+                {
+                    Pause();
+                    return;
+                }
+
                 _levelRunningTime += Time.deltaTime;
 
                 var csvTick = (int)(_levelRunningTime / CSVTickGap);
@@ -335,10 +348,11 @@ namespace com.hive.projectr
                 }
 
                 InfoTextTick();
-                AsteroidProgressTick();
+                AsteroidsTick();
                 SpacecraftMovementTick();
             }
 
+            ArrowTick();
             GameProgressTick();
         }
 
@@ -448,6 +462,44 @@ namespace com.hive.projectr
             _spacecraftController.SetWorldPos(new Vector3(spacecraftWorldPos.x, spacecraftWorldPos.y, _spacecraftController.GetWorldPos().z));
         }
 
+        private void ArrowTick()
+        {
+            if (_spacecraftController != null)
+            {
+                var isVisible = _spacecraftController.IsVisibleByCamera(CameraManager.Instance.MainCamera);
+                if (!isVisible)
+                {
+                    _arrowCG.CanvasGroupOn();
+
+                    var center = new Vector2(Screen.width / 2, Screen.height / 2);
+                    Vector2 target = CameraManager.Instance.UICamera.WorldToScreenPoint(_spacecraftController.GetWorldPos());
+                    var direction = (target - center).normalized;
+                    var bounds = new Vector2(_visibleAreaRT.rect.width, _visibleAreaRT.rect.height);
+                    var tx = (direction.x > 0 ? (bounds.x - center.x) : center.x) / direction.x;
+                    var ty = (direction.y > 0 ? (bounds.y - center.y) : center.y) / direction.y;
+                    var tMin = Mathf.Min(Mathf.Abs(tx), Mathf.Abs(ty));
+                    var intersectionScreen = center + direction * tMin;
+                    var arrowPosScreen = intersectionScreen - direction * CoreGameConfig.GetData().ArrowDistanceFromScreenEdge;
+
+                    RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)_arrowRT.parent, arrowPosScreen, CameraManager.Instance.UICamera, out var arrowPosLocal);
+
+                    _arrowRT.localPosition = arrowPosLocal;
+
+                    var angle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg;
+                    angle = (angle + 360) % 360;  // Normalize angle to be within 0-360 degrees
+                    _arrowRotRT.rotation = Quaternion.Euler(0, 0, -angle);
+                }
+                else
+                {
+                    _arrowCG.CanvasGroupOff();
+                }
+            }
+            else
+            {
+                _arrowCG.CanvasGroupOff();
+            }
+        }
+
         private void GameProgressTick()
         {
             if (_currentGameProgressFill < _targetGameProgressFill)
@@ -458,7 +510,7 @@ namespace com.hive.projectr
             }
         }
 
-        private void AsteroidProgressTick()
+        private void AsteroidsTick()
         {
             var activeAsteroids = new List<AsteroidController>(_activeAsteroids.Values);
             var fill = activeAsteroids.Count > 0
@@ -502,13 +554,16 @@ namespace com.hive.projectr
 
             yield return new WaitForSeconds(_levelConfigData.AsteroidSpawnGapSec);
 
+            var capturedCount = 0;
             var collectedCount = 0;
+            var totalCount = _asteroidDataDict.Count;
+
             foreach (var data in _asteroidDataDict.Values)
             {
+                if (data.isAsteroidCaptured)
+                    ++capturedCount;
                 if (data.isAsteroidCollected)
-                {
                     ++collectedCount;
-                }
             }
 
             var isPassed = collectedCount >= _levelConfigData.NumOfAsteroidCollectedToPass;
@@ -517,6 +572,14 @@ namespace com.hive.projectr
             StatsManager.Instance.OnLevelCompleted(new LevelStats(_levelConfigData.Level, collectedCount));
 
             SoundManager.Instance.PlaySound(SoundType.CoreGameLevelEnd);
+
+            CSVManager.Instance.OnCoreGameEnded(new CSVCoreGameEndedData(
+                _levelConfigData.Level,
+                capturedCount,
+                collectedCount,
+                totalCount,
+                (int)(collectedCount * 100f / totalCount)
+                ));
 
             if (isPassed)
             {
@@ -594,15 +657,34 @@ namespace com.hive.projectr
 
         private void Resume()
         {
+            InputManager.Instance.DecenterCursor();
+
             MonoBehaviourUtil.Instance.StartCoroutine(CountdownRoutine(() =>
             {
                 UpdateState(CoreGameState.Running);
+
+                foreach (var controller in _activeAsteroids.Values)
+                {
+                    controller.Resume();
+                }
             }));
         }
 
         private void Pause()
         {
             UpdateState(CoreGameState.Paused);
+
+            foreach (var controller in _activeAsteroids.Values)
+            {
+                controller.Pause();
+            }
+
+            InputManager.Instance.CenterCursor();
+
+            GameSceneManager.Instance.ShowScene(SceneNames.Pause, new PauseData(() =>
+            {
+                Resume();
+            }));
         }
 
         private void Start()
@@ -628,29 +710,6 @@ namespace com.hive.projectr
 
             LevelManager.Instance.OnLevelStarted(_levelConfigData.Level);
             UpdateGameProgress(true);
-        }
-
-        private void End()
-        {
-            var capturedCount = 0;
-            var collectedCount = 0;
-            var totalCount = _asteroidDataDict.Count;
-
-            foreach (var data in _asteroidDataDict.Values)
-            {
-                if (data.isAsteroidCaptured)
-                    ++capturedCount;
-                if (data.isAsteroidCollected)
-                    ++collectedCount;
-            }
-
-            CSVManager.Instance.OnCoreGameEnded(new CSVCoreGameEndedData(
-                _levelConfigData.Level,
-                capturedCount,
-                collectedCount,
-                totalCount,
-                (int)(collectedCount * 100f / totalCount)
-                ));
         }
 
         private IEnumerator CountdownRoutine(Action onCountdownFinished)
@@ -704,7 +763,9 @@ namespace com.hive.projectr
 
         private Vector3 GetSpacecraftScreenPosRaw()
         {
-            return InputManager.Instance.CursorScreenPos + _spacecraftScreenOffsetFromCursor;
+            Logger.LogError($"SpacecraftScreenPosRaw: {InputManager.Instance.CursorScreenPosition + _spacecraftScreenOffsetFromCursor}");
+
+            return InputManager.Instance.CursorScreenPosition + _spacecraftScreenOffsetFromCursor;
         }
 
         private Vector3 GetSpacecraftScreenPos()
@@ -720,7 +781,7 @@ namespace com.hive.projectr
 
         private void CenterSpacecraft()
         {
-            _spacecraftScreenOffsetFromCursor = _centerScreenPos - InputManager.Instance.CursorScreenPos;
+            _spacecraftScreenOffsetFromCursor = _centerScreenPos - InputManager.Instance.CursorScreenPosition;
         }
         #endregion
 

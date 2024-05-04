@@ -8,12 +8,16 @@ namespace com.hive.projectr
     public class MonoBehaviourUtil : MonoBehaviour
     {
         public static MonoBehaviourUtil Instance { get; private set; }
+        
+        public bool IsFocused { get; private set; } = true;
 
         public static Action OnUpdate;
         public static Action OnLateUpdate;
         public static Action OnUpdatePerSec;
         public static Action OnFixedUpdate;
         public static Action OnApplicationQuitEvent;
+        public static Action OnApplicationFocusLost;
+        public static Action OnApplicationFocusBack;
 
         private Coroutine _tickPerSecRoutine;
 
@@ -78,6 +82,54 @@ namespace com.hive.projectr
         private void OnApplicationQuit()
         {
             OnApplicationQuitEvent?.Invoke();
+        }
+
+        private void OnApplicationPause(bool pause)
+        {
+            if (pause)
+            {
+                if (IsFocused)
+                {
+                    OnApplicationFocusLost?.Invoke();
+                    IsFocused = false;
+
+                    Logger.Log($"Focus Lost");
+                }
+            }
+            else
+            {
+                if (!IsFocused)
+                {
+                    OnApplicationFocusBack?.Invoke();
+                    IsFocused = true;
+                }
+            }
+
+            IsFocused = !pause;
+        }
+
+        private void OnApplicationFocus(bool focus)
+        {
+            if (!focus)
+            {
+                if (IsFocused)
+                {
+                    OnApplicationFocusLost?.Invoke();
+
+                    Logger.Log($"Focus Lost");
+                }
+            }
+            else
+            {
+                if (!IsFocused)
+                {
+                    OnApplicationFocusBack?.Invoke();
+
+                    Logger.Log($"Focus Back");
+                }
+            }
+
+            IsFocused = focus;
         }
     }
 }

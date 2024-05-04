@@ -1,11 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace com.hive.projectr
 {
     public class GameManager : MonoBehaviour
     {
+        public static GameManager Instance { get; private set; }
+
+        public bool IsFocused => _monoBehaviourUtil != null ? _monoBehaviourUtil.IsFocused : false;
+
         private GameSceneManager _sceneManager;
         private CameraManager _cameraManager;
         private ConfigDataManager _configManager;
@@ -24,6 +29,8 @@ namespace com.hive.projectr
 
         private void Awake()
         {
+            Instance = this;
+
             if (SystemInfo.systemMemorySize >= 1024)
             {
                 Application.targetFrameRate = 120;
@@ -125,6 +132,15 @@ namespace com.hive.projectr
             _mailManager = null;
 
             _monoBehaviourUtil = null;
+        }
+
+        public void QuitGame()
+        {
+#if UNITY_EDITOR
+            EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
         }
     }
 }

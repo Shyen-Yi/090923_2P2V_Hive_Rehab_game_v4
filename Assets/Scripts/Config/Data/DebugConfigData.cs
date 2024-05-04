@@ -62,6 +62,7 @@ namespace com.hive.projectr
 		private DebugSOItem _item;
 
 		public Boolean EnableCalibration => _item.EnableCalibration;
+		public Boolean EnableKeyboardCursorControl => _item.EnableKeyboardCursorControl;
 
 		public DebugConfigData(DebugSOItem item)
 		{

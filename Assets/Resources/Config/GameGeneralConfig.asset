@@ -22,3 +22,4 @@ MonoBehaviour:
     defaultUserName: 
     adminUsername: Hive
     adminPassword: Hive
+    soundVolumePercentageWhenInBackground: 25

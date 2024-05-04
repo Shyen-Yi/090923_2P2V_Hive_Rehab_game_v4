@@ -66,6 +66,7 @@ namespace com.hive.projectr
 		public Int32 InfoTextUpdateSec => _item.InfoTextUpdateSec;
 		public Single GameProgressFillSec => _item.GameProgressFillSec;
 		public Single AsteroidWarningSec => _item.AsteroidWarningSec;
+		public Single ArrowDistanceFromScreenEdge => _item.ArrowDistanceFromScreenEdge;
 
 		public CoreGameConfigData(CoreGameSOItem item)
 		{

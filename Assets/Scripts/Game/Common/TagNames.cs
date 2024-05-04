@@ -13,5 +13,7 @@ namespace com.hive.projectr
         public static string UICamera = "UICamera";
         public static string Asteroid = "Asteroid";
         public static string AudioSourceRoot = "AudioSourceRoot";
+        public static string MotionTracker = "MotionTracker";
+        public static string Cursor = "Cursor";
     }
 }
