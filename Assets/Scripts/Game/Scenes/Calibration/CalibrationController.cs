@@ -167,14 +167,8 @@ namespace com.hive.projectr
         {
             if (showState == GameSceneShowState.New)
             {
+                Reset();
                 Start();
-            }
-            else
-            {
-                if (_status == CalibrationStatus.Paused)
-                {
-                    Resume();
-                }
             }
 
             SoundManager.Instance.PlaySound(SoundType.CalibrationBackground);
@@ -185,11 +179,6 @@ namespace com.hive.projectr
 
         protected override void OnHide(GameSceneHideState hideState)
         {
-            if (_status == CalibrationStatus.Running)
-            {
-                Pause();
-            }
-
             InputManager.Instance.ShowCursor();
         }
 
@@ -219,7 +208,6 @@ namespace com.hive.projectr
             _questionButton.onClick.AddListener(OnQuestionButtonClick);
 
             MonoBehaviourUtil.OnUpdate += Tick;
-            MonoBehaviourUtil.OnApplicationFocusLost += OnFocusLost;
         }
 
         private void UnbindActions()
@@ -230,7 +218,6 @@ namespace com.hive.projectr
             _questionButton.onClick.RemoveAllListeners();
 
             MonoBehaviourUtil.OnUpdate -= Tick;
-            MonoBehaviourUtil.OnApplicationFocusLost -= OnFocusLost;
         }
         #endregion
 
@@ -241,12 +228,6 @@ namespace com.hive.projectr
                 return false;
 
             return true;
-        }
-
-        public void Restart()
-        {
-            Reset();
-            Start();
         }
 
         private void Start()
@@ -262,12 +243,21 @@ namespace com.hive.projectr
 
         private void Resume()
         {
+            InputManager.Instance.DecenterCursor();
+
             UpdateStatus(CalibrationStatus.Running);
         }
 
         private void Pause()
         {
             UpdateStatus(CalibrationStatus.Paused);
+
+            InputManager.Instance.CenterCursor();
+
+            GameSceneManager.Instance.ShowScene(SceneNames.Pause, new PauseData(() =>
+            {
+                Resume();
+            }));
         }
 
         private void UpdateStatus(CalibrationStatus status)
@@ -643,15 +633,16 @@ namespace com.hive.projectr
             }
         }
 
-        private void OnFocusLost()
-        {
-            Pause();
-        }
-
         private void Tick()
         {
             if (_status != CalibrationStatus.Running)
                 return;
+
+            if (!GameManager.Instance.IsFocused)
+            {
+                Pause();
+                return;
+            }
 
             IdleTick();
 
@@ -660,7 +651,7 @@ namespace com.hive.projectr
             {
                 _stageElapsedTime = 0;
                 GameSceneManager.Instance.ShowScene(SceneNames.CalibrationErrorProtection);
-                Pause();
+                UpdateStatus(CalibrationStatus.Paused);
                 return;
             }
 

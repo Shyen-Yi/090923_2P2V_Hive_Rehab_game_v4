@@ -35,7 +35,7 @@ namespace com.hive.projectr
             var deltaTickPosition = tickPosition - _lastTickPosition;
             _lastTickPosition = tickPosition;
             var isIdle = deltaTickPosition.sqrMagnitude < InputConfig.GetData().CursorHoldingMaxScreenOffset;
-            if (isIdle && _isOnClickable)
+            if (isIdle && _isOnClickable && InputManager.Instance.CanClick())
             {
                 if (_idleDuration < -.5f)
                 {

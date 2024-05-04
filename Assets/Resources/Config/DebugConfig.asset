@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: DebugConfig
   m_EditorClassIdentifier: 
   _items:
-  - enableCalibration: 1
+  - enableCalibration: 0
     enableKeyboardCursorControl: 1

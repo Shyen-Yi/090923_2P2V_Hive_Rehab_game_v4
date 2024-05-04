@@ -47,7 +47,10 @@ namespace com.hive.projectr
         }
         private UICursor _uiCursor;
         private Vector3 _cursorPos;
+        private Vector3 _prevCursorPos;
         private Vector3 _initCursorPos;
+        private Vector3 _cursorPosOffset;
+        private bool _hasMovedCursor;
         private bool _isCursorInitialized;
         private PointerEventData _pointerEventData;
         private EventSystem _eventSystem;
@@ -76,6 +79,7 @@ namespace com.hive.projectr
         public void OnDispose()
         {
             MonoBehaviourUtil.OnUpdate -= Tick;
+
             UICursor.OnClick -= OnClick;
         }
 
@@ -149,7 +153,14 @@ namespace com.hive.projectr
                     _cursorPos += new Vector3(horizontal, vertical, 0) * MotionTracker.Sensitivity;
                 }
 
-                UICursor.SetPosition(_cursorPos);
+                if ((_prevCursorPos - _cursorPos).sqrMagnitude > 1)
+                {
+                    _hasMovedCursor = true;
+                }
+
+                _prevCursorPos = _cursorPos;
+
+                UICursor.SetPosition(_cursorPos + _cursorPosOffset);
 
                 CursorInputTick();
             }
@@ -264,6 +275,22 @@ namespace com.hive.projectr
             }
         }
 
+        public bool CanClick()
+        {
+            return _hasMovedCursor;
+        }
+
+        public void CenterCursor()
+        {
+            _cursorPosOffset = new Vector3(Screen.width / 2, Screen.height / 2, 0) - CursorScreenPosition;
+            _hasMovedCursor = false; // need to move before clicking is enabled
+        }
+
+        public void DecenterCursor()
+        {
+            _cursorPosOffset = Vector3.zero;
+        }
+
         private GameObject GetPointerPressableObject(List<RaycastResult> results)
         {
             if (results == null || results.Count < 1)
@@ -334,7 +361,7 @@ namespace com.hive.projectr
 
         private void TryTriggerPointerClick(GameObject obj, PointerEventData pointerEventData)
         {
-            if (_currentClicking != null && _currentClicking.Add(obj))
+            if (CanClick() && _currentClicking != null && _currentClicking.Add(obj))
             {
                 ExecuteEvents.Execute(obj, pointerEventData, ExecuteEvents.pointerClickHandler);
             }

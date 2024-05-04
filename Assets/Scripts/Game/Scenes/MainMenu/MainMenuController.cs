@@ -119,11 +119,7 @@ namespace com.hive.projectr
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-#if UNITY_EDITOR
-            EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
+            GameManager.Instance.QuitGame();
         }
         #endregion
     }

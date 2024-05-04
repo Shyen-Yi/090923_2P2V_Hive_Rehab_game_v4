@@ -8,6 +8,8 @@ namespace com.hive.projectr
     public class MonoBehaviourUtil : MonoBehaviour
     {
         public static MonoBehaviourUtil Instance { get; private set; }
+        
+        public bool IsFocused { get; private set; } = true;
 
         public static Action OnUpdate;
         public static Action OnLateUpdate;
@@ -18,7 +20,6 @@ namespace com.hive.projectr
         public static Action OnApplicationFocusBack;
 
         private Coroutine _tickPerSecRoutine;
-        private bool _isFocused = true;
 
         private void OnEnable()
         {
@@ -87,31 +88,31 @@ namespace com.hive.projectr
         {
             if (pause)
             {
-                if (_isFocused)
+                if (IsFocused)
                 {
                     OnApplicationFocusLost?.Invoke();
-                    _isFocused = false;
+                    IsFocused = false;
 
                     Logger.Log($"Focus Lost");
                 }
             }
             else
             {
-                if (!_isFocused)
+                if (!IsFocused)
                 {
                     OnApplicationFocusBack?.Invoke();
-                    _isFocused = true;
+                    IsFocused = true;
                 }
             }
 
-            _isFocused = !pause;
+            IsFocused = !pause;
         }
 
         private void OnApplicationFocus(bool focus)
         {
             if (!focus)
             {
-                if (_isFocused)
+                if (IsFocused)
                 {
                     OnApplicationFocusLost?.Invoke();
 
@@ -120,7 +121,7 @@ namespace com.hive.projectr
             }
             else
             {
-                if (!_isFocused)
+                if (!IsFocused)
                 {
                     OnApplicationFocusBack?.Invoke();
 
@@ -128,7 +129,7 @@ namespace com.hive.projectr
                 }
             }
 
-            _isFocused = focus;
+            IsFocused = focus;
         }
     }
 }
