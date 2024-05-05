@@ -51,6 +51,33 @@ namespace com.hive.projectr
         }
         #endregion
 
+        private string GetPlayedDaysKey()
+        {
+            var key = SettingManager.Instance.IsDefaultUser
+                ? ""
+                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.PlayedDays}";
+
+            return key;
+        }
+
+        private string GetLastPerformanceKey()
+        {
+            var key = SettingManager.Instance.IsDefaultUser
+                ? ""
+                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.LastPerformance}";
+
+            return key;
+        }
+
+        private string GetLastPerformanceDescKey()
+        {
+            var key = SettingManager.Instance.IsDefaultUser
+                ? ""
+                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.LastPerformanceDesc}";
+
+            return key;
+        }
+
         private void InitPlayedDays()
         {
             if (_playedDays == null)
@@ -58,7 +85,7 @@ namespace com.hive.projectr
                 _playedDays = new HashSet<GameDay>();
             }
 
-            if (PlayerPrefs.HasKey(PlayerPrefKeys.PlayedDays))
+            if (PlayerPrefs.HasKey(GetPlayedDaysKey()))
             {
                 var json = PlayerPrefs.GetString(PlayerPrefKeys.PlayedDays);
                 var playedDaysStorage = JsonUtility.FromJson<PlayedDays>(json);
@@ -137,11 +164,14 @@ namespace com.hive.projectr
 
         private void InitPerformance()
         {
-            if (PlayerPrefs.HasKey(PlayerPrefKeys.LastPerformance) &&
-                PlayerPrefs.HasKey(PlayerPrefKeys.LastPerformanceDesc))
+            var lastPerformanceKey = GetLastPerformanceKey();
+            var lastPerformanceDescKey = GetLastPerformanceDescKey();
+
+            if (PlayerPrefs.HasKey(lastPerformanceKey) &&
+                PlayerPrefs.HasKey(lastPerformanceDescKey))
             {
-                PerformanceType = (PerformanceType)PlayerPrefs.GetInt(PlayerPrefKeys.LastPerformance);
-                PerformanceDesc = PlayerPrefs.GetString(PlayerPrefKeys.LastPerformanceDesc);
+                PerformanceType = (PerformanceType)PlayerPrefs.GetInt(lastPerformanceKey);
+                PerformanceDesc = PlayerPrefs.GetString(lastPerformanceDescKey);
             }
             else
             {
@@ -192,8 +222,8 @@ namespace com.hive.projectr
                         break;
                 }
 
-                PlayerPrefs.SetInt(PlayerPrefKeys.LastPerformance, (int)PerformanceType);
-                PlayerPrefs.SetString(PlayerPrefKeys.LastPerformanceDesc, PerformanceDesc);
+                PlayerPrefs.SetInt(GetLastPerformanceKey(), (int)PerformanceType);
+                PlayerPrefs.SetString(GetLastPerformanceDescKey(), PerformanceDesc);
             }
             else
             {

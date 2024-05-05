@@ -6,10 +6,20 @@ namespace com.hive.projectr
 {
     public class SettingManager : SingletonBase<SettingManager>, ICoreManager
     {
-        public bool IsDefaultUser => DisplayName.Equals(GameGeneralConfig.GetData().DefaultUserName);
-        public string DisplayName { get; private set; }
+        public bool IsDefaultUser { get; private set; }
+        public string DisplayName 
+        { 
+            get => _displayName; 
+            private set
+            {
+                _displayName = value;
+                IsDefaultUser = _displayName == GameGeneralConfig.GetData().DefaultUserName;
+            }
+        }
         public int Level { get; private set; }
         public int DailyBlock { get; private set; }
+
+        private string _displayName;
 
         #region Lifecycle
         public void OnInit()
@@ -53,23 +63,29 @@ namespace com.hive.projectr
 
         private void SaveDisplayName()
         {
-            PlayerPrefs.SetString(PlayerPrefKeys.DisplayName, DisplayName);
-
-            Logger.Log($"Username {DisplayName} saved.");
+            if (!IsDefaultUser)
+            {
+                PlayerPrefs.SetString(PlayerPrefKeys.DisplayName, DisplayName);
+                Logger.Log($"Username {DisplayName} saved.");
+            }
         }
 
         private void SaveLevel()
         {
-            PlayerPrefs.SetInt(PlayerPrefKeys.Level, Level);
-         
-            Logger.Log($"Level {Level} saved.");
+            if (!IsDefaultUser)
+            {
+                PlayerPrefs.SetInt(PlayerPrefKeys.Level, Level);
+                Logger.Log($"Level {Level} saved.");
+            }
         }
 
         private void SaveDailyBlock()
         {
-            PlayerPrefs.SetInt(PlayerPrefKeys.DailyBlock, DailyBlock);
-
-            Logger.Log($"DailyBlock {DailyBlock} saved.");
+            if (!IsDefaultUser)
+            {
+                PlayerPrefs.SetInt(PlayerPrefKeys.DailyBlock, DailyBlock);
+                Logger.Log($"DailyBlock {DailyBlock} saved.");
+            }
         }
 
         public void UpdateDisplayName(string displayName, bool toSave)
