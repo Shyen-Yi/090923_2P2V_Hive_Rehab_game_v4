@@ -450,6 +450,8 @@ namespace com.hive.projectr
         /// <returns></returns>
         private bool TryEndLog()
         {
+            Logger.Log($"CSVManager::TryEndLog - _isLogging: {_isLogging} | _logSbDict: {string.Join(",", _logSbDict)}");
+
             try
             {
                 if (_isLogging)

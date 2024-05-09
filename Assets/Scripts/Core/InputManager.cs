@@ -72,14 +72,11 @@ namespace com.hive.projectr
 
             MonoBehaviourUtil.OnUpdate += Tick;
             UICursor.OnClick += OnClick;
-
-            Cursor.visible = false;
         }
 
         public void OnDispose()
         {
             MonoBehaviourUtil.OnUpdate -= Tick;
-
             UICursor.OnClick -= OnClick;
         }
 
