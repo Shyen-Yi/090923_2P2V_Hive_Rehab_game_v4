@@ -72,6 +72,8 @@ namespace com.hive.projectr
 
             MonoBehaviourUtil.OnUpdate += Tick;
             UICursor.OnClick += OnClick;
+
+            Cursor.visible = DebugConfig.GetData().ShowBuiltInCursor;
         }
 
         public void OnDispose()

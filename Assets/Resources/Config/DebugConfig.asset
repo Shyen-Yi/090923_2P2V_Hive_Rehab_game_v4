@@ -15,3 +15,4 @@ MonoBehaviour:
   _items:
   - enableCalibration: 1
     enableKeyboardCursorControl: 1
+    showBuiltInCursor: 0

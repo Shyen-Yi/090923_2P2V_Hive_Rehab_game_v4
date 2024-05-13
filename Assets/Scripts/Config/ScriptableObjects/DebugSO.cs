@@ -19,8 +19,10 @@ namespace com.hive.projectr
         
 		[SerializeField] private Boolean enableCalibration;
 		[SerializeField] private Boolean enableKeyboardCursorControl;
+		[SerializeField] private Boolean showBuiltInCursor;
 
 		public Boolean EnableCalibration => enableCalibration;
 		public Boolean EnableKeyboardCursorControl => enableKeyboardCursorControl;
+		public Boolean ShowBuiltInCursor => showBuiltInCursor;
     }
 }
