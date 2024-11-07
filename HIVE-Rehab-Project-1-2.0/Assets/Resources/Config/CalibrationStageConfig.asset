@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a82204f4fc33f354daa7a339a05dbe37, type: 3}
+  m_Name: CalibrationStageConfig
+  m_EditorClassIdentifier: 
+  _items:
+  - stage: 0
+    sortingId: 1
+    instruction: Extend then hold your arm in a comfortable spot until the animation
+      ends for calibration.
+    instructionWhenHolding: Calibrating the centre point...
+    maxHoldingCheckCount: 3
+    eachHoldingCheckDuration: 1
+    holdingPreparationTime: 2
+    cooldownTime: 2
+  - stage: 1
+    sortingId: 2
+    instruction: Move your arm in comfrot spot, then extend your arm to the most
+      top-left corner and hold still for calibration.
+    instructionWhenHolding: Calibrating the top left corner...
+    maxHoldingCheckCount: 3
+    eachHoldingCheckDuration: 1
+    holdingPreparationTime: 2
+    cooldownTime: 2
+  - stage: 2
+    sortingId: 3
+    instruction: Move your arm in comfrot spot, then extend your arm to the most
+      top-right corner and hold still for calibration.
+    instructionWhenHolding: Calibrating top-right corner...
+    maxHoldingCheckCount: 3
+    eachHoldingCheckDuration: 1
+    holdingPreparationTime: 2
+    cooldownTime: 2
+  - stage: 3
+    sortingId: 4
+    instruction: Move your arm in comfrot spot, then extend your arm to the most
+      bottom-right corner and hold still for calibration.
+    instructionWhenHolding: Calibrating buttom-right corner...
+    maxHoldingCheckCount: 3
+    eachHoldingCheckDuration: 1
+    holdingPreparationTime: 2
+    cooldownTime: 2
+  - stage: 4
+    sortingId: 5
+    instruction: Move your arm in comfrot spot, then extend your arm to the most
+      bottom-left corner and hold still for calibration.
+    instructionWhenHolding: Calibrating bottom-left corner...
+    maxHoldingCheckCount: 3
+    eachHoldingCheckDuration: 1
+    holdingPreparationTime: 2
+    cooldownTime: 2

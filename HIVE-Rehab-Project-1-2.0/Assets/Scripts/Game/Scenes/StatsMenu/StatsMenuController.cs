@@ -1,0 +1,330 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using System;
+
+namespace com.hive.projectr
+{
+    public class StatsMenuController : GameSceneControllerBase, ISimpleGridHandler
+    {
+        #region Extra
+        private enum ExtraConfig
+        {
+            DayOfWeekSun = 0,
+            DayOfWeekMon = 1,
+            DayOfWeekTues = 2,
+            DayOfWeekWed = 3,
+            DayOfWeekThurs = 4,
+            DayOfWeekFri = 5,
+            DayOfWeekSat = 6,
+        }
+
+        private enum ExtraTMP
+        {
+            Performance = 0,
+            Remark = 1,
+            Streak = 2,
+            Month = 3,
+        }
+
+        private enum ExtraBtn
+        {
+            Cross = 0,
+            Share = 1,
+            Contact = 2,
+            Question = 3,
+            PrevMonth = 4,
+            NextMonth = 5,
+        }
+
+        private enum ExtraObj
+        {
+            Grid = 0,
+        }
+
+        private GeneralWidgetConfig _dayOfWeekSun;
+        private GeneralWidgetConfig _dayOfWeekMon;
+        private GeneralWidgetConfig _dayOfWeekTues;
+        private GeneralWidgetConfig _dayOfWeekWed;
+        private GeneralWidgetConfig _dayOfWeekThurs;
+        private GeneralWidgetConfig _dayOfWeekFri;
+        private GeneralWidgetConfig _dayOfWeekSat;
+
+        private TMP_Text _performanceText;
+        private TMP_Text _remarkText;
+        private TMP_Text _streakText;
+        private TMP_Text _monthText;
+
+        private HiveButton _crossButton;
+        private HiveButton _shareButton;
+        private HiveButton _contactButton;
+        private HiveButton _questionButton;
+        private HiveButton _prevMonthButton;
+        private HiveButton _nextMonthButton;
+
+        private SimpleGrid _grid;
+        #endregion
+
+        #region Fields
+        private List<StatsDayOfMonthWidgetData> _dayOfMonthDataList = new List<StatsDayOfMonthWidgetData>();
+        private int _year;
+        private int _month;
+        #endregion
+
+        #region Lifecycle
+        protected override void OnInit()
+        {
+            InitExtra();
+            BindActions();
+        }
+
+        private void InitExtra()
+        {
+            _dayOfWeekSun = Config.ExtraWidgetConfigs[(int)ExtraConfig.DayOfWeekSun];
+            _dayOfWeekMon = Config.ExtraWidgetConfigs[(int)ExtraConfig.DayOfWeekMon];
+            _dayOfWeekTues = Config.ExtraWidgetConfigs[(int)ExtraConfig.DayOfWeekTues];
+            _dayOfWeekWed = Config.ExtraWidgetConfigs[(int)ExtraConfig.DayOfWeekWed];
+            _dayOfWeekThurs = Config.ExtraWidgetConfigs[(int)ExtraConfig.DayOfWeekThurs];
+            _dayOfWeekFri = Config.ExtraWidgetConfigs[(int)ExtraConfig.DayOfWeekFri];
+            _dayOfWeekSat = Config.ExtraWidgetConfigs[(int)ExtraConfig.DayOfWeekSat];
+
+            _performanceText = Config.ExtraTextMeshPros[(int)ExtraTMP.Performance];
+            _remarkText = Config.ExtraTextMeshPros[(int)ExtraTMP.Remark];
+            _streakText = Config.ExtraTextMeshPros[(int)ExtraTMP.Streak];
+            _monthText = Config.ExtraTextMeshPros[(int)ExtraTMP.Month];
+
+            _crossButton = Config.ExtraButtons[(int)ExtraBtn.Cross];
+            _shareButton = Config.ExtraButtons[(int)ExtraBtn.Share];
+            _contactButton = Config.ExtraButtons[(int)ExtraBtn.Contact];
+            _questionButton = Config.ExtraButtons[(int)ExtraBtn.Question];
+            _prevMonthButton = Config.ExtraButtons[(int)ExtraBtn.PrevMonth];
+            _nextMonthButton = Config.ExtraButtons[(int)ExtraBtn.NextMonth];
+
+            _grid = Config.ExtraObjects[(int)ExtraObj.Grid].GetComponent<SimpleGrid>();
+        }
+
+        protected override void OnShow(ISceneData data, GameSceneShowState showState)
+        {
+            base.OnShow(data, showState);
+
+            _year = DateTime.Now.Year;
+            _month = DateTime.Now.Month;
+
+            RefreshPerformance();
+            RefreshWeekly();
+            RefreshMonthly();
+        }
+
+        protected override void OnDispose()
+        {
+            UnbindActions();
+        }
+        #endregion
+
+        #region Content
+        private void RefreshPerformance()
+        {
+            _performanceText.text = StatsManager.Instance.PerformanceType.ToString();
+            _remarkText.text = StatsManager.Instance.PerformanceDesc;
+        }
+
+        private void RefreshWeekly()
+        {
+            var streak = StatsManager.Instance.PlayingStreak;
+            _streakText.text = streak == 1
+                ? $"{streak} DAY STREAK"
+                : $"{streak} DAYS STREAK";
+
+            var now = TimeManager.Instance.GetCurrentDateTime();
+            var dayOffset = DayOfWeek.Sunday == 0
+                ? (int)now.DayOfWeek
+                : (int)now.DayOfWeek - (int)DayOfWeek.Sunday;
+            for (var i = 0; i < 7; ++i)
+            {
+                var date = now.AddDays(-dayOffset + i);
+                var isPlayed = StatsManager.Instance.DidPlayOnDate(date);
+                var dayOfWeek = date.DayOfWeek;
+                switch (dayOfWeek)
+                {
+                    case DayOfWeek.Sunday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekSun, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Monday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekMon, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Tuesday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekTues, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Wednesday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekWed, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Thursday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekThurs, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Friday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekFri, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    case DayOfWeek.Saturday:
+                        StatsDayOfWeekWidgetController.ShowData(_dayOfWeekSat, new StatsDayOfWeekWidgetData(isPlayed));
+                        break;
+                    default:
+                        Logger.LogError($"Invalid day of week: {dayOfWeek}");
+                        break;
+                }
+            }
+        }
+
+        private void RefreshMonthly()
+        {
+            // text
+            _monthText.text = $"{TimeUtil.GetMonthName(_month)}, {_year}";
+
+            // grid
+            _dayOfMonthDataList.Clear();
+
+            var daysInMonth = DateTime.DaysInMonth(_year, _month);
+            for (var i = 0; i < daysInMonth; ++i)
+            {
+                var day = i + 1;
+                var showLeft = day % 7 != 1;
+                var showRight = day % 7 != 0;
+                var showTop = day / 7 > 1;
+                var showBottom = !(day % 7 > 0 && daysInMonth / 7 == day / 7);
+                var date = new DateTime(_year, _month, day);
+                var state = StatsManager.Instance.DidPlayOnDate(date) ? StatsDayOfMonthState.Active : StatsDayOfMonthState.None;
+                var data = new StatsDayOfMonthWidgetData(day, state, showLeft, showRight, showTop, showBottom);
+                _dayOfMonthDataList.Add(data);
+            }
+
+            _grid.Refresh();
+        }
+        #endregion
+
+        #region UI Binding
+        private void BindActions()
+        {
+            _grid.Init(this);
+
+            _crossButton.onClick.AddListener(OnCrossButtonClick);
+            _shareButton.onClick.AddListener(OnShareButtonClick);
+            _contactButton.onClick.AddListener(OnContactButtonClick);
+            _questionButton.onClick.AddListener(OnQuestionButtonClick);
+            _prevMonthButton.onClick.AddListener(OnPrevMonthButtonClick);
+            _nextMonthButton.onClick.AddListener(OnNextMonthButtonClick);
+        }
+
+        private void UnbindActions()
+        {
+            _grid.Dispose();
+
+            _crossButton.onClick.RemoveAllListeners();
+            _shareButton.onClick.RemoveAllListeners();
+            _contactButton.onClick.RemoveAllListeners();
+            _questionButton.onClick.RemoveAllListeners();
+            _prevMonthButton.onClick.RemoveAllListeners();
+            _nextMonthButton.onClick.RemoveAllListeners();
+        }
+        #endregion
+
+        #region Callback
+        private void OnCrossButtonClick()
+        {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
+            GameSceneManager.Instance.GoBack();
+        }
+
+        private void OnShareButtonClick()
+        {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
+            GameSceneManager.Instance.ShowScene(SceneNames.Share);
+        }
+
+        private void OnContactButtonClick()
+        {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
+            GameSceneManager.Instance.ShowScene(SceneNames.ContactInfo);
+        }
+
+        private void OnQuestionButtonClick()
+        {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
+            GameSceneManager.Instance.ShowScene(SceneNames.FeatureInfo, new FeatureInfoData(FeatureType.Stats));
+        }
+
+        private void OnPrevMonthButtonClick()
+        {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
+            if (_month == 1)
+            {
+                --_year;
+                _month = 12;
+            }
+            else
+            {
+                --_month;
+            }
+
+            RefreshMonthly();
+            _prevMonthButton.gameObject.SetActive(_month > 1 || _year > 1);
+        }
+
+        private void OnNextMonthButtonClick()
+        {
+            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
+
+            if (_month == 12)
+            {
+                ++_year;
+                _month = 1;
+            }
+            else
+            {
+                ++_month;
+            }
+
+            RefreshMonthly();
+            _nextMonthButton.gameObject.SetActive(_month < 12 || _year < 2999);
+        }
+        #endregion
+
+        #region Grid
+        public int GetDataCount()
+        {
+            return _dayOfMonthDataList.Count;
+        }
+
+        public void OnElementShow(SimpleGridElement element)
+        {
+            if (element is GeneralWidgetConfig config)
+            {
+                var data = _dayOfMonthDataList[config.Index];
+                StatsDayOfMonthWidgetController.ShowData(config, data);
+            }
+        }
+
+        public void OnElementHide(SimpleGridElement element)
+        {
+        }
+
+        public void OnElementCreate(SimpleGridElement element)
+        {
+        }
+
+        public void OnElementDestroy(SimpleGridElement element)
+        {
+        }
+        #endregion
+    }
+
+    public class StatsMenuStorage
+    {
+        public PerformanceSOItem lastPerformance;
+    }
+
+}

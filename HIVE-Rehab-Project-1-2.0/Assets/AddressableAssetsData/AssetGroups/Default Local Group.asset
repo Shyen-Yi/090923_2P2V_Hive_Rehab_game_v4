@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: ef6e310ab4400b842b560518eb3bb013
+  m_SerializeEntries:
+  - m_GUID: 3af74f89332f0d647b4b34766b0e990d
+    m_Address: Assets/Audio/AsteroidCaught.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2edaff1eecf511e4c9161c3f0a058504
+    m_Address: Assets/Audio/AsteroidSpawn.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0884287c46e7489478a19a63b1fb82fc
+    m_Address: Assets/Audio/SpacecraftMoving.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 80bafce2598817341b264dabc948c900
+    m_Address: Assets/Audio/ButtonClick.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 51c56549703f8f54c99ea37484068b8c
+    m_Address: Assets/Audio/VacuumDisable.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9fc3278f7242011488b48fdee341a666
+    m_Address: Assets/Audio/VacuumEnable.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 518436ac31c560148bbd8ab7aeaee535
+    m_Address: Assets/Audio/GameSceneBackground.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6e734d07627faf847bfa8f97dfe51cd1
+    m_Address: Assets/Audio/CalibrationMarkSet.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cfb2ae5f8761ab141b4da5a315e28c34
+    m_Address: Assets/Audio/AsteroidWarning.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d53ebe3cdd4b7e845be9e07a427d6b9c
+    m_Address: Assets/Audio/CoreGameEndShowReport.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c309a701f35af12458b1d549c33323dc
+    m_Address: Assets/Audio/LevelUp.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3f23818af001daa4b822c12e678c84d3
+    m_Address: Assets/Audio/BlockComplete.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 15227ff877b469445a556db3ac390a74
+    m_Address: Assets/Audio/AsteroidGone.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38c2e5b2367dd3e40aeb014ec78b99d6
+    m_Address: Assets/Audio/MenuBackground.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 10487816fcb6832408916f0b1f0cd7bc, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 55d3e767b8deb364bac3eec7d976b10a, type: 2}
+    - {fileID: 11400000, guid: fea86a89bcc123f4a82847bd11a72a10, type: 2}

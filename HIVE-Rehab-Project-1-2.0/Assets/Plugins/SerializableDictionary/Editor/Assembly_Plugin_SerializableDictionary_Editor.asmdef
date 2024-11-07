@@ -1,0 +1,18 @@
+{
+    "name": "Assembly_Plugin_SerializableDictionary_Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:500f5a41f496e51498b3eb3c28670cfc"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

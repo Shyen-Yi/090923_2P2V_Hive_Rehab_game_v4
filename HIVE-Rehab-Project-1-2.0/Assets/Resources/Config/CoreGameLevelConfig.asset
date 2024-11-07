@@ -1,0 +1,345 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc5bb718ff01aef43bd99177ef9a44be, type: 3}
+  m_Name: CoreGameLevelConfig
+  m_EditorClassIdentifier: 
+  _items:
+  - level: 1
+    asteroidSpeed: 1
+    asteroidSize: 1.5
+    asteroidLifeTime: 8
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 1
+    spacecraftSize: 1.5
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
+  - level: 2
+    asteroidSpeed: 3
+    asteroidSize: 1.3
+    asteroidLifeTime: 8
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 0.8
+    spacecraftSize: 1.3
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
+  - level: 3
+    asteroidSpeed: 5
+    asteroidSize: 1.3
+    asteroidLifeTime: 8
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 0.8
+    spacecraftSize: 1.3
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
+  - level: 4
+    asteroidSpeed: 5
+    asteroidSize: 1.1
+    asteroidLifeTime: 8
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 0.8
+    spacecraftSize: 1.1
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
+  - level: 5
+    asteroidSpeed: 7
+    asteroidSize: 1.1
+    asteroidLifeTime: 6
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 0.6
+    spacecraftSize: 1.1
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
+  - level: 6
+    asteroidSpeed: 7
+    asteroidSize: 0.9
+    asteroidLifeTime: 6
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 0.6
+    spacecraftSize: 0.9
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
+  - level: 7
+    asteroidSpeed: 7
+    asteroidSize: 0.7
+    asteroidLifeTime: 6
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 0.4
+    spacecraftSize: 0.7
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
+  - level: 8
+    asteroidSpeed: 9
+    asteroidSize: 0.7
+    asteroidLifeTime: 4
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 0.4
+    spacecraftSize: 0.7
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
+  - level: 9
+    asteroidSpeed: 11
+    asteroidSize: 0.5
+    asteroidLifeTime: 4
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 0.2
+    spacecraftSize: 0.7
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
+  - level: 10
+    asteroidSpeed: 12
+    asteroidSize: 0.4
+    asteroidLifeTime: 4
+    asteroidMovement:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.053348467
+        value: 0.047169812
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.67763907
+        value: 0.6438679
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    asteroidSpawnGapSec: 2
+    vacuumSize: 0.1
+    spacecraftSize: 0.5
+    maxAsteroidCount: 50
+    numOfAsteroidCollectedToPass: 40
