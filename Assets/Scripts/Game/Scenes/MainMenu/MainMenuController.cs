@@ -79,6 +79,15 @@ namespace com.hive.projectr
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
+            var dailySessionNum = CSVManager.Instance.GetFinishedSessionNumOfDay(TimeManager.Instance.GetCurrentDateTime());
+            var dailyMaxSession = GameGeneralConfig.GetData().DailyMaxSession;
+            var isDailyMaxSessionReached = dailySessionNum >= dailyMaxSession;
+            if (isDailyMaxSessionReached && !CSVManager.Instance.HasGeneratedLogInCurrentSession())
+            {
+                GameSceneManager.Instance.ShowScene(SceneNames.DailyMaxSessionReached);
+                return;
+            }
+
             if (DebugConfig.GetData().EnableCalibration) 
             {
                 GameSceneManager.Instance.ShowScene(SceneNames.TransitionCalibration);
@@ -91,13 +100,6 @@ namespace com.hive.projectr
                     new Vector3(Screen.width / 2, Screen.height / 2),
                     1,
                     SettingManager.Instance.Level));
-
-                //GameSceneManager.Instance.ShowScene(SceneNames.TransitionCoreGame, new CoreGameData(
-                //    new Vector3(0, 0),
-                //    new Vector3(Screen.width, Screen.height),
-                //    new Vector3(Screen.width / 2, Screen.height / 2),
-                //    1,
-                //    SettingManager.Instance.Level));
             }
         }
 

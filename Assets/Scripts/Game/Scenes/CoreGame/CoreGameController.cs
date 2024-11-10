@@ -763,8 +763,6 @@ namespace com.hive.projectr
 
         private Vector3 GetSpacecraftScreenPosRaw()
         {
-            Logger.LogError($"SpacecraftScreenPosRaw: {InputManager.Instance.CursorScreenPosition + _spacecraftScreenOffsetFromCursor}");
-
             return InputManager.Instance.CursorScreenPosition + _spacecraftScreenOffsetFromCursor;
         }
 

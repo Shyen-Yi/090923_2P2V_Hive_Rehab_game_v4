@@ -27,6 +27,7 @@ namespace com.hive.projectr
 		[SerializeField] private String adminUsername;
 		[SerializeField] private String adminPassword;
 		[SerializeField] private Int32 soundVolumePercentageWhenInBackground;
+		[SerializeField] private Int32 dailyMaxSession;
 
 		public Int32 DefaultGoal => defaultGoal;
 		public Int32 MinGoal => minGoal;
@@ -38,5 +39,6 @@ namespace com.hive.projectr
 		public String AdminUsername => adminUsername;
 		public String AdminPassword => adminPassword;
 		public Int32 SoundVolumePercentageWhenInBackground => soundVolumePercentageWhenInBackground;
+		public Int32 DailyMaxSession => dailyMaxSession;
     }
 }

@@ -23,5 +23,6 @@ namespace com.hive.projectr
         public static string CoreGameLevelFailed = "CoreGameLevelFailed";
         public static string TransitionCalibration = "TransitionCalibration";
         public static string Pause = "Pause";
+        public static string DailyMaxSessionReached = "DailyMaxSessionReached";
     }
 }

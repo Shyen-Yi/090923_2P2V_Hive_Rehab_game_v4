@@ -71,6 +71,7 @@ namespace com.hive.projectr
 		public String AdminUsername => _item.AdminUsername;
 		public String AdminPassword => _item.AdminPassword;
 		public Int32 SoundVolumePercentageWhenInBackground => _item.SoundVolumePercentageWhenInBackground;
+		public Int32 DailyMaxSession => _item.DailyMaxSession;
 
 		public GameGeneralConfigData(GameGeneralSOItem item)
 		{

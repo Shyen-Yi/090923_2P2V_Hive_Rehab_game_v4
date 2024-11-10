@@ -30,6 +30,7 @@ namespace com.hive.projectr
             _config.AirConfig.Animator.SetBool(AirIsActiveBoolHash, true);
 
             SoundManager.Instance.PlaySound(SoundType.VacuumEnable);
+            SoundManager.Instance.StopSound(SoundType.VacuumDisable);
         }
 
         public void Deactivate()
@@ -40,6 +41,7 @@ namespace com.hive.projectr
             _config.AirConfig.Animator.SetBool(AirIsActiveBoolHash, false);
 
             SoundManager.Instance.PlaySound(SoundType.VacuumDisable);
+            SoundManager.Instance.StopSound(SoundType.VacuumEnable);
         }
 
         public void SetAirSize(float scale)

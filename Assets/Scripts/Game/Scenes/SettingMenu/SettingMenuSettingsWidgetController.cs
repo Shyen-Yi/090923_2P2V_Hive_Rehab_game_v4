@@ -116,7 +116,7 @@ namespace com.hive.projectr
             _levelDownButton.onClick.AddListener(OnLevelDownButtonClick);
             _resetButton.onClick.AddListener(OnResetButtonClick);
 
-            _nameInputField.onEndEdit.AddListener(OnNameEndEdit);
+            _nameInputField.onValueChanged.AddListener(OnNameChanged);
             _goalInputField.onSelect.AddListener(OnGoalSelect);
             _goalInputField.onEndEdit.AddListener(OnGoalEndEdit);
         }
@@ -127,7 +127,7 @@ namespace com.hive.projectr
             _levelDownButton.onClick.RemoveAllListeners();
             _resetButton.onClick.RemoveAllListeners();
 
-            _nameInputField.onEndEdit.RemoveAllListeners();
+            _nameInputField.onValueChanged.RemoveAllListeners();
             _goalInputField.onSelect.RemoveAllListeners();
             _goalInputField.onEndEdit.RemoveAllListeners();
         }
@@ -197,7 +197,7 @@ namespace com.hive.projectr
             Show();
         }
 
-        private void OnNameEndEdit(string displayName)
+        private void OnNameChanged(string displayName)
         {
             RefreshName(displayName);
         }

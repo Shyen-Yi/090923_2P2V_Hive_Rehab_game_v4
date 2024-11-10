@@ -218,6 +218,7 @@ namespace com.hive.projectr
         private int _calibrationNum;
         private int _coreGameNum;
         private int _sessionNum;
+        private int _sessionLogCount;
         private Dictionary<CSVType, StringBuilder> _logSbDict = new Dictionary<CSVType, StringBuilder>();
 
         private string _coordinatePosFilePath;
@@ -316,7 +317,7 @@ namespace com.hive.projectr
 
         public void OnCoreGameTick(CSVCoreGameTickData data)
         {
-            Logger.Log($"CSVManager::OnCoreGameTick");
+            //Logger.Log($"CSVManager::OnCoreGameTick");
 
             // coordinates
             AppendLog(CSVType.Coordinates, GenerateCSVContent(new List<CSVCoreGameTickData>() { data }));
@@ -457,6 +458,8 @@ namespace com.hive.projectr
                 if (_isLogging)
                 {
                     _isLogging = false;
+
+                    ++_sessionLogCount;
 
                     // save
                     foreach (var pair in _logSbDict)
@@ -602,21 +605,14 @@ namespace com.hive.projectr
                 }
 
                 // check existing session folders within day folder
-                var sessionNum = 0;
-                var sessionFolders = Directory.GetDirectories(dayFolderPath);
-                foreach (var sessionFolder in sessionFolders)
-                {
-                    if (TryParseSessionFolder(sessionFolder, out var pSessionNum))
-                    {
-                        sessionNum = Mathf.Max(sessionNum, pSessionNum);
-                    }
-                }
-                sessionNum = Mathf.Max(sessionNum, 0);
+                var sessionNum = GetFinishedSessionNumOfDay(logTime);
 
                 if (_sessionNum == 0 || _sessionNum != sessionNum) // init session (folder and stuff)
                 {
-                    _sessionNum = sessionNum + 1;
                     isNewSession = true;
+
+                    _sessionNum = sessionNum + 1;
+                    _sessionLogCount = 0;
                 }
 
                 if (isNewSession)
@@ -665,6 +661,28 @@ namespace com.hive.projectr
             return isSuccess;
         }
 
+        public int GetFinishedSessionNumOfDay(DateTime time)
+        {
+            var sessionNum = 0;
+
+            var dayFolderPath = GetDayFolderPath(time, SettingManager.Instance.DisplayName);
+
+            if (Directory.Exists(dayFolderPath))
+            {
+                // check existing session folders within day folder
+                var sessionFolders = Directory.GetDirectories(dayFolderPath);
+                foreach (var sessionFolder in sessionFolders)
+                {
+                    if (TryParseSessionFolder(sessionFolder, out var pSessionNum))
+                    {
+                        sessionNum = Mathf.Max(sessionNum, pSessionNum);
+                    }
+                }
+            }
+
+            return sessionNum;
+        }
+
         public string GenerateCSVHeader<T>() where T : ICSVData
         {
             using (var writer = new StringWriter())
@@ -708,6 +726,11 @@ namespace com.hive.projectr
         #endregion
 
         #region Public
+        public bool HasGeneratedLogInCurrentSession()
+        {
+            return _sessionLogCount > 0;
+        }
+
         public List<string> GetCSVDirectoriesForUser(string username)
         {
             if (string.IsNullOrEmpty(username))

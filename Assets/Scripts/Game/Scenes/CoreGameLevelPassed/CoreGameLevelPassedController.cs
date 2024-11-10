@@ -146,31 +146,70 @@ namespace com.hive.projectr
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-            GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
+            if (IsDailyMaxSessionReached())
             {
-                GameSceneManager.Instance.HideScene(SceneName);
-            });
+                GameSceneManager.Instance.ShowScene(SceneNames.DailyMaxSessionReached, null, () =>
+                {
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
+            else
+            {
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
+                {
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
         }
 
         private void OnReplayButtonClick()
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-            GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, ()=>
+            if (IsDailyMaxSessionReached())
             {
-                GameSceneManager.Instance.HideScene(SceneName);
-            });
+                GameSceneManager.Instance.ShowScene(SceneNames.DailyMaxSessionReached, null, () =>
+                {
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
+            else
+            {
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
+                {
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
         }
 
         private void OnNextLevelButtonClick()
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-            GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, new CoreGameData(_coreGameData.bottomLeftScreenPos, _coreGameData.topRightScreenPos, _coreGameData.centerScreenPos, _coreGameData.spacecraftMovementScale, _coreGameData.level + 1), () =>
+            if (IsDailyMaxSessionReached())
             {
-                GameSceneManager.Instance.HideScene(SceneName);
-            });
+                GameSceneManager.Instance.ShowScene(SceneNames.DailyMaxSessionReached, null, () =>
+                {
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
+            else
+            {
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, new CoreGameData(_coreGameData.bottomLeftScreenPos, _coreGameData.topRightScreenPos, _coreGameData.centerScreenPos, _coreGameData.spacecraftMovementScale, _coreGameData.level + 1), () =>
+                {
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
         }
         #endregion
+
+        private bool IsDailyMaxSessionReached()
+        {
+            var dailySessionNum = CSVManager.Instance.GetFinishedSessionNumOfDay(TimeManager.Instance.GetCurrentDateTime());
+            var dailyMaxSession = GameGeneralConfig.GetData().DailyMaxSession;
+            var isDailyMaxSessionReached = dailySessionNum >= dailyMaxSession && !CSVManager.Instance.HasGeneratedLogInCurrentSession();
+
+            return isDailyMaxSessionReached;
+        }
     }
 }
