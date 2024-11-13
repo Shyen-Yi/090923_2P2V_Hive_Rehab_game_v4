@@ -213,12 +213,13 @@ namespace com.hive.projectr
 
     public class CSVManager : SingletonBase<CSVManager>, ICoreManager
     {
+        public int DailyAttempt { get; private set; }
+
         private bool _isLogging;
 
         private int _calibrationNum;
         private int _coreGameNum;
         private int _sessionNum;
-        private int _sessionLogCount;
         private Dictionary<CSVType, StringBuilder> _logSbDict = new Dictionary<CSVType, StringBuilder>();
 
         private string _coordinatePosFilePath;
@@ -238,6 +239,7 @@ namespace com.hive.projectr
         public void OnInit()
         {
             TrySetupDayFolder(TimeUtil.Now, out var dayFolderPath);
+            InitDailyAttempt();
 
             MonoBehaviourUtil.OnApplicationQuitEvent += OnApplicationQuit;
         }
@@ -459,8 +461,6 @@ namespace com.hive.projectr
                 {
                     _isLogging = false;
 
-                    ++_sessionLogCount;
-
                     // save
                     foreach (var pair in _logSbDict)
                     {
@@ -483,6 +483,8 @@ namespace com.hive.projectr
                     _summaryFilePath = null;
                     _sessionInfoFilePath = null;
                     _logSbDict.Clear();
+
+                    ++DailyAttempt;
 
                     return true;
                 }
@@ -574,6 +576,56 @@ namespace com.hive.projectr
             }
         }
 
+        private void InitDailyAttempt()
+        {
+            DailyAttempt = 0;
+
+            var now = TimeManager.Instance.GetCurrentDateTime();
+            var dayFolderPath = GetDayFolderPath(now, SettingManager.Instance.DisplayName);
+
+            if (Directory.Exists(dayFolderPath))
+            {
+                // check existing session folders within day folder
+                var sessionFolders = Directory.GetDirectories(dayFolderPath);
+                foreach (var sessionFolder in sessionFolders)
+                {
+                    var sessionInfoFilePath = GetSessionInfoFilePath(sessionFolder);
+                    var sessionAttempt = 0;
+
+                    if (File.Exists(sessionInfoFilePath))
+                    {
+                        using (var reader = new StreamReader(sessionInfoFilePath))
+                        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                        {
+                            csv.Read();
+                            csv.ReadHeader();
+
+                            var infos = csv.GetRecords<CSVSessionInfo>();
+                            foreach (var info in infos)
+                            {
+                                var calibrationNum = info.CalibrationNum;
+                                var coreGameNum = info.CoreGameNum;
+                                sessionAttempt = Mathf.Max(sessionAttempt, coreGameNum);
+                            }
+                        }
+                    }
+
+                    DailyAttempt += sessionAttempt;
+                }
+            }
+
+            Logger.Log($"InitDailyAttempt - DailyAttempt: {DailyAttempt}");
+        }
+
+        public bool IsDailyMaxAttemptReached()
+        {
+            var dailyAttempt = DailyAttempt;
+            var dailyMaxAttempt = GameGeneralConfig.GetData().DailyMaxAttempt;
+            var isDailyMaxAttemptReached = dailyAttempt >= dailyMaxAttempt;
+
+            return isDailyMaxAttemptReached;
+        }
+
         /// <summary>
         /// Need to be called before writing any log to local file
         /// </summary>
@@ -605,14 +657,13 @@ namespace com.hive.projectr
                 }
 
                 // check existing session folders within day folder
-                var sessionNum = GetFinishedSessionNumOfDay(logTime);
+                var sessionNum = GetMaxSessionNumOfDay(logTime);
 
                 if (_sessionNum == 0 || _sessionNum != sessionNum) // init session (folder and stuff)
                 {
                     isNewSession = true;
 
                     _sessionNum = sessionNum + 1;
-                    _sessionLogCount = 0;
                 }
 
                 if (isNewSession)
@@ -661,7 +712,7 @@ namespace com.hive.projectr
             return isSuccess;
         }
 
-        public int GetFinishedSessionNumOfDay(DateTime time)
+        public int GetMaxSessionNumOfDay(DateTime time)
         {
             var sessionNum = 0;
 
@@ -726,11 +777,6 @@ namespace com.hive.projectr
         #endregion
 
         #region Public
-        public bool HasGeneratedLogInCurrentSession()
-        {
-            return _sessionLogCount > 0;
-        }
-
         public List<string> GetCSVDirectoriesForUser(string username)
         {
             if (string.IsNullOrEmpty(username))

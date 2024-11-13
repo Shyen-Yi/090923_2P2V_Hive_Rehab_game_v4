@@ -79,10 +79,10 @@ namespace com.hive.projectr
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-            var dailySessionNum = CSVManager.Instance.GetFinishedSessionNumOfDay(TimeManager.Instance.GetCurrentDateTime());
-            var dailyMaxSession = GameGeneralConfig.GetData().DailyMaxSession;
-            var isDailyMaxSessionReached = dailySessionNum >= dailyMaxSession;
-            if (isDailyMaxSessionReached && !CSVManager.Instance.HasGeneratedLogInCurrentSession())
+            var dailyAttempt = CSVManager.Instance.DailyAttempt;
+            var dailyMaxAttempt = GameGeneralConfig.GetData().DailyMaxAttempt;
+            var isDailyMaxAttemptReached = dailyAttempt >= dailyMaxAttempt;
+            if (isDailyMaxAttemptReached)
             {
                 GameSceneManager.Instance.ShowScene(SceneNames.DailyMaxSessionReached);
                 return;

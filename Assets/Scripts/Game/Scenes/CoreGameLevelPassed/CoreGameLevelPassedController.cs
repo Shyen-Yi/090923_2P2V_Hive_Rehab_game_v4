@@ -146,7 +146,7 @@ namespace com.hive.projectr
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-            if (IsDailyMaxSessionReached())
+            if (CSVManager.Instance.IsDailyMaxAttemptReached())
             {
                 GameSceneManager.Instance.ShowScene(SceneNames.DailyMaxSessionReached, null, () =>
                 {
@@ -166,7 +166,7 @@ namespace com.hive.projectr
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-            if (IsDailyMaxSessionReached())
+            if (CSVManager.Instance.IsDailyMaxAttemptReached())
             {
                 GameSceneManager.Instance.ShowScene(SceneNames.DailyMaxSessionReached, null, () =>
                 {
@@ -186,7 +186,7 @@ namespace com.hive.projectr
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-            if (IsDailyMaxSessionReached())
+            if (CSVManager.Instance.IsDailyMaxAttemptReached())
             {
                 GameSceneManager.Instance.ShowScene(SceneNames.DailyMaxSessionReached, null, () =>
                 {
@@ -202,14 +202,5 @@ namespace com.hive.projectr
             }
         }
         #endregion
-
-        private bool IsDailyMaxSessionReached()
-        {
-            var dailySessionNum = CSVManager.Instance.GetFinishedSessionNumOfDay(TimeManager.Instance.GetCurrentDateTime());
-            var dailyMaxSession = GameGeneralConfig.GetData().DailyMaxSession;
-            var isDailyMaxSessionReached = dailySessionNum >= dailyMaxSession && !CSVManager.Instance.HasGeneratedLogInCurrentSession();
-
-            return isDailyMaxSessionReached;
-        }
     }
 }

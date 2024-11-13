@@ -91,10 +91,20 @@ namespace com.hive.projectr
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
 
-            GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
+            if (CSVManager.Instance.IsDailyMaxAttemptReached())
             {
-                GameSceneManager.Instance.HideScene(SceneName);
-            });
+                GameSceneManager.Instance.ShowScene(SceneNames.DailyMaxSessionReached, null, () =>
+                {
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
+            else
+            {
+                GameSceneManager.Instance.ShowScene(SceneNames.CoreGame, _coreGameData, () =>
+                {
+                    GameSceneManager.Instance.HideScene(SceneName);
+                });
+            }
         }
         #endregion
     }
