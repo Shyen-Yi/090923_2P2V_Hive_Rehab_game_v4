@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace com.hive.projectr
 {
@@ -21,12 +22,21 @@ namespace com.hive.projectr
 
         private string _displayName;
 
+        #region Events
+        public static Action OnDisplayNameUpdated;
+        #endregion
+
         #region Lifecycle
         public void OnInit()
         {
-            DisplayName = PlayerPrefs.HasKey(PlayerPrefKeys.DisplayName) ? PlayerPrefs.GetString(PlayerPrefKeys.DisplayName) : GameGeneralConfig.GetData().DefaultUserName;
-            Level = PlayerPrefs.HasKey(PlayerPrefKeys.Level) ? PlayerPrefs.GetInt(PlayerPrefKeys.Level) : CoreGameLevelConfig.MinLevel;
-            DailyBlock = PlayerPrefs.HasKey(PlayerPrefKeys.DailyBlock) ? PlayerPrefs.GetInt(PlayerPrefKeys.DailyBlock) : GameGeneralConfig.GetData().DefaultGoal;
+            var displayName = PlayerPrefs.HasKey(PlayerPrefKeys.DisplayName) ? PlayerPrefs.GetString(PlayerPrefKeys.DisplayName) : GameGeneralConfig.GetData().DefaultUserName;
+            UpdateDisplayName(displayName, false);
+
+            var level = PlayerPrefs.HasKey(PlayerPrefKeys.Level) ? PlayerPrefs.GetInt(PlayerPrefKeys.Level) : CoreGameLevelConfig.MinLevel;
+            UpdateLevel(level, false);
+
+            var dailyBlock = PlayerPrefs.HasKey(PlayerPrefKeys.DailyBlock) ? PlayerPrefs.GetInt(PlayerPrefKeys.DailyBlock) : GameGeneralConfig.GetData().DefaultGoal;
+            UpdateDailyBlock(dailyBlock, false);
 
             Logger.Log($"Setting loaded. Username: {DisplayName} | Level: {Level} | DailyBlock: {DailyBlock}");
         }
@@ -96,6 +106,8 @@ namespace com.hive.projectr
             {
                 SaveDisplayName();
             }
+
+            OnDisplayNameUpdated?.Invoke();
         }
 
         public void UpdateLevel(int level, bool toSave)

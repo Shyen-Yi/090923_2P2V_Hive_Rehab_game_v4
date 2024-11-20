@@ -62,6 +62,7 @@ namespace com.hive.projectr
 		private CoreGameLevelSOItem _item;
 
 		public Int32 Level => _item.Level;
+		public Int32 RequiredDailySuccessToPass => _item.RequiredDailySuccessToPass;
 		public Single AsteroidSpeed => _item.AsteroidSpeed;
 		public Single AsteroidSize => _item.AsteroidSize;
 		public Single AsteroidLifeTime => _item.AsteroidLifeTime;

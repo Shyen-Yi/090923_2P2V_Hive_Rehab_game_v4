@@ -213,9 +213,19 @@ namespace com.hive.projectr
 
     public class CSVManager : SingletonBase<CSVManager>, ICoreManager
     {
-        public int DailyAttempt { get; private set; }
+        public int DailyAttempt
+        {
+            get => _dailyAttempt;
+            private set
+            {
+                _dailyAttempt = value;
+                Logger.LogError($"Update Daily Attempt: {DailyAttempt}");
+            }
+        }
+        private int _dailyAttempt;
 
         private bool _isLogging;
+        private bool _isCoreGame;
 
         private int _calibrationNum;
         private int _coreGameNum;
@@ -242,11 +252,15 @@ namespace com.hive.projectr
             InitDailyAttempt();
 
             MonoBehaviourUtil.OnApplicationQuitEvent += OnApplicationQuit;
+            SettingManager.OnDisplayNameUpdated += OnDisplayNameChanged;
+            TimeManager.OnGameDayUpdated += OnGameDayUpdated;
         }
 
         public void OnDispose()
         {
             MonoBehaviourUtil.OnApplicationQuitEvent -= OnApplicationQuit;
+            SettingManager.OnDisplayNameUpdated -= OnDisplayNameChanged;
+            TimeManager.OnGameDayUpdated -= OnGameDayUpdated;
         }
         #endregion
 
@@ -255,6 +269,16 @@ namespace com.hive.projectr
         {
             TryEndLog();
         }
+
+        private void OnDisplayNameChanged()
+        {
+            InitDailyAttempt();
+        }
+
+        private void OnGameDayUpdated()
+        {
+            InitDailyAttempt();
+        }
         #endregion
 
         #region Calibration
@@ -262,7 +286,7 @@ namespace com.hive.projectr
         {
             Logger.Log($"CSVManager::OnCalibrationStarted - logTime: {logTime}");
 
-            StartLog(logTime);
+            StartLog(logTime, false);
 
             ++_calibrationNum;
 
@@ -292,7 +316,7 @@ namespace com.hive.projectr
         {
             Logger.Log($"CSVManager::OnCoreGameStarted - logTime: {logTime}");
 
-            StartLog(logTime);
+            StartLog(logTime, true);
 
             ++_coreGameNum;
 
@@ -453,7 +477,7 @@ namespace com.hive.projectr
         /// <returns></returns>
         private bool TryEndLog()
         {
-            Logger.Log($"CSVManager::TryEndLog - _isLogging: {_isLogging} | _logSbDict: {string.Join(",", _logSbDict)}");
+            Logger.Log($"CSVManager::TryEndLog - _isLogging: {_isLogging} | _isCoreGame: {_isCoreGame} | _logSbDict: {string.Join(",", _logSbDict)}");
 
             try
             {
@@ -484,7 +508,12 @@ namespace com.hive.projectr
                     _sessionInfoFilePath = null;
                     _logSbDict.Clear();
 
-                    ++DailyAttempt;
+                    if (_isCoreGame)
+                    {
+                        ++DailyAttempt;
+                    }
+
+                    _isCoreGame = false;
 
                     return true;
                 }
@@ -623,6 +652,8 @@ namespace com.hive.projectr
             var dailyMaxAttempt = GameGeneralConfig.GetData().DailyMaxAttempt;
             var isDailyMaxAttemptReached = dailyAttempt >= dailyMaxAttempt;
 
+            Logger.LogError($"IsDailyMaxAttemptReached - DailyAttempt: {DailyAttempt} | dailyMaxAttempt: {dailyMaxAttempt}");
+
             return isDailyMaxAttemptReached;
         }
 
@@ -631,7 +662,7 @@ namespace com.hive.projectr
         /// </summary>
         /// <param name="logTime">Generation time of the log</param>
         /// <returns>If success</returns>
-        private bool StartLog(DateTime logTime)
+        private bool StartLog(DateTime logTime, bool isCoreGame)
         {
             TryEndLog();
 
@@ -644,6 +675,7 @@ namespace com.hive.projectr
             var isSuccess = true;
 
             _isLogging = true;
+            _isCoreGame = isCoreGame;
 
             try
             {

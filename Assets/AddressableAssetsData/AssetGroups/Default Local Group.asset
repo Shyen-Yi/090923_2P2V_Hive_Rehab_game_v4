@@ -87,6 +87,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7667988229da3484daba3a8b5618dcb2
+    m_Address: Assets/Audio/AudioFiles/Lock.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 10487816fcb6832408916f0b1f0cd7bc, type: 2}
   m_SchemaSet:

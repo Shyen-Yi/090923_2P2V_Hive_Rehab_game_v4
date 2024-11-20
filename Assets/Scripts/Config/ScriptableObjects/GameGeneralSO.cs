@@ -22,7 +22,6 @@ namespace com.hive.projectr
 		[SerializeField] private Int32 maxGoal;
 		[SerializeField] private Single coreGameTransitionSec;
 		[SerializeField] private Single calibrationTransitionSec;
-		[SerializeField] private Int32 passingStreakToNextLevel;
 		[SerializeField] private String defaultUserName;
 		[SerializeField] private String adminUsername;
 		[SerializeField] private String adminPassword;
@@ -34,7 +33,6 @@ namespace com.hive.projectr
 		public Int32 MaxGoal => maxGoal;
 		public Single CoreGameTransitionSec => coreGameTransitionSec;
 		public Single CalibrationTransitionSec => calibrationTransitionSec;
-		public Int32 PassingStreakToNextLevel => passingStreakToNextLevel;
 		public String DefaultUserName => defaultUserName;
 		public String AdminUsername => adminUsername;
 		public String AdminPassword => adminPassword;

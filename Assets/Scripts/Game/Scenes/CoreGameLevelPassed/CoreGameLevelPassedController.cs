@@ -71,7 +71,7 @@ namespace com.hive.projectr
             {
                 _replayButton.gameObject.SetActive(false);
 
-                if (LevelManager.Instance.LatestLevelPassedStreak < GameGeneralConfig.GetData().PassingStreakToNextLevel)
+                if (LevelManager.Instance.CurrentLevel <= _coreGameData.level)
                 {
                     _playButton.gameObject.SetActive(true);
                     _nextLevelButton.gameObject.SetActive(false);

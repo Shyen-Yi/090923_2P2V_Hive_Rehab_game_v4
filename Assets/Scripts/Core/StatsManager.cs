@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Newtonsoft.Json;
 
 namespace com.hive.projectr
 {
@@ -85,10 +86,12 @@ namespace com.hive.projectr
                 _playedDays = new HashSet<GameDay>();
             }
 
-            if (PlayerPrefs.HasKey(GetPlayedDaysKey()))
+            var key = GetPlayedDaysKey();
+
+            if (PlayerPrefs.HasKey(key))
             {
-                var json = PlayerPrefs.GetString(PlayerPrefKeys.PlayedDays);
-                var playedDaysStorage = JsonUtility.FromJson<PlayedDays>(json);
+                var json = PlayerPrefs.GetString(key);
+                var playedDaysStorage = JsonConvert.DeserializeObject<PlayedDays>(json);
                 if (playedDaysStorage != null)
                 {
                     var playedDays = playedDaysStorage.days;
@@ -107,8 +110,8 @@ namespace com.hive.projectr
             {
                 _playedDays.Add(currentDay);
 
-                var json = JsonUtility.ToJson(_playedDays);
-                PlayerPrefs.SetString(PlayerPrefKeys.PlayedDays, json);
+                var json = JsonConvert.SerializeObject(_playedDays);
+                PlayerPrefs.SetString(key, json);
             }
         }
 
