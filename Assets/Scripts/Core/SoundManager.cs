@@ -410,6 +410,19 @@ namespace com.hive.projectr
             return source;
         }
 
+        public void StopAllSound()
+        {
+            foreach (var list in _activePlaybackDict.Values)
+            {
+                foreach (var playback in list)
+                {
+                    StopPlayback(playback);
+                }
+            }
+
+            _activePlaybackDict.Clear();
+        }
+
         public void StopSound(SoundType soundType)
         {
             if (_activePlaybackDict.TryGetValue(soundType, out var activePlaybacks))

@@ -8,13 +8,12 @@ namespace com.hive.projectr
     {
         // level
         public static readonly string LatestLevelPlayed = "LatestLevelPlayed";
-        public static readonly string LatestLevelPassedStreak = "LatestLevelPassedStreak";
+        public static readonly string LevelStreaks = "LevelStreaks";
 
         // setting
         public static readonly string DisplayName = "DisplayName";
         public static readonly string Level = "Level";
         public static readonly string DailyBlock = "DailyBlock";
-        public static readonly string UserInfoStorage = "UserInfo";
 
         // stats
         public static readonly string PlayedDays = "PlayedDays";

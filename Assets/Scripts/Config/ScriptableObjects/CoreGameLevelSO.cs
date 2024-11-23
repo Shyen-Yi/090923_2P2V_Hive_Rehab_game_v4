@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.AddressableAssets;
 
 namespace com.hive.projectr
 {
@@ -17,6 +18,7 @@ namespace com.hive.projectr
     {
         
 		[SerializeField] private Int32 level;
+		[SerializeField] private Int32 requiredDailySuccessToPass;
 		[SerializeField] private Single asteroidSpeed;
 		[SerializeField] private Single asteroidSize;
 		[SerializeField] private Single asteroidLifeTime;
@@ -28,6 +30,7 @@ namespace com.hive.projectr
 		[SerializeField] private Int32 numOfAsteroidCollectedToPass;
 
 		public Int32 Level => level;
+		public Int32 RequiredDailySuccessToPass => requiredDailySuccessToPass;
 		public Single AsteroidSpeed => asteroidSpeed;
 		public Single AsteroidSize => asteroidSize;
 		public Single AsteroidLifeTime => asteroidLifeTime;

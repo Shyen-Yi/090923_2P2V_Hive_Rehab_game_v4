@@ -91,7 +91,7 @@ MonoBehaviour:
       m_EditorAssetChanged: 1
     playType: 1
     isLoop: 0
-    needCache: 1
+    needCache: 0
     mixerGroup: 1
   - type: 8
     clip:
@@ -101,7 +101,7 @@ MonoBehaviour:
       m_EditorAssetChanged: 1
     playType: 1
     isLoop: 0
-    needCache: 1
+    needCache: 0
     mixerGroup: 1
   - type: 9
     clip:
@@ -111,7 +111,7 @@ MonoBehaviour:
       m_EditorAssetChanged: 1
     playType: 1
     isLoop: 0
-    needCache: 1
+    needCache: 0
     mixerGroup: 1
   - type: 10
     clip:
@@ -121,7 +121,7 @@ MonoBehaviour:
       m_EditorAssetChanged: 1
     playType: 1
     isLoop: 0
-    needCache: 1
+    needCache: 0
     mixerGroup: 1
   - type: 11
     clip:
@@ -131,7 +131,7 @@ MonoBehaviour:
       m_EditorAssetChanged: 1
     playType: 1
     isLoop: 0
-    needCache: 1
+    needCache: 0
     mixerGroup: 1
   - type: 12
     clip:
@@ -141,7 +141,7 @@ MonoBehaviour:
       m_EditorAssetChanged: 1
     playType: 1
     isLoop: 0
-    needCache: 1
+    needCache: 0
     mixerGroup: 1
   - type: 13
     clip:
@@ -162,4 +162,14 @@ MonoBehaviour:
     playType: 1
     isLoop: 0
     needCache: 1
+    mixerGroup: 1
+  - type: 15
+    clip:
+      m_AssetGUID: 7667988229da3484daba3a8b5618dcb2
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    playType: 1
+    isLoop: 0
+    needCache: 0
     mixerGroup: 1

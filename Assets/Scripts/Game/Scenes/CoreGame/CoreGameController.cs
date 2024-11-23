@@ -286,15 +286,16 @@ namespace com.hive.projectr
                 Start();
             }
 
+            SoundManager.Instance.StopAllSound();
             SoundManager.Instance.PlaySound(SoundType.CoreGameBackground);
-            SoundManager.Instance.StopSound(SoundType.MenuBackground);
-            SoundManager.Instance.StopSound(SoundType.CalibrationBackground);
 
             InputManager.Instance.HideCursor();
         }
 
         protected override void OnHide(GameSceneHideState hideState)
         {
+            SoundManager.Instance.StopSound(SoundType.CoreGameBackground);
+
             InputManager.Instance.ShowCursor();
         }
 

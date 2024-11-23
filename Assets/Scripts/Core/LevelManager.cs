@@ -1,24 +1,183 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using Newtonsoft.Json;
 
 namespace com.hive.projectr
 {
+    [Serializable]
+    public class LevelStreaks
+    {
+        public Dictionary<int, Dictionary<int, int>> dict; // key1: gameday.day, key2: level, value: streak
+    }
+
     public class LevelManager : SingletonBase<LevelManager>, ICoreManager
     {
+        public int CurrentLevel
+        {
+            get => _currentLevel;
+            private set
+            {
+                _currentLevel = value;
+            }
+        }
+        private int _currentLevel;
+
         public int LatestLevelPlayed { get; private set; }
-        public int LatestLevelPassedStreak { get; private set; }
+
+        private Dictionary<int, Dictionary<int, int>> _dailyLevelStreaks; // key1: gameday.day, key2: level, value: streak
+
+        #region Lifecycle
+        public void OnInit()
+        {
+            _dailyLevelStreaks = new Dictionary<int, Dictionary<int, int>>();
+
+            InitLevel();
+
+            var latestLevelPlayedKey = GetLatestLevelPlayedKey();
+            if (PlayerPrefsUtil.HasKey(latestLevelPlayedKey))
+            {
+                LatestLevelPlayed = PlayerPrefsUtil.GetInt(latestLevelPlayedKey);
+            }
+            else
+            {
+                LatestLevelPlayed = 0;
+            }
+
+            SettingManager.OnDisplayNameUpdated += OnDisplayNameUpdated;
+        }
+
+        public void OnDispose()
+        {
+            _dailyLevelStreaks.Clear();
+            _dailyLevelStreaks = null;
+
+            SettingManager.OnDisplayNameUpdated -= OnDisplayNameUpdated;
+        }
+        #endregion
+
+        private string GetLevelStreaksKey()
+        {
+            var key = SettingManager.Instance.IsDefaultUser
+                ? ""
+                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.LevelStreaks}";
+
+            return key;
+        }
+
+        private string GetLatestLevelPlayedKey()
+        {
+            var key = SettingManager.Instance.IsDefaultUser
+                ? ""
+                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.LatestLevelPlayed}";
+
+            return key;
+        }
+
+        private void InitLevel()
+        {
+            _dailyLevelStreaks.Clear();
+
+            CurrentLevel = CoreGameLevelConfig.MinLevel;
+
+            try
+            {
+                var key = GetLevelStreaksKey();
+
+                if (PlayerPrefsUtil.HasKey(key))
+                {
+                    var json = PlayerPrefsUtil.GetString(key);
+                    var playedDaysStorage = JsonConvert.DeserializeObject<LevelStreaks>(json);
+                    if (playedDaysStorage != null)
+                    {
+                        var dict = playedDaysStorage.dict;
+                        var levels = new List<int>(dict.Keys);
+                        levels.Sort();
+
+                        var maxLevel = CoreGameLevelConfig.MinLevel;
+                        var maxLevelStreak = 0;
+
+                        var currentGameDay = TimeManager.Instance.GetCurrentGameDay();
+
+                        foreach (var day in dict.Keys)
+                        {
+                            if (currentGameDay.day == day)
+                            {
+                                _dailyLevelStreaks[day] = new Dictionary<int, int>();
+                            }
+
+                            var levelDict = dict[day];
+                            foreach (var level in levelDict.Keys)
+                            {
+                                var streak = levelDict[level];
+
+                                if (currentGameDay.day == day)
+                                {
+                                    _dailyLevelStreaks[day][level] = streak;
+                                }
+
+                                if (streak > 0 && level > maxLevel)
+                                {
+                                    maxLevel = level;
+                                    maxLevelStreak = streak;
+                                }
+                            }
+                        }
+
+                        var requiredStreakToPass = CoreGameLevelConfig.GetLevelData(maxLevel).RequiredDailySuccessToPass;
+                        var isLevelPassed = maxLevelStreak >= requiredStreakToPass;
+
+                        if (!isLevelPassed)
+                        {
+                            CurrentLevel = maxLevel;
+                        }
+                        else
+                        {
+                            CurrentLevel = Mathf.Min(maxLevel + 1, CoreGameLevelConfig.MaxLevel);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogException(e);
+            }
+
+            Logger.Log($"LevelManager::InitLevel - CurrentLevel: {CurrentLevel}");
+        }
+
+        public int GetLevelWinningStreak(int level)
+        {
+            if (_dailyLevelStreaks.TryGetValue(TimeManager.Instance.GetCurrentGameDay().day, out var levelDict) &&
+                levelDict.TryGetValue(level, out var streak))
+            {
+                return streak;
+            }
+
+            return 0;
+        }
 
         public void OnLevelStarted(int level)
         {
             if (LatestLevelPlayed != level)
             {
-                LatestLevelPassedStreak = 0;
-                PlayerPrefs.SetInt(PlayerPrefKeys.LatestLevelPassedStreak, 0);
+                var currentGameDay = TimeManager.Instance.GetCurrentGameDay().day;
+                if (!_dailyLevelStreaks.TryGetValue(currentGameDay, out var levelDict))
+                {
+                    levelDict = new Dictionary<int, int>();
+                    _dailyLevelStreaks[currentGameDay] = levelDict;
+                }
+
+                levelDict[level] = 0;
             }
 
             LatestLevelPlayed = level;
-            PlayerPrefs.SetInt(PlayerPrefKeys.LatestLevelPlayed, LatestLevelPlayed);
+
+            if (!SettingManager.Instance.IsDefaultUser)
+            {
+                PlayerPrefsUtil.TrySetInt(GetLatestLevelPlayedKey(), LatestLevelPlayed);
+            }
         }
 
         public void OnLevelCompleted(int level, bool isPassed)
@@ -30,34 +189,44 @@ namespace com.hive.projectr
             }
 
             // save latest level result
-            LatestLevelPassedStreak = isPassed ? LatestLevelPassedStreak + 1 : 0;
-            PlayerPrefs.SetInt(PlayerPrefKeys.LatestLevelPassedStreak, LatestLevelPassedStreak);
-        }
+            LatestLevelPlayed = level;
+            PlayerPrefsUtil.TrySetInt(GetLatestLevelPlayedKey(), LatestLevelPlayed);
 
-        public void OnInit()
-        {
-            if (PlayerPrefs.HasKey(PlayerPrefKeys.LatestLevelPlayed))
+            var currentGameDay = TimeManager.Instance.GetCurrentGameDay().day;
+            if (!_dailyLevelStreaks.TryGetValue(currentGameDay, out var levelDict))
             {
-                LatestLevelPlayed = PlayerPrefs.GetInt(PlayerPrefKeys.LatestLevelPlayed);
+                levelDict = new Dictionary<int, int>();
+                _dailyLevelStreaks[currentGameDay] = levelDict;
+            }
+
+            if (!levelDict.ContainsKey(level))
+            {
+                levelDict[level] = 0;
+            }
+
+            if (isPassed)
+            {
+                ++levelDict[level];
+
+                var levelConfigData = CoreGameLevelConfig.GetLevelData(level);
+                if (levelDict[level] >= levelConfigData.RequiredDailySuccessToPass)
+                {
+                    CurrentLevel = Mathf.Min(level + 1, CoreGameLevelConfig.MaxLevel);
+                }
             }
             else
             {
-                LatestLevelPlayed = 0;
+                levelDict.Remove(level);
             }
 
-            if (PlayerPrefs.HasKey(PlayerPrefKeys.LatestLevelPassedStreak))
-            {
-                LatestLevelPassedStreak = PlayerPrefs.GetInt(PlayerPrefKeys.LatestLevelPassedStreak);
-            }
-            else
-            {
-                LatestLevelPassedStreak = 0;
-            }
+            var levelStreaks = new LevelStreaks() { dict = _dailyLevelStreaks };
+            var json = JsonConvert.SerializeObject(levelStreaks);
+            PlayerPrefs.SetString(GetLevelStreaksKey(), json);
         }
 
-        public void OnDispose()
+        private void OnDisplayNameUpdated()
         {
-
+            InitLevel();
         }
     }
 }

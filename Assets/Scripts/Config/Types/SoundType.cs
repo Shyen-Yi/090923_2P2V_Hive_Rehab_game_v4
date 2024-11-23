@@ -18,5 +18,6 @@ namespace com.hive.projectr
 		AsteroidGone,
 		AsteroidWarning,
 		ButtonClick,
+		Lock,
 	}
 }

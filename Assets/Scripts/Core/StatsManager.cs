@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Newtonsoft.Json;
 
 namespace com.hive.projectr
 {
@@ -42,14 +43,25 @@ namespace com.hive.projectr
             InitPlayedDays();
             InitPlayingStreak();
             InitPerformance();
+
+            SettingManager.OnDisplayNameUpdated += OnDisplayNameUpdated;
         }
 
         public void OnDispose()
         {
             _playedDays.Clear();
             _playedDays = null;
+
+            SettingManager.OnDisplayNameUpdated -= OnDisplayNameUpdated;
         }
         #endregion
+
+        private void OnDisplayNameUpdated()
+        {
+            InitPlayedDays();
+            InitPlayingStreak();
+            InitPerformance();
+        }
 
         private string GetPlayedDaysKey()
         {
@@ -85,30 +97,39 @@ namespace com.hive.projectr
                 _playedDays = new HashSet<GameDay>();
             }
 
-            if (PlayerPrefs.HasKey(GetPlayedDaysKey()))
+            try
             {
-                var json = PlayerPrefs.GetString(PlayerPrefKeys.PlayedDays);
-                var playedDaysStorage = JsonUtility.FromJson<PlayedDays>(json);
-                if (playedDaysStorage != null)
+                var key = GetPlayedDaysKey();
+
+                if (PlayerPrefsUtil.HasKey(key))
                 {
-                    var playedDays = playedDaysStorage.days;
-                    if (playedDays != null)
+                    var json = PlayerPrefsUtil.GetString(key);
+                    var playedDaysStorage = JsonConvert.DeserializeObject<PlayedDays>(json);
+                    if (playedDaysStorage != null)
                     {
-                        foreach (var playedDay in playedDays)
+                        var playedDays = playedDaysStorage.days;
+                        if (playedDays != null)
                         {
-                            _playedDays.Add(playedDay);
+                            foreach (var playedDay in playedDays)
+                            {
+                                _playedDays.Add(playedDay);
+                            }
                         }
                     }
                 }
+
+                var currentDay = TimeManager.Instance.GetCurrentGameDay();
+                if (!_playedDays.Contains(currentDay))
+                {
+                    _playedDays.Add(currentDay);
+
+                    var json = JsonConvert.SerializeObject(new PlayedDays() { days = _playedDays });
+                    PlayerPrefsUtil.TrySetString(key, json);
+                }
             }
-
-            var currentDay = TimeManager.Instance.GetCurrentGameDay();
-            if (!_playedDays.Contains(currentDay))
+            catch (Exception e)
             {
-                _playedDays.Add(currentDay);
-
-                var json = JsonUtility.ToJson(_playedDays);
-                PlayerPrefs.SetString(PlayerPrefKeys.PlayedDays, json);
+                Logger.LogException(e);
             }
         }
 
@@ -167,11 +188,11 @@ namespace com.hive.projectr
             var lastPerformanceKey = GetLastPerformanceKey();
             var lastPerformanceDescKey = GetLastPerformanceDescKey();
 
-            if (PlayerPrefs.HasKey(lastPerformanceKey) &&
-                PlayerPrefs.HasKey(lastPerformanceDescKey))
+            if (PlayerPrefsUtil.HasKey(lastPerformanceKey) &&
+                PlayerPrefsUtil.HasKey(lastPerformanceDescKey))
             {
-                PerformanceType = (PerformanceType)PlayerPrefs.GetInt(lastPerformanceKey);
-                PerformanceDesc = PlayerPrefs.GetString(lastPerformanceDescKey);
+                PerformanceType = (PerformanceType)PlayerPrefsUtil.GetInt(lastPerformanceKey);
+                PerformanceDesc = PlayerPrefsUtil.GetString(lastPerformanceDescKey);
             }
             else
             {
@@ -222,8 +243,8 @@ namespace com.hive.projectr
                         break;
                 }
 
-                PlayerPrefs.SetInt(GetLastPerformanceKey(), (int)PerformanceType);
-                PlayerPrefs.SetString(GetLastPerformanceDescKey(), PerformanceDesc);
+                PlayerPrefsUtil.TrySetInt(GetLastPerformanceKey(), (int)PerformanceType);
+                PlayerPrefsUtil.TrySetString(GetLastPerformanceDescKey(), PerformanceDesc);
             }
             else
             {

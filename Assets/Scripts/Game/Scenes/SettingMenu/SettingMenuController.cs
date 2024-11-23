@@ -169,6 +169,8 @@ namespace com.hive.projectr
 
         private void OnLockButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.Lock);
+
             _settingsWidgetController.SaveSettings();
             _unlockWidgetController.Reset();
 
@@ -177,6 +179,8 @@ namespace com.hive.projectr
 
         private void OnUnlockButtonClick()
         {
+            SoundManager.Instance.PlaySound(SoundType.Lock);
+
             var canUnlock = _unlockWidgetController.TryAuthenticate();
             if (canUnlock)
             {

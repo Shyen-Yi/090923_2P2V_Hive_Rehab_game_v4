@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEngine.AddressableAssets;
 
 namespace com.hive.projectr
 {
@@ -66,7 +65,6 @@ namespace com.hive.projectr
 		public Int32 MaxGoal => _item.MaxGoal;
 		public Single CoreGameTransitionSec => _item.CoreGameTransitionSec;
 		public Single CalibrationTransitionSec => _item.CalibrationTransitionSec;
-		public Int32 PassingStreakToNextLevel => _item.PassingStreakToNextLevel;
 		public String DefaultUserName => _item.DefaultUserName;
 		public String AdminUsername => _item.AdminUsername;
 		public String AdminPassword => _item.AdminPassword;
