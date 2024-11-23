@@ -27,4 +27,13 @@ MonoBehaviour:
     desc: Calibration Info wulala
   - feature: 4
     title: 
-    desc: Congratulations! You've passed level {0} with amazing performance!
+    desc: Congratulations! You've won level {0} with amazing performance! Only {1}
+      more winning away from beating the level!
+  - feature: 4
+    title: 
+    desc: Congratulations! You've won level {0} with amazing performance! You're
+      now moving on to level {1}!
+  - feature: 4
+    title: 
+    desc: Congratulations! You've won level {0} with amazing performance! You've
+      beaten the max level we prepared for you!

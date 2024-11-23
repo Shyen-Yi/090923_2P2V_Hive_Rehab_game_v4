@@ -125,7 +125,7 @@ namespace com.hive.projectr
                             }
                         }
 
-                        var requiredStreakToPass = CoreGameLevelConfig.GetLevelData(maxLevel).RequiredDailySuccessToPass;
+                        var requiredStreakToPass = CoreGameLevelConfig.GetLevelData(maxLevel).RequiredDailyWinningStreakToPass;
                         var isLevelPassed = maxLevelStreak >= requiredStreakToPass;
 
                         if (!isLevelPassed)
@@ -209,7 +209,7 @@ namespace com.hive.projectr
                 ++levelDict[level];
 
                 var levelConfigData = CoreGameLevelConfig.GetLevelData(level);
-                if (levelDict[level] >= levelConfigData.RequiredDailySuccessToPass)
+                if (levelDict[level] >= levelConfigData.RequiredDailyWinningStreakToPass)
                 {
                     CurrentLevel = Mathf.Min(level + 1, CoreGameLevelConfig.MaxLevel);
                 }

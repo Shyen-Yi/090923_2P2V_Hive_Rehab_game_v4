@@ -106,7 +106,7 @@ namespace com.hive.projectr
                 else
                 {
                     var currentStreak = LevelManager.Instance.GetLevelWinningStreak(_coreGameData.level);
-                    var requiredStreak = CoreGameLevelConfig.GetLevelData(_coreGameData.level).RequiredDailySuccessToPass;
+                    var requiredStreak = CoreGameLevelConfig.GetLevelData(_coreGameData.level).RequiredDailyWinningStreakToPass;
                     _contentText.text = string.Format(feautureInfoList[0].Desc, _coreGameData.level, requiredStreak - currentStreak);
                 }
             }
