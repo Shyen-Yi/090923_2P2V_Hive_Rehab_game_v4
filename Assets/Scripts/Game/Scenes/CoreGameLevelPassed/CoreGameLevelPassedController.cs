@@ -95,13 +95,27 @@ namespace com.hive.projectr
             var feautureInfoList = FeatureInfoConfig.GetDataForFeature(FeatureType.CoreGameLevelPassed);
             if (feautureInfoList.Count > 0)
             {
-                _contentText.text = string.Format(feautureInfoList[0].Desc, _coreGameData.level);
+                if (LevelManager.Instance.CurrentLevel > _coreGameData.level)
+                {
+                    _contentText.text = string.Format(feautureInfoList[1].Desc, _coreGameData.level, LevelManager.Instance.CurrentLevel);
+                }
+                else if (LevelManager.Instance.CurrentLevel == CoreGameLevelConfig.MaxLevel)
+                {
+                    _contentText.text = string.Format(feautureInfoList[2].Desc, _coreGameData.level);
+                }
+                else
+                {
+                    var currentStreak = LevelManager.Instance.GetLevelWinningStreak(_coreGameData.level);
+                    var requiredStreak = CoreGameLevelConfig.GetLevelData(_coreGameData.level).RequiredDailySuccessToPass;
+                    _contentText.text = string.Format(feautureInfoList[0].Desc, _coreGameData.level, requiredStreak - currentStreak);
+                }
             }
             else
             {
                 Logger.LogError($"No defined feature info data for {FeatureType.CoreGameLevelPassed}");
             }
 
+            SoundManager.Instance.StopAllSound();
             SoundManager.Instance.PlaySound(SoundType.CoreGameLevelEndShowReport);
             SoundManager.Instance.PlaySound(SoundType.MenuBackground);
         }

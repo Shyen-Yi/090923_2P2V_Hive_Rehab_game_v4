@@ -29,13 +29,13 @@ namespace com.hive.projectr
         #region Lifecycle
         public void OnInit()
         {
-            var displayName = PlayerPrefs.HasKey(PlayerPrefKeys.DisplayName) ? PlayerPrefs.GetString(PlayerPrefKeys.DisplayName) : GameGeneralConfig.GetData().DefaultUserName;
+            var displayName = PlayerPrefsUtil.HasKey(PlayerPrefKeys.DisplayName) ? PlayerPrefsUtil.GetString(PlayerPrefKeys.DisplayName) : GameGeneralConfig.GetData().DefaultUserName;
             UpdateDisplayName(displayName, false);
 
-            var level = PlayerPrefs.HasKey(PlayerPrefKeys.Level) ? PlayerPrefs.GetInt(PlayerPrefKeys.Level) : CoreGameLevelConfig.MinLevel;
+            var level = PlayerPrefsUtil.HasKey(PlayerPrefKeys.Level) ? PlayerPrefsUtil.GetInt(PlayerPrefKeys.Level) : CoreGameLevelConfig.MinLevel;
             UpdateLevel(level, false);
 
-            var dailyBlock = PlayerPrefs.HasKey(PlayerPrefKeys.DailyBlock) ? PlayerPrefs.GetInt(PlayerPrefKeys.DailyBlock) : GameGeneralConfig.GetData().DefaultGoal;
+            var dailyBlock = PlayerPrefsUtil.HasKey(PlayerPrefKeys.DailyBlock) ? PlayerPrefsUtil.GetInt(PlayerPrefKeys.DailyBlock) : GameGeneralConfig.GetData().DefaultGoal;
             UpdateDailyBlock(dailyBlock, false);
 
             Logger.Log($"Setting loaded. Username: {DisplayName} | Level: {Level} | DailyBlock: {DailyBlock}");
@@ -51,19 +51,19 @@ namespace com.hive.projectr
 
         public void Reset()
         {
-            if (PlayerPrefs.HasKey(PlayerPrefKeys.DisplayName))
+            if (PlayerPrefsUtil.HasKey(PlayerPrefKeys.DisplayName))
             {
-                PlayerPrefs.DeleteKey(PlayerPrefKeys.DisplayName);
+                PlayerPrefsUtil.TryDeleteKey(PlayerPrefKeys.DisplayName);
             }
 
-            if (PlayerPrefs.HasKey(PlayerPrefKeys.Level))
+            if (PlayerPrefsUtil.HasKey(PlayerPrefKeys.Level))
             {
-                PlayerPrefs.DeleteKey(PlayerPrefKeys.Level);
+                PlayerPrefsUtil.TryDeleteKey(PlayerPrefKeys.Level);
             }
 
-            if (PlayerPrefs.HasKey(PlayerPrefKeys.DailyBlock))
+            if (PlayerPrefsUtil.HasKey(PlayerPrefKeys.DailyBlock))
             {
-                PlayerPrefs.DeleteKey(PlayerPrefKeys.DailyBlock);
+                PlayerPrefsUtil.TryDeleteKey(PlayerPrefKeys.DailyBlock);
             }
 
             DisplayName = GameGeneralConfig.GetData().DefaultUserName;
@@ -75,7 +75,7 @@ namespace com.hive.projectr
         {
             if (!IsDefaultUser)
             {
-                PlayerPrefs.SetString(PlayerPrefKeys.DisplayName, DisplayName);
+                PlayerPrefsUtil.TrySetString(PlayerPrefKeys.DisplayName, DisplayName);
                 Logger.Log($"Username {DisplayName} saved.");
             }
         }
@@ -84,7 +84,7 @@ namespace com.hive.projectr
         {
             if (!IsDefaultUser)
             {
-                PlayerPrefs.SetInt(PlayerPrefKeys.Level, Level);
+                PlayerPrefsUtil.TrySetInt(PlayerPrefKeys.Level, Level);
                 Logger.Log($"Level {Level} saved.");
             }
         }
@@ -93,7 +93,7 @@ namespace com.hive.projectr
         {
             if (!IsDefaultUser)
             {
-                PlayerPrefs.SetInt(PlayerPrefKeys.DailyBlock, DailyBlock);
+                PlayerPrefsUtil.TrySetInt(PlayerPrefKeys.DailyBlock, DailyBlock);
                 Logger.Log($"DailyBlock {DailyBlock} saved.");
             }
         }

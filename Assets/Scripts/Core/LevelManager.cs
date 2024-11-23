@@ -20,41 +20,38 @@ namespace com.hive.projectr
             private set
             {
                 _currentLevel = value;
-                Logger.LogError($"Update CurrentLevel -> {CurrentLevel}");
             }
         }
         private int _currentLevel;
 
         public int LatestLevelPlayed { get; private set; }
 
-        private Dictionary<int, Dictionary<int, int>> _levelStreaks;
+        private Dictionary<int, Dictionary<int, int>> _dailyLevelStreaks; // key1: gameday.day, key2: level, value: streak
 
         #region Lifecycle
         public void OnInit()
         {
-            _levelStreaks = new Dictionary<int, Dictionary<int, int>>();
+            _dailyLevelStreaks = new Dictionary<int, Dictionary<int, int>>();
 
             InitLevel();
 
             var latestLevelPlayedKey = GetLatestLevelPlayedKey();
-            if (PlayerPrefs.HasKey(latestLevelPlayedKey))
+            if (PlayerPrefsUtil.HasKey(latestLevelPlayedKey))
             {
-                LatestLevelPlayed = PlayerPrefs.GetInt(latestLevelPlayedKey);
+                LatestLevelPlayed = PlayerPrefsUtil.GetInt(latestLevelPlayedKey);
             }
             else
             {
                 LatestLevelPlayed = 0;
             }
 
-            Logger.LogError($"LevelManager.OnInit - LatestLevelPlayed: {LatestLevelPlayed} | _levelStreaks: {string.Join(",", _levelStreaks)}");
-
             SettingManager.OnDisplayNameUpdated += OnDisplayNameUpdated;
         }
 
         public void OnDispose()
         {
-            _levelStreaks.Clear();
-            _levelStreaks = null;
+            _dailyLevelStreaks.Clear();
+            _dailyLevelStreaks = null;
 
             SettingManager.OnDisplayNameUpdated -= OnDisplayNameUpdated;
         }
@@ -80,58 +77,85 @@ namespace com.hive.projectr
 
         private void InitLevel()
         {
-            _levelStreaks.Clear();
+            _dailyLevelStreaks.Clear();
 
             CurrentLevel = CoreGameLevelConfig.MinLevel;
 
-            var key = GetLevelStreaksKey();
-
-            if (PlayerPrefs.HasKey(key))
+            try
             {
-                var json = PlayerPrefs.GetString(key);
-                var playedDaysStorage = JsonConvert.DeserializeObject<LevelStreaks>(json);
-                if (playedDaysStorage != null)
+                var key = GetLevelStreaksKey();
+
+                if (PlayerPrefsUtil.HasKey(key))
                 {
-                    var dict = playedDaysStorage.dict;
-                    var levels = new List<int>(dict.Keys);
-                    levels.Sort();
-
-                    var maxLevel = CoreGameLevelConfig.MinLevel;
-                    var maxLevelStreak = 0;
-
-                    foreach (var day in dict.Keys)
+                    var json = PlayerPrefsUtil.GetString(key);
+                    var playedDaysStorage = JsonConvert.DeserializeObject<LevelStreaks>(json);
+                    if (playedDaysStorage != null)
                     {
-                        _levelStreaks[day] = new Dictionary<int, int>();
+                        var dict = playedDaysStorage.dict;
+                        var levels = new List<int>(dict.Keys);
+                        levels.Sort();
 
-                        var levelDict = dict[day];
-                        foreach (var level in levelDict.Keys)
+                        var maxLevel = CoreGameLevelConfig.MinLevel;
+                        var maxLevelStreak = 0;
+
+                        var currentGameDay = TimeManager.Instance.GetCurrentGameDay();
+
+                        foreach (var day in dict.Keys)
                         {
-                            var streak = levelDict[level];
-                            _levelStreaks[day][level] = streak;
-
-                            if (streak > 0 && level > maxLevel)
+                            if (currentGameDay.day == day)
                             {
-                                maxLevel = level;
-                                maxLevelStreak = streak;
+                                _dailyLevelStreaks[day] = new Dictionary<int, int>();
+                            }
+
+                            var levelDict = dict[day];
+                            foreach (var level in levelDict.Keys)
+                            {
+                                var streak = levelDict[level];
+
+                                if (currentGameDay.day == day)
+                                {
+                                    _dailyLevelStreaks[day][level] = streak;
+                                }
+
+                                if (streak > 0 && level > maxLevel)
+                                {
+                                    maxLevel = level;
+                                    maxLevelStreak = streak;
+                                }
                             }
                         }
-                    }
 
-                    var requiredStreakToPass = CoreGameLevelConfig.GetLevelData(maxLevel).RequiredDailySuccessToPass;
-                    var isPassed = maxLevelStreak >= requiredStreakToPass;
+                        var requiredStreakToPass = CoreGameLevelConfig.GetLevelData(maxLevel).RequiredDailySuccessToPass;
+                        var isLevelPassed = maxLevelStreak >= requiredStreakToPass;
 
-                    if (!isPassed)
-                    {
-                        CurrentLevel = maxLevel;
-                    }
-                    else
-                    {
-                        CurrentLevel = Mathf.Max(maxLevel + 1, CoreGameLevelConfig.MaxLevel);
+                        if (!isLevelPassed)
+                        {
+                            CurrentLevel = maxLevel;
+                        }
+                        else
+                        {
+                            CurrentLevel = Mathf.Min(maxLevel + 1, CoreGameLevelConfig.MaxLevel);
+                        }
                     }
                 }
             }
+            catch (Exception e)
+            {
+                Logger.LogException(e);
+            }
 
-            Logger.LogError($"InitLevel - CurrentLevel: {CurrentLevel}");
+            Logger.Log($"LevelManager::InitLevel - CurrentLevel: {CurrentLevel}");
+        }
+
+        public int GetLevelWinningStreak(int level)
+        {
+            if (_dailyLevelStreaks.TryGetValue(TimeManager.Instance.GetCurrentGameDay().day, out var levelDict) &&
+                levelDict.TryGetValue(level, out var streak))
+            {
+                return streak;
+            }
+
+            return 0;
         }
 
         public void OnLevelStarted(int level)
@@ -139,9 +163,10 @@ namespace com.hive.projectr
             if (LatestLevelPlayed != level)
             {
                 var currentGameDay = TimeManager.Instance.GetCurrentGameDay().day;
-                if (!_levelStreaks.TryGetValue(currentGameDay, out var levelDict))
+                if (!_dailyLevelStreaks.TryGetValue(currentGameDay, out var levelDict))
                 {
-                    _levelStreaks[currentGameDay] = new Dictionary<int, int>();
+                    levelDict = new Dictionary<int, int>();
+                    _dailyLevelStreaks[currentGameDay] = levelDict;
                 }
 
                 levelDict[level] = 0;
@@ -151,7 +176,7 @@ namespace com.hive.projectr
 
             if (!SettingManager.Instance.IsDefaultUser)
             {
-                PlayerPrefs.SetInt(GetLatestLevelPlayedKey(), LatestLevelPlayed);
+                PlayerPrefsUtil.TrySetInt(GetLatestLevelPlayedKey(), LatestLevelPlayed);
             }
         }
 
@@ -165,43 +190,43 @@ namespace com.hive.projectr
 
             // save latest level result
             LatestLevelPlayed = level;
-            PlayerPrefs.SetInt(GetLatestLevelPlayedKey(), LatestLevelPlayed);
+            PlayerPrefsUtil.TrySetInt(GetLatestLevelPlayedKey(), LatestLevelPlayed);
 
             var currentGameDay = TimeManager.Instance.GetCurrentGameDay().day;
-            if (!_levelStreaks.TryGetValue(currentGameDay, out var levelDict))
+            if (!_dailyLevelStreaks.TryGetValue(currentGameDay, out var levelDict))
             {
-                _levelStreaks[currentGameDay] = new Dictionary<int, int>();
+                levelDict = new Dictionary<int, int>();
+                _dailyLevelStreaks[currentGameDay] = levelDict;
             }
 
-            ++_levelStreaks[LatestLevelPlayed];
-
-            var levelConfigData = CoreGameLevelConfig.GetLevelData(level);
-            if (_levelStreaks[LatestLevelPlayed] >= levelConfigData.RequiredDailySuccessToPass)
+            if (!levelDict.ContainsKey(level))
             {
-                CurrentLevel = Mathf.Max(level + 1, CoreGameLevelConfig.MaxLevel);
+                levelDict[level] = 0;
             }
 
-            var json = JsonConvert.SerializeObject(new LevelStreaks() { dict = _levelStreaks });
+            if (isPassed)
+            {
+                ++levelDict[level];
+
+                var levelConfigData = CoreGameLevelConfig.GetLevelData(level);
+                if (levelDict[level] >= levelConfigData.RequiredDailySuccessToPass)
+                {
+                    CurrentLevel = Mathf.Min(level + 1, CoreGameLevelConfig.MaxLevel);
+                }
+            }
+            else
+            {
+                levelDict.Remove(level);
+            }
+
+            var levelStreaks = new LevelStreaks() { dict = _dailyLevelStreaks };
+            var json = JsonConvert.SerializeObject(levelStreaks);
             PlayerPrefs.SetString(GetLevelStreaksKey(), json);
-
-            Logger.LogError($"Save Latest Level Passed Streak - _levelStreaks: {string.Join(",", _levelStreaks)} | json: {json}");
         }
 
         private void OnDisplayNameUpdated()
         {
             InitLevel();
-        }
-
-        private void UpdateLevelStreak(int level, int streak)
-        {
-            var currentGameDay = TimeManager.Instance.GetCurrentGameDay().day;
-            if (!_levelStreaks.TryGetValue(currentGameDay, out var levelDict))
-            {
-                levelDict = new Dictionary<int, int>();
-                _levelStreaks[currentGameDay] = levelDict;
-            }
-
-            levelDict[level] = streak;
         }
     }
 }

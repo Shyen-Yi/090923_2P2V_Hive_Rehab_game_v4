@@ -171,8 +171,8 @@ namespace com.hive.projectr
                 Start();
             }
 
+            SoundManager.Instance.StopAllSound();
             SoundManager.Instance.PlaySound(SoundType.CalibrationBackground);
-            SoundManager.Instance.StopSound(SoundType.MenuBackground);
 
             InputManager.Instance.HideCursor();
         }

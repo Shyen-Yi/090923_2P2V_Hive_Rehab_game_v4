@@ -219,7 +219,6 @@ namespace com.hive.projectr
             private set
             {
                 _dailyAttempt = value;
-                Logger.LogError($"Update Daily Attempt: {DailyAttempt}");
             }
         }
         private int _dailyAttempt;
@@ -651,8 +650,6 @@ namespace com.hive.projectr
             var dailyAttempt = DailyAttempt;
             var dailyMaxAttempt = GameGeneralConfig.GetData().DailyMaxAttempt;
             var isDailyMaxAttemptReached = dailyAttempt >= dailyMaxAttempt;
-
-            Logger.LogError($"IsDailyMaxAttemptReached - DailyAttempt: {DailyAttempt} | dailyMaxAttempt: {dailyMaxAttempt}");
 
             return isDailyMaxAttemptReached;
         }
