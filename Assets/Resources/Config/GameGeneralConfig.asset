@@ -13,10 +13,8 @@ MonoBehaviour:
   m_Name: GameGeneralConfig
   m_EditorClassIdentifier: 
   _items:
-  - defaultTotal: 100
+  - defaultBlock: 100
     defaultGoal: 80
-    minGoal: 50
-    maxGoal: 100
     coreGameTransitionSec: 2
     calibrationTransitionSec: 5
     defaultUserName: 
