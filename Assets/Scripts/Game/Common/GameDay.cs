@@ -18,7 +18,7 @@ namespace com.hive.projectr
         {
             var dayOfYear = day % YearScale;
             var year = day / YearScale;
-            var dateTime = new DateTime(year, 0, 0).AddDays(dayOfYear);
+            var dateTime = new DateTime(year, 1, 1).AddDays(dayOfYear);
             return dateTime;
         }
 

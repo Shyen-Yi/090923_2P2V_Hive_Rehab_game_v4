@@ -99,7 +99,7 @@ namespace com.hive.projectr
                     new Vector3(Screen.width, Screen.height),
                     new Vector3(Screen.width / 2, Screen.height / 2),
                     1,
-                    SettingManager.Instance.Level));
+                    LevelManager.Instance.CurrentLevel));
             }
         }
 

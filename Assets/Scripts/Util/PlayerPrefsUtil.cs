@@ -6,6 +6,16 @@ namespace com.hive.projectr
 {
     public static class PlayerPrefsUtil
     {
+        public static string GetUserSpecificKey(string key)
+        {
+            if (SettingManager.Instance.IsDefaultUser)
+            {
+                return key;
+            }
+
+            return $"{SettingManager.Instance.DisplayName}_{key}";
+        }
+
         public static bool IsValidKey(string key)
         {
             return !string.IsNullOrEmpty(key);

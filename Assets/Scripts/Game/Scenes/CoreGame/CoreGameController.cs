@@ -441,7 +441,7 @@ namespace com.hive.projectr
 
             UpdateGameProgress(false);
 
-            if (_endedAsteroidCount >= _levelConfigData.MaxAsteroidCount)
+            if (_endedAsteroidCount >= SettingManager.Instance.LevelTotal)
             {
                 OnLevelEnded();
             }
@@ -567,7 +567,7 @@ namespace com.hive.projectr
                     ++collectedCount;
             }
 
-            var isPassed = collectedCount >= _levelConfigData.NumOfAsteroidCollectedToPass;
+            var isPassed = collectedCount >= SettingManager.Instance.LevelGoal;
 
             LevelManager.Instance.OnLevelCompleted(_levelConfigData.Level, isPassed);
             StatsManager.Instance.OnLevelCompleted(new LevelStats(_levelConfigData.Level, collectedCount));
@@ -623,7 +623,7 @@ namespace com.hive.projectr
 
         private void UpdateGameProgress(bool isInstant)
         {
-            var fillAmount = Mathf.Clamp01((float)_endedAsteroidCount / _levelConfigData.MaxAsteroidCount);
+            var fillAmount = Mathf.Clamp01((float)_endedAsteroidCount / SettingManager.Instance.LevelTotal);
             fillAmount = Mathf.Clamp01(fillAmount);
 
             _targetGameProgressFill = fillAmount;

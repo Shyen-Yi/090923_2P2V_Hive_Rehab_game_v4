@@ -490,7 +490,7 @@ namespace com.hive.projectr
                 topRightScreenPos,
                 centerScreenPos,
                 scaleFactor, 
-                SettingManager.Instance.Level)), ()=> 
+                LevelManager.Instance.CurrentLevel)), ()=> 
             {
                 GameSceneManager.Instance.HideScene(SceneName);
             });

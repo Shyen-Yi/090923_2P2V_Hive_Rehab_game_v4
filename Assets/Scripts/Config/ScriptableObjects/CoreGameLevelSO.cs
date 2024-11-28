@@ -26,8 +26,6 @@ namespace com.hive.projectr
 		[SerializeField] private Single asteroidSpawnGapSec;
 		[SerializeField] private Single vacuumSize;
 		[SerializeField] private Single spacecraftSize;
-		[SerializeField] private Int32 maxAsteroidCount;
-		[SerializeField] private Int32 numOfAsteroidCollectedToPass;
 
 		public Int32 Level => level;
 		public Int32 RequiredDailyWinningStreakToPass => requiredDailyWinningStreakToPass;
@@ -38,7 +36,5 @@ namespace com.hive.projectr
 		public Single AsteroidSpawnGapSec => asteroidSpawnGapSec;
 		public Single VacuumSize => vacuumSize;
 		public Single SpacecraftSize => spacecraftSize;
-		public Int32 MaxAsteroidCount => maxAsteroidCount;
-		public Int32 NumOfAsteroidCollectedToPass => numOfAsteroidCollectedToPass;
     }
 }

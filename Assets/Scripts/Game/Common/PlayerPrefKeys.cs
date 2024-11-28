@@ -12,8 +12,8 @@ namespace com.hive.projectr
 
         // setting
         public static readonly string DisplayName = "DisplayName";
-        public static readonly string Level = "Level";
-        public static readonly string DailyBlock = "DailyBlock";
+        public static readonly string LevelTotal = "LevelTotal";
+        public static readonly string LevelGoal = "LevelGoal";
 
         // stats
         public static readonly string PlayedDays = "PlayedDays";

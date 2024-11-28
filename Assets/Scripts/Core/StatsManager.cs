@@ -63,33 +63,6 @@ namespace com.hive.projectr
             InitPerformance();
         }
 
-        private string GetPlayedDaysKey()
-        {
-            var key = SettingManager.Instance.IsDefaultUser
-                ? ""
-                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.PlayedDays}";
-
-            return key;
-        }
-
-        private string GetLastPerformanceKey()
-        {
-            var key = SettingManager.Instance.IsDefaultUser
-                ? ""
-                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.LastPerformance}";
-
-            return key;
-        }
-
-        private string GetLastPerformanceDescKey()
-        {
-            var key = SettingManager.Instance.IsDefaultUser
-                ? ""
-                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.LastPerformanceDesc}";
-
-            return key;
-        }
-
         private void InitPlayedDays()
         {
             if (_playedDays == null)
@@ -99,7 +72,7 @@ namespace com.hive.projectr
 
             try
             {
-                var key = GetPlayedDaysKey();
+                var key = PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.PlayedDays);
 
                 if (PlayerPrefsUtil.HasKey(key))
                 {
@@ -185,8 +158,8 @@ namespace com.hive.projectr
 
         private void InitPerformance()
         {
-            var lastPerformanceKey = GetLastPerformanceKey();
-            var lastPerformanceDescKey = GetLastPerformanceDescKey();
+            var lastPerformanceKey = PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LastPerformance);
+            var lastPerformanceDescKey = PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LastPerformanceDesc);
 
             if (PlayerPrefsUtil.HasKey(lastPerformanceKey) &&
                 PlayerPrefsUtil.HasKey(lastPerformanceDescKey))
@@ -243,8 +216,8 @@ namespace com.hive.projectr
                         break;
                 }
 
-                PlayerPrefsUtil.TrySetInt(GetLastPerformanceKey(), (int)PerformanceType);
-                PlayerPrefsUtil.TrySetString(GetLastPerformanceDescKey(), PerformanceDesc);
+                PlayerPrefsUtil.TrySetInt(PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LastPerformance), (int)PerformanceType);
+                PlayerPrefsUtil.TrySetString(PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LastPerformanceDesc), PerformanceDesc);
             }
             else
             {

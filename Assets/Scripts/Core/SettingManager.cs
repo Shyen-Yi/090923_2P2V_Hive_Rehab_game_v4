@@ -17,8 +17,8 @@ namespace com.hive.projectr
                 IsDefaultUser = _displayName == GameGeneralConfig.GetData().DefaultUserName;
             }
         }
-        public int Level { get; private set; }
-        public int DailyBlock { get; private set; }
+        public int LevelTotal { get; private set; }
+        public int LevelGoal { get; private set; }
 
         private string _displayName;
 
@@ -32,20 +32,19 @@ namespace com.hive.projectr
             var displayName = PlayerPrefsUtil.HasKey(PlayerPrefKeys.DisplayName) ? PlayerPrefsUtil.GetString(PlayerPrefKeys.DisplayName) : GameGeneralConfig.GetData().DefaultUserName;
             UpdateDisplayName(displayName, false);
 
-            var level = PlayerPrefsUtil.HasKey(PlayerPrefKeys.Level) ? PlayerPrefsUtil.GetInt(PlayerPrefKeys.Level) : CoreGameLevelConfig.MinLevel;
-            UpdateLevel(level, false);
+            var levelTotal = PlayerPrefsUtil.HasKey(PlayerPrefKeys.LevelTotal) ? PlayerPrefsUtil.GetInt(PlayerPrefKeys.LevelTotal) : GameGeneralConfig.GetData().DefaultBlock;
+            UpdateLevelTotal(levelTotal, false);
 
-            var dailyBlock = PlayerPrefsUtil.HasKey(PlayerPrefKeys.DailyBlock) ? PlayerPrefsUtil.GetInt(PlayerPrefKeys.DailyBlock) : GameGeneralConfig.GetData().DefaultGoal;
-            UpdateDailyBlock(dailyBlock, false);
+            var levelGoal = PlayerPrefsUtil.HasKey(PlayerPrefKeys.LevelGoal) ? PlayerPrefsUtil.GetInt(PlayerPrefKeys.LevelGoal) : GameGeneralConfig.GetData().DefaultGoal;
+            UpdateLevelGoal(levelGoal, false);
 
-            Logger.Log($"Setting loaded. Username: {DisplayName} | Level: {Level} | DailyBlock: {DailyBlock}");
+            Logger.Log($"Setting loaded. Username: {DisplayName} | LevelTotal: {LevelTotal} | LevelGoal: {LevelGoal}");
         }
 
         public void OnDispose()
         {
             SaveDisplayName();
-            SaveLevel();
-            SaveDailyBlock();
+            SaveLevelTotal();
         }
         #endregion
 
@@ -56,19 +55,19 @@ namespace com.hive.projectr
                 PlayerPrefsUtil.TryDeleteKey(PlayerPrefKeys.DisplayName);
             }
 
-            if (PlayerPrefsUtil.HasKey(PlayerPrefKeys.Level))
+            if (PlayerPrefsUtil.HasKey(PlayerPrefKeys.LevelTotal))
             {
-                PlayerPrefsUtil.TryDeleteKey(PlayerPrefKeys.Level);
+                PlayerPrefsUtil.TryDeleteKey(PlayerPrefKeys.LevelTotal);
             }
 
-            if (PlayerPrefsUtil.HasKey(PlayerPrefKeys.DailyBlock))
+            if (PlayerPrefsUtil.HasKey(PlayerPrefKeys.LevelGoal))
             {
-                PlayerPrefsUtil.TryDeleteKey(PlayerPrefKeys.DailyBlock);
+                PlayerPrefsUtil.TryDeleteKey(PlayerPrefKeys.LevelGoal);
             }
 
             DisplayName = GameGeneralConfig.GetData().DefaultUserName;
-            Level = CoreGameLevelConfig.MinLevel;
-            DailyBlock = GameGeneralConfig.GetData().DefaultGoal;
+            LevelTotal = GameGeneralConfig.GetData().DefaultBlock;
+            LevelGoal = GameGeneralConfig.GetData().DefaultGoal;
         }
 
         private void SaveDisplayName()
@@ -80,21 +79,21 @@ namespace com.hive.projectr
             }
         }
 
-        private void SaveLevel()
+        private void SaveLevelTotal()
         {
             if (!IsDefaultUser)
             {
-                PlayerPrefsUtil.TrySetInt(PlayerPrefKeys.Level, Level);
-                Logger.Log($"Level {Level} saved.");
+                PlayerPrefsUtil.TrySetInt(PlayerPrefKeys.LevelTotal, LevelTotal);
+                Logger.Log($"LevelTotal {LevelTotal} saved.");
             }
         }
 
-        private void SaveDailyBlock()
+        private void SaveLevelGoal()
         {
             if (!IsDefaultUser)
             {
-                PlayerPrefsUtil.TrySetInt(PlayerPrefKeys.DailyBlock, DailyBlock);
-                Logger.Log($"DailyBlock {DailyBlock} saved.");
+                PlayerPrefsUtil.TrySetInt(PlayerPrefKeys.LevelGoal, LevelGoal);
+                Logger.Log($"LevelGoal {LevelGoal} saved.");
             }
         }
 
@@ -110,23 +109,23 @@ namespace com.hive.projectr
             OnDisplayNameUpdated?.Invoke();
         }
 
-        public void UpdateLevel(int level, bool toSave)
+        public void UpdateLevelTotal(int levelTotal, bool toSave)
         {
-            Level = level;
+            LevelTotal = levelTotal;
 
             if (toSave)
             {
-                SaveLevel();
+                SaveLevelTotal();
             }
         }
 
-        public void UpdateDailyBlock(int block, bool toSave)
+        public void UpdateLevelGoal(int levelGoal, bool toSave)
         {
-            DailyBlock = block;
+            LevelGoal = levelGoal;
 
             if (toSave)
             {
-                SaveDailyBlock();
+                SaveLevelGoal();
             }
         }
     }

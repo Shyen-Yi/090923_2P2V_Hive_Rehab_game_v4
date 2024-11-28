@@ -240,8 +240,8 @@ namespace com.hive.projectr
         private static readonly string DayFolderTemplate = "{0:00}-{1:00}-{2:0000}_{3}"; // 03-13-2024_Mark
         private static readonly string SessionFolderTemplate = "Session#{0}_{1:00}-{2:00}"; // Session#3_14-25
         private static readonly string SessionNumPrefix = "Session#";
-        private static readonly string CoordinatePosFileTemplate = "{0}_{1}-{2}-{3}_{4}Block_Level{5}_CoordinatePOS"; // Mark_03-13-2024_100Block_Level1_CoordinatePOS
-        private static readonly string CoordinatesFileTemplate = "{0}_{1}-{2}-{3}_{4}Block_Level{5}_Coordinates"; // Mark_03-13-2024_100Block_Level1_Coordinates
+        private static readonly string CoordinatePosFileTemplate = "{0}_{1}-{2}-{3}_{4}Block_{5}Goal_Level{6}_CoordinatePOS"; // Mark_03-13-2024_100Block_80Goal_Level1_CoordinatePOS
+        private static readonly string CoordinatesFileTemplate = "{0}_{1}-{2}-{3}_{4}Block_{5}Goal_Level{6}_Coordinates"; // Mark_03-13-2024_100Block_80Goal_Level1_Coordinates
         private static readonly string SummaryFileTemplate = "{0}_Summary"; // Mark_Summary
 
         #region Lifecycle
@@ -417,14 +417,14 @@ namespace com.hive.projectr
             return Path.Combine(dayFolderPath, GetSessionFolderName(sessionNum, time));
         }
 
-        private string GetCoordinatePosFileName(DateTime time, string username, int block, int level)
+        private string GetCoordinatePosFileName(DateTime time, string username, int block, int goal, int level)
         {
-            return string.Format(CoordinatePosFileTemplate, username, time.Month, time.Day, time.Year, block, level);
+            return string.Format(CoordinatePosFileTemplate, username, time.Month, time.Day, time.Year, block, goal, level);
         }
 
-        private string GetCoordinatePosFilePath(string sessionFolderPath, DateTime time, string username, int block, int level)
+        private string GetCoordinatePosFilePath(string sessionFolderPath, DateTime time, string username, int block, int goal, int level)
         {
-            return Path.Combine(sessionFolderPath, $"{GetCoordinatePosFileName(time, username, block, level)}.csv");
+            return Path.Combine(sessionFolderPath, $"{GetCoordinatePosFileName(time, username, block, goal, level)}.csv");
         }
 
         private string GetCoordinatesFileName(DateTime time, string username, int block, int level)
@@ -702,8 +702,8 @@ namespace com.hive.projectr
 
                 Directory.CreateDirectory(_sessionFolderPath); // does nothing when already exists
 
-                _coordinatePosFilePath = GetCoordinatePosFilePath(_sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
-                _coordinatesFilePath = GetCoordinatesFilePath(_sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.DailyBlock, SettingManager.Instance.Level);
+                _coordinatePosFilePath = GetCoordinatePosFilePath(_sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.LevelTotal, SettingManager.Instance.LevelGoal, LevelManager.Instance.CurrentLevel);
+                _coordinatesFilePath = GetCoordinatesFilePath(_sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.LevelTotal, LevelManager.Instance.CurrentLevel);
                 _summaryFilePath = GetSummaryFilePath(_sessionFolderPath, SettingManager.Instance.DisplayName);
                 
                 // read session info

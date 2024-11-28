@@ -11,11 +11,12 @@ namespace com.hive.projectr
         private GeneralWidgetConfig _config;
 
         #region Fields
-        private int _level = -1;
         private int _year = -1;
         private int _month = -1;
         private int _goal = -1;
         private string _goalInputCache = string.Empty;
+        private int _total = -1;
+        private string _totalInputCache = string.Empty;
         private string _name = string.Empty;
         #endregion
 
@@ -23,31 +24,27 @@ namespace com.hive.projectr
         private enum ExtraTMP
         {
             CalendarDate = 0,
-            Level = 1,
         }
 
         private enum ExtraBtn
         {
-            LevelUp = 0,
-            LevelDown = 1,
-            Reset = 2,
+            Reset = 0,
         }
 
         private enum ExtraObj
         {
             NameInputField = 0,
             GoalInputField = 1,
+            TotalInputField = 2,
         }
 
         private TMP_Text _calendarDateText;
-        private TMP_Text _levelText;
 
-        private HiveButton _levelUpButton;
-        private HiveButton _levelDownButton;
         private HiveButton _resetButton;
 
         private TMP_InputField _nameInputField;
         private TMP_InputField _goalInputField;
+        private TMP_InputField _totalInputField;
         #endregion
 
         #region Lifecycle
@@ -65,14 +62,12 @@ namespace com.hive.projectr
         private void InitExtra()
         {
             _calendarDateText = _config.ExtraTextMeshPros[(int)ExtraTMP.CalendarDate];
-            _levelText = _config.ExtraTextMeshPros[(int)ExtraTMP.Level];
 
-            _levelUpButton = _config.ExtraButtons[(int)ExtraBtn.LevelUp];
-            _levelDownButton = _config.ExtraButtons[(int)ExtraBtn.LevelDown];
             _resetButton = _config.ExtraButtons[(int)ExtraBtn.Reset];
 
             _nameInputField = _config.ExtraObjects[(int)ExtraObj.NameInputField].GetComponent<TMP_InputField>();
             _goalInputField = _config.ExtraObjects[(int)ExtraObj.GoalInputField].GetComponent<TMP_InputField>();
+            _totalInputField = _config.ExtraObjects[(int)ExtraObj.TotalInputField].GetComponent<TMP_InputField>();
         }
 
         public void Show()
@@ -80,8 +75,8 @@ namespace com.hive.projectr
             var year = DateTime.Now.Year;
             var month = DateTime.Now.Month;
             var name = SettingManager.Instance.DisplayName;
-            var level = SettingManager.Instance.Level;
-            var goal = SettingManager.Instance.DailyBlock;
+            var levelGoal = SettingManager.Instance.LevelGoal;
+            var levelTotal = SettingManager.Instance.LevelTotal;
 
             // calendar date
             RefreshCalendarDate(year, month);
@@ -89,11 +84,11 @@ namespace com.hive.projectr
             // name
             RefreshName(name);
 
-            // level
-            RefreshLevel(level);
+            // total
+            RefreshLevelTotal(levelTotal);
 
             // goal
-            RefreshGoal(goal);
+            RefreshLevelGoal(levelGoal);
 
             _config.CanvasGroup.CanvasGroupOn();
         }
@@ -112,24 +107,24 @@ namespace com.hive.projectr
         #region UI Binding
         private void BindActions()
         {
-            _levelUpButton.onClick.AddListener(OnLevelUpButtonClick);
-            _levelDownButton.onClick.AddListener(OnLevelDownButtonClick);
             _resetButton.onClick.AddListener(OnResetButtonClick);
 
             _nameInputField.onValueChanged.AddListener(OnNameChanged);
             _goalInputField.onSelect.AddListener(OnGoalSelect);
             _goalInputField.onEndEdit.AddListener(OnGoalEndEdit);
+            _totalInputField.onSelect.AddListener(OnTotalSelect);
+            _totalInputField.onEndEdit.AddListener(OnTotalEndEdit);
         }
 
         private void UnbindActions()
         {
-            _levelUpButton.onClick.RemoveAllListeners();
-            _levelDownButton.onClick.RemoveAllListeners();
             _resetButton.onClick.RemoveAllListeners();
 
             _nameInputField.onValueChanged.RemoveAllListeners();
             _goalInputField.onSelect.RemoveAllListeners();
             _goalInputField.onEndEdit.RemoveAllListeners();
+            _totalInputField.onSelect.RemoveAllListeners();
+            _totalInputField.onEndEdit.RemoveAllListeners();
         }
         #endregion
 
@@ -152,13 +147,13 @@ namespace com.hive.projectr
             _nameInputField.text = _name;
         }
 
-        private void RefreshLevel(int level)
+        private void RefreshLevelTotal(int total)
         {
-            _level = level;
-            _levelText.text = $"{_level}";
+            _total = total;
+            _totalInputField.text = $"{_total}";
         }
 
-        private void RefreshGoal(int goal)
+        private void RefreshLevelGoal(int goal)
         {
             _goal = goal;
             _goalInputField.text = $"{_goal}";
@@ -167,28 +162,12 @@ namespace com.hive.projectr
         public void SaveSettings()
         {
             SettingManager.Instance.UpdateDisplayName(_name, true);
-            SettingManager.Instance.UpdateLevel(_level, true);
-            SettingManager.Instance.UpdateDailyBlock(_goal, true);
+            SettingManager.Instance.UpdateLevelTotal(_total, true);
+            SettingManager.Instance.UpdateLevelGoal(_goal, true);
         }
         #endregion
 
         #region Event
-        private void OnLevelUpButtonClick()
-        {
-            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
-
-            var level = Mathf.Clamp(_level + 1, CoreGameLevelConfig.MinLevel, CoreGameLevelConfig.MaxLevel);
-            RefreshLevel(level);
-        }
-
-        private void OnLevelDownButtonClick()
-        {
-            SoundManager.Instance.PlaySound(SoundType.ButtonClick);
-
-            var level = Mathf.Clamp(_level - 1, CoreGameLevelConfig.MinLevel, CoreGameLevelConfig.MaxLevel);
-            RefreshLevel(level);
-        }
-
         private void OnResetButtonClick()
         {
             SoundManager.Instance.PlaySound(SoundType.ButtonClick);
@@ -209,11 +188,11 @@ namespace com.hive.projectr
 
         private void OnGoalEndEdit(string txt)
         {
-            if (int.TryParse(txt, out var dailyBlock))
+            if (int.TryParse(txt, out var goal))
             {
-                dailyBlock = Mathf.Clamp(dailyBlock, GameGeneralConfig.GetData().MinGoal, GameGeneralConfig.GetData().MaxGoal);
+                goal = Mathf.Clamp(goal, 1, _total);
 
-                RefreshGoal(dailyBlock);
+                RefreshLevelGoal(goal);
             }
             else
             {
@@ -221,6 +200,32 @@ namespace com.hive.projectr
             }
 
             _goalInputCache = null;
+        }
+
+        private void OnTotalSelect(string txt)
+        {
+            _totalInputCache = txt;
+        }
+
+        private void OnTotalEndEdit(string txt)
+        {
+            if (int.TryParse(txt, out var total))
+            {
+                total = Mathf.Max(total, 1);
+
+                if (total != _total || _goal > total)
+                {
+                    RefreshLevelGoal(Mathf.Max(1, total * GameGeneralConfig.GetData().DefaultGoal / GameGeneralConfig.GetData().DefaultBlock));
+                }
+
+                RefreshLevelTotal(total);
+            }
+            else
+            {
+                _totalInputField.text = _totalInputCache;
+            }
+
+            _totalInputCache = null;
         }
         #endregion
     }

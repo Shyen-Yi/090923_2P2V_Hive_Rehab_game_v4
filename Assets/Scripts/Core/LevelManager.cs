@@ -35,7 +35,7 @@ namespace com.hive.projectr
 
             InitLevel();
 
-            var latestLevelPlayedKey = GetLatestLevelPlayedKey();
+            var latestLevelPlayedKey = PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LatestLevelPlayed);
             if (PlayerPrefsUtil.HasKey(latestLevelPlayedKey))
             {
                 LatestLevelPlayed = PlayerPrefsUtil.GetInt(latestLevelPlayedKey);
@@ -57,24 +57,6 @@ namespace com.hive.projectr
         }
         #endregion
 
-        private string GetLevelStreaksKey()
-        {
-            var key = SettingManager.Instance.IsDefaultUser
-                ? ""
-                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.LevelStreaks}";
-
-            return key;
-        }
-
-        private string GetLatestLevelPlayedKey()
-        {
-            var key = SettingManager.Instance.IsDefaultUser
-                ? ""
-                : $"{SettingManager.Instance.DisplayName}_{PlayerPrefKeys.LatestLevelPlayed}";
-
-            return key;
-        }
-
         private void InitLevel()
         {
             _dailyLevelStreaks.Clear();
@@ -83,7 +65,7 @@ namespace com.hive.projectr
 
             try
             {
-                var key = GetLevelStreaksKey();
+                var key = PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LevelStreaks);
 
                 if (PlayerPrefsUtil.HasKey(key))
                 {
@@ -176,7 +158,7 @@ namespace com.hive.projectr
 
             if (!SettingManager.Instance.IsDefaultUser)
             {
-                PlayerPrefsUtil.TrySetInt(GetLatestLevelPlayedKey(), LatestLevelPlayed);
+                PlayerPrefsUtil.TrySetInt(PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LatestLevelPlayed), LatestLevelPlayed);
             }
         }
 
@@ -190,7 +172,7 @@ namespace com.hive.projectr
 
             // save latest level result
             LatestLevelPlayed = level;
-            PlayerPrefsUtil.TrySetInt(GetLatestLevelPlayedKey(), LatestLevelPlayed);
+            PlayerPrefsUtil.TrySetInt(PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LatestLevelPlayed), LatestLevelPlayed);
 
             var currentGameDay = TimeManager.Instance.GetCurrentGameDay().day;
             if (!_dailyLevelStreaks.TryGetValue(currentGameDay, out var levelDict))
@@ -221,7 +203,7 @@ namespace com.hive.projectr
 
             var levelStreaks = new LevelStreaks() { dict = _dailyLevelStreaks };
             var json = JsonConvert.SerializeObject(levelStreaks);
-            PlayerPrefs.SetString(GetLevelStreaksKey(), json);
+            PlayerPrefs.SetString(PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LevelStreaks), json);
         }
 
         private void OnDisplayNameUpdated()

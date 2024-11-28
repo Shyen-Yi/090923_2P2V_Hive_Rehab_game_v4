@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: GameGeneralConfig
   m_EditorClassIdentifier: 
   _items:
-  - defaultGoal: 80
+  - defaultTotal: 100
+    defaultGoal: 80
     minGoal: 50
     maxGoal: 100
     coreGameTransitionSec: 2
     calibrationTransitionSec: 5
-    passingStreakToNextLevel: 1
     defaultUserName: 
     adminUsername: Hive
     adminPassword: Hive
