@@ -427,14 +427,14 @@ namespace com.hive.projectr
             return Path.Combine(sessionFolderPath, $"{GetCoordinatePosFileName(time, username, block, goal, level)}.csv");
         }
 
-        private string GetCoordinatesFileName(DateTime time, string username, int block, int level)
+        private string GetCoordinatesFileName(DateTime time, string username, int block, int goal, int level)
         {
-            return string.Format(CoordinatesFileTemplate, username, time.Month, time.Day, time.Year, block, level);
+            return string.Format(CoordinatesFileTemplate, username, time.Month, time.Day, time.Year, block, goal, level);
         }
 
-        private string GetCoordinatesFilePath(string sessionFolderPath, DateTime time, string username, int block, int level)
+        private string GetCoordinatesFilePath(string sessionFolderPath, DateTime time, string username, int block, int goal, int level)
         {
-            return Path.Combine(sessionFolderPath, $"{GetCoordinatesFileName(time, username, block, level)}.csv");
+            return Path.Combine(sessionFolderPath, $"{GetCoordinatesFileName(time, username, block, goal, level)}.csv");
         }
 
         private string GetSummaryFileName(string username)
@@ -703,7 +703,7 @@ namespace com.hive.projectr
                 Directory.CreateDirectory(_sessionFolderPath); // does nothing when already exists
 
                 _coordinatePosFilePath = GetCoordinatePosFilePath(_sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.LevelTotal, SettingManager.Instance.LevelGoal, LevelManager.Instance.CurrentLevel);
-                _coordinatesFilePath = GetCoordinatesFilePath(_sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.LevelTotal, LevelManager.Instance.CurrentLevel);
+                _coordinatesFilePath = GetCoordinatesFilePath(_sessionFolderPath, logTime, SettingManager.Instance.DisplayName, SettingManager.Instance.LevelTotal, SettingManager.Instance.LevelGoal, LevelManager.Instance.CurrentLevel);
                 _summaryFilePath = GetSummaryFilePath(_sessionFolderPath, SettingManager.Instance.DisplayName);
                 
                 // read session info
