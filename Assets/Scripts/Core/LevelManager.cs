@@ -26,7 +26,7 @@ namespace com.hive.projectr
 
         public int LatestLevelPlayed { get; private set; }
 
-        private Dictionary<int, Dictionary<int, int>> _dailyLevelStreaks; // key1: gameday.day, key2: level, value: streak
+        private Dictionary<int, Dictionary<int, int>> _dailyLevelStreaks; // key1: gameday.day, key2: level, value: streak // only for TODAY
 
         #region Lifecycle
         public void OnInit()
@@ -99,7 +99,7 @@ namespace com.hive.projectr
                                     _dailyLevelStreaks[day][level] = streak;
                                 }
 
-                                if (streak > 0 && level > maxLevel)
+                                if (streak > 0 && level >= maxLevel)
                                 {
                                     maxLevel = level;
                                     maxLevelStreak = streak;
