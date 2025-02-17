@@ -23,6 +23,7 @@ namespace com.hive.projectr
 		[SerializeField] private Single gameProgressFillSec;
 		[SerializeField] private Single asteroidWarningSec;
 		[SerializeField] private Single arrowDistanceFromScreenEdge;
+		[SerializeField] private Boolean randomizeVacuumPositionAlongScreen;
 
 		public Single AsteroidSpinRoundPerSec => asteroidSpinRoundPerSec;
 		public Int32 StartCountdownSec => startCountdownSec;
@@ -30,5 +31,6 @@ namespace com.hive.projectr
 		public Single GameProgressFillSec => gameProgressFillSec;
 		public Single AsteroidWarningSec => asteroidWarningSec;
 		public Single ArrowDistanceFromScreenEdge => arrowDistanceFromScreenEdge;
+		public Boolean RandomizeVacuumPositionAlongScreen => randomizeVacuumPositionAlongScreen;
     }
 }

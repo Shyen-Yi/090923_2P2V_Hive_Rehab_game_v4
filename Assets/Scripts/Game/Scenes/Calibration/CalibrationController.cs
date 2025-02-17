@@ -170,6 +170,10 @@ namespace com.hive.projectr
                 Reset();
                 Start();
             }
+            else
+            {
+                Resume();
+            }
 
             SoundManager.Instance.StopAllSound();
             SoundManager.Instance.PlaySound(SoundType.CalibrationBackground);
@@ -254,10 +258,7 @@ namespace com.hive.projectr
 
             InputManager.Instance.CenterCursor();
 
-            GameSceneManager.Instance.ShowScene(SceneNames.Pause, new PauseData(() =>
-            {
-                Resume();
-            }));
+            GameSceneManager.Instance.ShowScene(SceneNames.Pause);
         }
 
         private void UpdateStatus(CalibrationStatus status)

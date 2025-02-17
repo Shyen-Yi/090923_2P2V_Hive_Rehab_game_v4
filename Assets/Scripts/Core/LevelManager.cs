@@ -140,6 +140,28 @@ namespace com.hive.projectr
             return 0;
         }
 
+        public void OverrideCurrentLevel(int currentLevel)
+        {
+            CurrentLevel = currentLevel;
+
+            // remove following level streaks
+            if (_dailyLevelStreaks.TryGetValue(TimeManager.Instance.GetCurrentGameDay().day, out var levelDict))
+            {
+                var levels = new List<int>(levelDict.Keys);
+                levels.Sort();
+                for (var i = levels.Count - 1; i >= 0; --i)
+                {
+                    var level = levels[i];
+                    if (level < CurrentLevel)
+                    {
+                        break;
+                    }
+
+                    levelDict.Remove(level);
+                }
+            }
+        }
+
         public void OnLevelStarted(int level)
         {
             if (LatestLevelPlayed != level)

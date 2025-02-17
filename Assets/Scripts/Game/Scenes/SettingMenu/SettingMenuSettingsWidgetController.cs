@@ -17,6 +17,8 @@ namespace com.hive.projectr
         private string _goalInputCache = string.Empty;
         private int _total = -1;
         private string _totalInputCache = string.Empty;
+        private int _currentLevel = -1;
+        private string _currentLevelInputCache = string.Empty;
         private string _name = string.Empty;
         #endregion
 
@@ -36,6 +38,7 @@ namespace com.hive.projectr
             NameInputField = 0,
             GoalInputField = 1,
             TotalInputField = 2,
+            CurrentLevelInputField = 3,
         }
 
         private TMP_Text _calendarDateText;
@@ -45,6 +48,7 @@ namespace com.hive.projectr
         private TMP_InputField _nameInputField;
         private TMP_InputField _goalInputField;
         private TMP_InputField _totalInputField;
+        private TMP_InputField _currentLevelInputField;
         #endregion
 
         #region Lifecycle
@@ -68,6 +72,7 @@ namespace com.hive.projectr
             _nameInputField = _config.ExtraObjects[(int)ExtraObj.NameInputField].GetComponent<TMP_InputField>();
             _goalInputField = _config.ExtraObjects[(int)ExtraObj.GoalInputField].GetComponent<TMP_InputField>();
             _totalInputField = _config.ExtraObjects[(int)ExtraObj.TotalInputField].GetComponent<TMP_InputField>();
+            _currentLevelInputField = _config.ExtraObjects[(int)ExtraObj.CurrentLevelInputField].GetComponent<TMP_InputField>();
         }
 
         public void Show()
@@ -89,6 +94,9 @@ namespace com.hive.projectr
 
             // goal
             RefreshLevelGoal(levelGoal);
+
+            // current level
+            RefreshCurrentLevel(LevelManager.Instance.CurrentLevel);
 
             _config.CanvasGroup.CanvasGroupOn();
         }
@@ -114,6 +122,8 @@ namespace com.hive.projectr
             _goalInputField.onEndEdit.AddListener(OnGoalEndEdit);
             _totalInputField.onSelect.AddListener(OnTotalSelect);
             _totalInputField.onEndEdit.AddListener(OnTotalEndEdit);
+            _currentLevelInputField.onSelect.AddListener(OnCurrentLevelSelect);
+            _currentLevelInputField.onEndEdit.AddListener(OnCurrentLevelEndEdit);
         }
 
         private void UnbindActions()
@@ -125,6 +135,8 @@ namespace com.hive.projectr
             _goalInputField.onEndEdit.RemoveAllListeners();
             _totalInputField.onSelect.RemoveAllListeners();
             _totalInputField.onEndEdit.RemoveAllListeners();
+            _currentLevelInputField.onSelect.RemoveAllListeners();
+            _currentLevelInputField.onEndEdit.RemoveAllListeners();
         }
         #endregion
 
@@ -159,11 +171,18 @@ namespace com.hive.projectr
             _goalInputField.text = $"{_goal}";
         }
 
+        private void RefreshCurrentLevel(int currentLevel)
+        {
+            _currentLevel = currentLevel;
+            _currentLevelInputField.text = $"{currentLevel}";
+        }
+
         public void SaveSettings()
         {
             SettingManager.Instance.UpdateDisplayName(_name, true);
             SettingManager.Instance.UpdateLevelTotal(_total, true);
             SettingManager.Instance.UpdateLevelGoal(_goal, true);
+            LevelManager.Instance.OverrideCurrentLevel(_currentLevel);
         }
         #endregion
 
@@ -226,6 +245,30 @@ namespace com.hive.projectr
             }
 
             _totalInputCache = null;
+        }
+
+        private void OnCurrentLevelSelect(string txt)
+        {
+            _currentLevelInputCache = txt;
+        }
+
+        private void OnCurrentLevelEndEdit(string txt)
+        {
+            if (int.TryParse(txt, out var level))
+            {
+                level = Mathf.Clamp(level, CoreGameLevelConfig.MinLevel, CoreGameLevelConfig.MaxLevel);
+
+                if (level != _currentLevel)
+                {
+                    RefreshCurrentLevel(level);
+                }
+            }
+            else
+            {
+                _currentLevelInputField.text = _currentLevelInputCache;
+            }
+
+            _currentLevelInputCache = null;
         }
         #endregion
     }

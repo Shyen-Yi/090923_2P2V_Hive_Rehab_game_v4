@@ -67,6 +67,7 @@ namespace com.hive.projectr
 		public Single GameProgressFillSec => _item.GameProgressFillSec;
 		public Single AsteroidWarningSec => _item.AsteroidWarningSec;
 		public Single ArrowDistanceFromScreenEdge => _item.ArrowDistanceFromScreenEdge;
+		public Boolean RandomizeVacuumPositionAlongScreen => _item.RandomizeVacuumPositionAlongScreen;
 
 		public CoreGameConfigData(CoreGameSOItem item)
 		{

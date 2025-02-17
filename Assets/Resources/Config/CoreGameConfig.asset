@@ -19,3 +19,4 @@ MonoBehaviour:
     gameProgressFillSec: 0.15
     asteroidWarningSec: 4
     arrowDistanceFromScreenEdge: 55
+    randomizeVacuumPositionAlongScreen: 1

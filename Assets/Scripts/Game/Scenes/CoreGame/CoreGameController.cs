@@ -246,7 +246,8 @@ namespace com.hive.projectr
             {
                 if (!_vacuumControllers.ContainsKey(vacuumConfig.Type))
                 {
-                    _vacuumControllers[vacuumConfig.Type] = new VacuumController(vacuumConfig);
+                    var vacuumController = new VacuumController(vacuumConfig);
+                    _vacuumControllers[vacuumConfig.Type] = vacuumController;
                 }
             }
             _asteroidContainer = Config.ExtraObjects[(int)ExtraObj.AsteroidContainer];
@@ -647,7 +648,7 @@ namespace com.hive.projectr
             foreach (var controller in _vacuumControllers.Values)
             {
                 controller.Deactivate();
-                controller.SetAirSize(_levelConfigData.VacuumSize);
+                controller.InitVisual(_levelConfigData.VacuumSize);
             }
 
             _spacecraftController.Deactivate();

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 namespace com.hive.projectr
 {
@@ -44,9 +45,24 @@ namespace com.hive.projectr
             SoundManager.Instance.StopSound(SoundType.VacuumEnable);
         }
 
-        public void SetAirSize(float scale)
+        public void InitVisual(float scale)
         {
+            // scale
             _config.VisualScalableRoot.localScale = new Vector3(_initScale.x * scale, _initScale.y, _initScale.z);
+
+            // pos
+            if (CoreGameConfig.GetData().RandomizeVacuumPositionAlongScreen)
+            {
+                var size = Mathf.Max(_config.BaseConfig.ActiveRenderer.size.x, _config.BaseConfig.InactiveRenderer.size.x);
+                var offset = size * (1 - scale) / 2;
+                var pos = Random.Range(-offset, offset);
+                var oriVisualPos = _config.VisualScalableRoot.localPosition;
+                _config.VisualScalableRoot.localPosition = new Vector3(pos, oriVisualPos.y, oriVisualPos.z);
+            }
+            else
+            {
+                _config.VisualScalableRoot.localPosition = Vector3.zero;
+            }
         }
     }
 }

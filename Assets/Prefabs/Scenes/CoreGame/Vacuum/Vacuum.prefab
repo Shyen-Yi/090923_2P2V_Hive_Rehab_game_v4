@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f89883d7b1ed217419b7240384c43bbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _canvasGroup: {fileID: 0}
   _extraWidgetConfigs: []
   _extraRectTransforms: []
   _extraTextMeshPros: []
@@ -63,6 +64,7 @@ MonoBehaviour:
   _extraColorGradients: []
   _extraAnimators: []
   _extraRenderers: []
+  _extraCanvases: []
   _type: 0
   _baseConfig: {fileID: 1581261452335258758}
   _airConfig: {fileID: 6795986487606384006}
@@ -207,6 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3971317ba17d8de47ad8350d7867116b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _canvasGroup: {fileID: 0}
   _extraWidgetConfigs: []
   _extraRectTransforms: []
   _extraTextMeshPros: []
@@ -224,6 +227,7 @@ MonoBehaviour:
   _extraColorGradients: []
   _extraAnimators: []
   _extraRenderers: []
+  _extraCanvases: []
   _vacuumRootConfig: {fileID: 261247915544467903}
   _animator: {fileID: 6286303390338858128}
 --- !u!1 &2506878262986860893
@@ -573,6 +577,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b568c32e5f2d37439d3feab0b650aee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _canvasGroup: {fileID: 0}
   _extraWidgetConfigs: []
   _extraRectTransforms: []
   _extraTextMeshPros: []
@@ -590,8 +595,11 @@ MonoBehaviour:
   _extraColorGradients: []
   _extraAnimators: []
   _extraRenderers: []
+  _extraCanvases: []
   _vacuumRootConfig: {fileID: 261247915544467903}
   _animator: {fileID: 3098499162351846537}
+  _activeRenderer: {fileID: 4242810110911114598}
+  _inactiveRenderer: {fileID: 2676836955939688162}
 --- !u!1 &6753049704819010740
 GameObject:
   m_ObjectHideFlags: 0
