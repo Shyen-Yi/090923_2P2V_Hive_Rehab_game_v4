@@ -7,6 +7,13 @@ using UnityEngine.U2D;
 
 namespace com.hive.projectr
 {
+    /// @ingroup Core
+    /// @class GeneralSceneConfig
+    /// @brief Provides configuration data for a general scene, including references to UI elements, widgets, and other scene objects.
+    ///
+    /// The GeneralSceneConfig class holds a variety of configurations related to a scene, such as references to UI elements
+    /// (like buttons, text fields, images), and other objects or data that may be needed for scene initialization or manipulation.
+    /// This class helps streamline scene setup by providing a centralized place for all scene-related configuration data.
     public class GeneralSceneConfig : MonoBehaviour
     {
         [SerializeField] private CanvasGroup _canvasGroup;

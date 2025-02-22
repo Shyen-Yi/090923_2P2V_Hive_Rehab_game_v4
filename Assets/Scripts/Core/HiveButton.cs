@@ -10,14 +10,31 @@ using UnityEditor;
 
 namespace com.hive.projectr
 {
+    /// @ingroup Core
+    /// @class HiveButton
+    /// @brief A custom button class that extends the Unity Button component and adds visual effects, scaling, and handling of pointer events.
+    /// 
+    /// The HiveButton class is a customized version of the Unity Button, providing additional functionality such as visual
+    /// feedback when the pointer enters, exits, or presses the button. The button scales down when pressed and restores its
+    /// original size when released. It also allows for custom navigation behavior within the Unity UI system.
     public class HiveButton : Button
     {
+        /// <summary>
+        /// The scaling factor applied when the button is pressed.
+        /// </summary>
         public static readonly float PressedSize = .95f;
+
+        /// <summary>
+        /// The default scale of the button when not pressed.
+        /// </summary>
         public static readonly Vector3 DefaultScale = Vector3.zero;
 
         private Vector3 _initialScale = DefaultScale;
         private bool _isPointerOnTop;
 
+        /// <summary>
+        /// Initializes the button's navigation settings when enabled.
+        /// </summary>
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -35,6 +52,10 @@ namespace com.hive.projectr
             navigation = nav;
         }
 
+        /// <summary>
+        /// Called when the pointer enters the button area. Changes the button's appearance to the highlighted sprite.
+        /// </summary>
+        /// <param name="eventData">Event data associated with the pointer entering the button.</param>
         public override void OnPointerEnter(PointerEventData eventData)
         {
             _isPointerOnTop = true;
@@ -47,6 +68,10 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Called when the pointer exits the button area. Changes the button's appearance to the disabled sprite.
+        /// </summary>
+        /// <param name="eventData">Event data associated with the pointer exiting the button.</param>
         public override void OnPointerExit(PointerEventData eventData)
         {
             _isPointerOnTop = false;
@@ -59,6 +84,10 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Called when the button is pressed. Scales the button down and changes its appearance to the pressed sprite.
+        /// </summary>
+        /// <param name="eventData">Event data associated with the pointer pressing the button.</param>
         public override void OnPointerDown(PointerEventData eventData)
         {
             base.OnPointerDown(eventData);
@@ -72,6 +101,11 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Called when the pointer is released. Restores the button's scale and updates its appearance based on whether the
+        /// pointer is still on top of the button or not.
+        /// </summary>
+        /// <param name="eventData">Event data associated with the pointer release.</param>
         public override void OnPointerUp(PointerEventData eventData)
         {
             base.OnPointerUp(eventData);
@@ -91,6 +125,9 @@ namespace com.hive.projectr
         }
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// Adds a new HiveButton to the scene when selected from the Unity Editor's GameObject menu.
+        /// </summary>
         [MenuItem("GameObject/UI/Hive Button")]
         static void AddHiveButton()
         {

@@ -534,10 +534,10 @@ namespace com.hive.projectr
                 switch (infoIndex)
                 {
                     case 0:
-                        RefreshInfoText($"Catch, Destroy, Collect");
+                        RefreshInfoText($"Level {_levelConfigData.Level}");
                         break;
                     case 1:
-                        RefreshInfoText($"Level {_levelConfigData.Level}");
+                        RefreshInfoText($"Catch, Destroy, Collect");
                         break;
                     default:
                         Logger.LogError($"Undefined core game info index: {infoIndex}");

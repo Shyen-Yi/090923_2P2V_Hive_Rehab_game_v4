@@ -7,6 +7,14 @@ using UnityEngine.U2D;
 
 namespace com.hive.projectr
 {
+    /// @ingroup Core
+    /// @class GeneralWidgetConfig
+    /// @brief Configures and holds various widget elements used in a scene, including UI elements like buttons, text fields, and images.
+    /// 
+    /// The GeneralWidgetConfig class is designed to store and manage a collection of different types of UI elements
+    /// and other scene-related objects, such as RectTransforms, TextMeshPro elements, buttons, game objects, images,
+    /// cameras, and more. These elements are typically used in a grid-based UI layout, and this class helps manage them
+    /// effectively within the scene.
     public class GeneralWidgetConfig : SimpleGridElement
     {
         [SerializeField] private CanvasGroup _canvasGroup;

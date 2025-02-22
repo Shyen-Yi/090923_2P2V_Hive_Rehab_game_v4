@@ -10,12 +10,18 @@ using System.Globalization;
 
 namespace com.hive.projectr
 {
+    /// <summary>
+    /// Implemented by all CSVData. A placeholder for structure and scalability.
+    /// </summary>
     public interface ICSVData
     {
 
     }
 
     #region CSV Data
+    /// <summary>
+    /// Data retrieved when a core game session is completed.
+    /// </summary>
     public struct CSVCoreGameEndedData : ICSVData
     {
         [Name("Level")]
@@ -43,6 +49,9 @@ namespace com.hive.projectr
         }
     }
 
+    /// <summary>
+    /// Data retrieved at every "tick" of a core game session.
+    /// </summary>
     public struct CSVCoreGameTickData : ICSVData
     {
         [Name("Time")]
@@ -62,6 +71,9 @@ namespace com.hive.projectr
         }
     }
 
+    /// <summary>
+    /// Data retrieved when an asteroid's lifecycle comes to an end (captured/self-destroyed).
+    /// </summary>
     public struct CSVCoreGameAsteroidEndedData : ICSVData
     {
         [Name("Asteroid ID")]
@@ -144,6 +156,9 @@ namespace com.hive.projectr
         }
     }
 
+    /// <summary>
+    /// Data retrieved when a calibration session is completed.
+    /// </summary>
     public struct CSVCalibrationEndedData : ICSVData
     {
         [Name("Center Coordinate X")]
@@ -191,6 +206,9 @@ namespace com.hive.projectr
         }
     }
 
+    /// <summary>
+    /// Stores #Calibration and #CoreGame for an entire game session.
+    /// </summary>
     public struct CSVSessionInfo : ICSVData
     {
         public int CalibrationNum { get; set; }
@@ -204,6 +222,9 @@ namespace com.hive.projectr
     }
     #endregion
 
+    /// <summary>
+    /// Different types of output CSV logs.
+    /// </summary>
     public enum CSVType
     {
         CoordinatePos,
@@ -211,8 +232,17 @@ namespace com.hive.projectr
         Coordinates,
     }
 
+    /// @ingroup Core
+    /// @class CSVManager
+    /// @brief Manages CSV logs for core game events such as game progress, coordinates, and summaries.
+    ///
+    /// This class handles the logging of game events to CSV files, including the creation of day folders
+    /// for organizing logs and methods for appending data to different CSV types (e.g., Coordinates, Summary).
     public class CSVManager : SingletonBase<CSVManager>, ICoreManager
     {
+        /// <summary>
+        /// The number of daily attempts made by the player.
+        /// </summary>
         public int DailyAttempt
         {
             get => _dailyAttempt;
@@ -245,6 +275,10 @@ namespace com.hive.projectr
         private static readonly string SummaryFileTemplate = "{0}_Summary"; // Mark_Summary
 
         #region Lifecycle
+        /// <summary>
+        /// Initializes the CSVManager instance.
+        /// This method is called when the CSVManager is initialized and subscribes to relevant events.
+        /// </summary>
         public void OnInit()
         {
             TrySetupDayFolder(TimeUtil.Now, out var dayFolderPath);
@@ -255,6 +289,10 @@ namespace com.hive.projectr
             TimeManager.OnGameDayUpdated += OnGameDayUpdated;
         }
 
+        /// <summary>
+        /// Disposes of the CSVManager instance.
+        /// This method is called when the CSVManager is disposed and unsubscribes from events.
+        /// </summary>
         public void OnDispose()
         {
             MonoBehaviourUtil.OnApplicationQuitEvent -= OnApplicationQuit;
@@ -264,16 +302,28 @@ namespace com.hive.projectr
         #endregion
 
         #region Event
+        /// <summary>
+        /// Triggered when the application quits.
+        /// Ends any active logging sessions.
+        /// </summary>
         private void OnApplicationQuit()
         {
             TryEndLog();
         }
 
+        /// <summary>
+        /// Triggered when the display name is updated.
+        /// Reinitializes the daily attempt count.
+        /// </summary>
         private void OnDisplayNameChanged()
         {
             InitDailyAttempt();
         }
 
+        /// <summary>
+        /// Triggered when the game day is updated.
+        /// Reinitializes the daily attempt count.
+        /// </summary>
         private void OnGameDayUpdated()
         {
             InitDailyAttempt();
@@ -281,6 +331,11 @@ namespace com.hive.projectr
         #endregion
 
         #region Calibration
+        /// <summary>
+        /// Called when a calibration session is started.
+        /// Begins logging and initializes data for the calibration.
+        /// </summary>
+        /// <param name="logTime">The timestamp for when the calibration starts.</param>
         public void OnCalibrationStarted(DateTime logTime)
         {
             Logger.Log($"CSVManager::OnCalibrationStarted - logTime: {logTime}");
@@ -295,10 +350,10 @@ namespace com.hive.projectr
         }
 
         /// <summary>
-        /// Called when a calibration is finished.
-        /// Save calibration CSV data.
+        /// Called when a calibration session ends.
+        /// Appends the calibration data to the log.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">The calibration data to be logged.</param>
         public void OnCalibrationEnded(CSVCalibrationEndedData data)
         {
             Logger.Log($"CSVManager::OnCalibrationEnded");
@@ -311,6 +366,11 @@ namespace com.hive.projectr
         #endregion
 
         #region Core Game
+        /// <summary>
+        /// Called when a core game session starts.
+        /// Initializes logging and appends header data for the core game session.
+        /// </summary>
+        /// <param name="logTime">The timestamp for when the core game starts.</param>
         public void OnCoreGameStarted(DateTime logTime)
         {
             Logger.Log($"CSVManager::OnCoreGameStarted - logTime: {logTime}");
@@ -332,6 +392,11 @@ namespace com.hive.projectr
             AppendLog(CSVType.Coordinates, GenerateCSVHeader<CSVCoreGameTickData>());
         }
 
+        /// <summary>
+        /// Called when an asteroid in the core game ends (either captured or self-destroyed).
+        /// Appends asteroid-related data to the log.
+        /// </summary>
+        /// <param name="data">The asteroid data to be logged.</param>
         public void OnCoreGameAsteroidEnded(CSVCoreGameAsteroidEndedData data)
         {
             Logger.Log($"CSVManager::OnCoreGameAsteroidEnded");
@@ -340,6 +405,11 @@ namespace com.hive.projectr
             AppendLog(CSVType.CoordinatePos, GenerateCSVContent(new List<CSVCoreGameAsteroidEndedData>() { data }));
         }
 
+        /// <summary>
+        /// Called every tick in the core game.
+        /// Appends the current tick data to the log.
+        /// </summary>
+        /// <param name="data">The core game tick data to be logged.</param>
         public void OnCoreGameTick(CSVCoreGameTickData data)
         {
             //Logger.Log($"CSVManager::OnCoreGameTick");
@@ -348,6 +418,11 @@ namespace com.hive.projectr
             AppendLog(CSVType.Coordinates, GenerateCSVContent(new List<CSVCoreGameTickData>() { data }));
         }
 
+        /// <summary>
+        /// Called when the core game ends.
+        /// Appends the summary data to the log.
+        /// </summary>
+        /// <param name="data">The summary data to be logged.</param>
         public void OnCoreGameEnded(CSVCoreGameEndedData data)
         {
             Logger.Log($"CSVManager::OnCoreGameEnded");
@@ -360,6 +435,9 @@ namespace com.hive.projectr
         #endregion
 
         #region Private
+        /// <summary>
+        /// Sets up the day folder for storing logs based on the current date.
+        /// </summary>
         private bool TrySetupDayFolder(DateTime time, out string dayFolderPath)
         {
             dayFolderPath = "";
@@ -386,6 +464,10 @@ namespace com.hive.projectr
             return true;
         }
 
+        /// <summary>
+        /// Gets the root storage path for all log files.
+        /// </summary>
+        /// <returns>The storage path for all log files.</returns>
         private string GetRootPath()
         {
 #if UNITY_EDITOR
@@ -396,62 +478,147 @@ namespace com.hive.projectr
             return rootPath;
         }
 
+        /// <summary>
+        /// Gets the folder name for the log files generated by a specific player at a specific time.
+        /// </summary>
+        /// <param name="time">Current time as a DateTime object.</param>
+        /// <param name="username">Current player's username.</param>
+        /// <returns>The folder name for the log files generated by the given player at the given time.</returns>
         private string GetDayFolderName(DateTime time, string username)
         {
             return string.Format(DayFolderTemplate, time.Month, time.Day, time.Year, username);
         }
 
+        /// <summary>
+        /// Gets the storage path for all log files generated by a specific player at a specific time.
+        /// </summary>
+        /// <param name="time">Current time as a DateTime object.</param>
+        /// <param name="username">Current player's username.</param>
+        /// <returns>The storage path for all log files generated by the given player at the given time.</returns>
         private string GetDayFolderPath(DateTime time, string username)
         {
             var dayFolderPath = Path.Combine(GetRootPath(), GetDayFolderName(time, username));
             return dayFolderPath;
         }
 
+        /// <summary>
+        /// Gets the folder name for the log files generated within a specific session at a specific time.
+        /// </summary>
+        /// <param name="sessionNum">Current session number as an integer.</param>
+        /// <param name="time">Current time as a DateTime object.</param>
+        /// <returns>The folder name for the log files generated within the given session at the given time.</returns>
         private string GetSessionFolderName(int sessionNum, DateTime time)
         {
             return string.Format(SessionFolderTemplate, sessionNum, time.Hour, time.Minute);
         }
 
+        /// <summary>
+        /// Gets the storage path for the log files generated within a specific session at a specific time with a day folder.
+        /// </summary>
+        /// <param name="dayFolderPath">The day folder path for the current time.</param>
+        /// <param name="sessionNum">Current session number.</param>
+        /// <param name="time">Current time as a DateTime object.</param>
+        /// <returns></returns>
         private string GetSessionFolderPath(string dayFolderPath, int sessionNum, DateTime time)
         {
             return Path.Combine(dayFolderPath, GetSessionFolderName(sessionNum, time));
         }
 
+        /// <summary>
+        /// Gets the name of the Coordinate Position log file.
+        /// </summary>
+        /// <param name="time">Current time as a DateTime object.</param>
+        /// <param name="username">Current player's username.</param>
+        /// <param name="block">Current level's block.</param>
+        /// <param name="goal">Current level's goal.</param>
+        /// <param name="level">Current level.</param>
+        /// <returns>Name of the Coordinate Position log file.</returns>
         private string GetCoordinatePosFileName(DateTime time, string username, int block, int goal, int level)
         {
             return string.Format(CoordinatePosFileTemplate, username, time.Month, time.Day, time.Year, block, goal, level);
         }
 
+        /// <summary>
+        /// Gets the storage path of the Coordinate Position log file.
+        /// </summary>
+        /// <param name="sessionFolderPath">Current session folder path.</param>
+        /// <param name="time">Current time.</param>
+        /// <param name="username">Current player's username.</param>
+        /// <param name="block">Current level's block.</param>
+        /// <param name="goal">Current level's goal.</param>
+        /// <param name="level">Current level.</param>
+        /// <returns>Storage path of the Coordinate Position log file.</returns>
         private string GetCoordinatePosFilePath(string sessionFolderPath, DateTime time, string username, int block, int goal, int level)
         {
             return Path.Combine(sessionFolderPath, $"{GetCoordinatePosFileName(time, username, block, goal, level)}.csv");
         }
 
+        /// <summary>
+        /// Gets the name of the Coordinates log file.
+        /// </summary>
+        /// <param name="time">Current time as a DateTime object.</param>
+        /// <param name="username">Current player's username.</param>
+        /// <param name="block">Current level's block.</param>
+        /// <param name="goal">Current level's goal.</param>
+        /// <param name="level">Current level.</param>
+        /// <returns>Name of the Coordinates log file.</returns>
         private string GetCoordinatesFileName(DateTime time, string username, int block, int goal, int level)
         {
             return string.Format(CoordinatesFileTemplate, username, time.Month, time.Day, time.Year, block, goal, level);
         }
 
+        /// <summary>
+        /// Gets the storage path of the Coordinates log file.
+        /// </summary>
+        /// <param name="sessionFolderPath">Current session folder path.</param>
+        /// <param name="time">Current time.</param>
+        /// <param name="username">Current player's username.</param>
+        /// <param name="block">Current level's block.</param>
+        /// <param name="goal">Current level's goal.</param>
+        /// <param name="level">Current level.</param>
+        /// <returns>Storage path of the Coordinates log file.</returns>
         private string GetCoordinatesFilePath(string sessionFolderPath, DateTime time, string username, int block, int goal, int level)
         {
             return Path.Combine(sessionFolderPath, $"{GetCoordinatesFileName(time, username, block, goal, level)}.csv");
         }
 
+        /// <summary>
+        /// Gets the name of the Summary log file.
+        /// </summary>
+        /// <param name="username">Current player's username.</param>
+        /// <returns>Name of the Summary log file.</returns>
         private string GetSummaryFileName(string username)
         {
             return string.Format(SummaryFileTemplate, username);
         }
 
+        /// <summary>
+        /// Gets the storage path of the Summary log file.
+        /// </summary>
+        /// <param name="sessionFolderPath">Current session folder path.</param>
+        /// <param name="username">Current player's username.</param>
+        /// <returns>Storage path of the Summary log file.</returns>
         private string GetSummaryFilePath(string sessionFolderPath, string username)
         {
             return Path.Combine(sessionFolderPath, $"{GetSummaryFileName(username)}.csv");
         }
 
+        /// <summary>
+        /// Gets the storage path of the Session Info file path.
+        /// </summary>
+        /// <param name="sessionFolderPath">Current session folder path.</param>
+        /// <returns>Storage path of the Session Info file path.</returns>
         private string GetSessionInfoFilePath(string sessionFolderPath)
         {
             return Path.Combine(sessionFolderPath, $"SessionInfo.txt");
         }
 
+        /// <summary>
+        /// Attempts to retrieve a session number from a session folder name.
+        /// </summary>
+        /// <param name="sessionFolderName">A session folder name.</param>
+        /// <param name="sessionNum">Retrieved session number.</param>
+        /// <returns>True if parsing is successfully; otherwise, false.</returns>
         private bool TryParseSessionFolder(string sessionFolderName, out int sessionNum)
         {
             sessionNum = 1;
@@ -471,9 +638,8 @@ namespace com.hive.projectr
         }
 
         /// <summary>
-        /// Called when a logging session starts / ends
+        /// Ends the current logging session and saves the logs to files.
         /// </summary>
-        /// <returns></returns>
         private bool TryEndLog()
         {
             Logger.Log($"CSVManager::TryEndLog - _isLogging: {_isLogging} | _isCoreGame: {_isCoreGame} | _logSbDict: {string.Join(",", _logSbDict)}");
@@ -525,6 +691,11 @@ namespace com.hive.projectr
             return false;
         }
 
+        /// <summary>
+        /// Saves the 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="info"></param>
         private void SaveSessionInfo(string path, CSVSessionInfo info)
         {
             try
@@ -543,6 +714,11 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Saves the log content to a specified log file.
+        /// </summary>
+        /// <param name="type">The type of log (e.g., Coordinates, Summary).</param>
+        /// <param name="content">The log content to be saved.</param>
         private void SaveLog(CSVType type, string content)
         {
             Logger.Log($"CSVManager::SaveLog - type: {type} | content: {content} | _coordinatePosFilePath: {_coordinatePosFilePath} | _summaryFilePath: {_summaryFilePath} | _coordinatesFilePath: {_coordinatesFilePath}");
@@ -604,6 +780,10 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Initializes daily attempt counter.
+        /// Triggered when entering a new day or session.
+        /// </summary>
         private void InitDailyAttempt()
         {
             DailyAttempt = 0;
@@ -645,6 +825,10 @@ namespace com.hive.projectr
             Logger.Log($"InitDailyAttempt - DailyAttempt: {DailyAttempt}");
         }
 
+        /// <summary>
+        /// Determines whether the maximum daily attempt is reached.
+        /// </summary>
+        /// <returns></returns>
         public bool IsDailyMaxAttemptReached()
         {
             var dailyAttempt = DailyAttempt;
@@ -655,10 +839,10 @@ namespace com.hive.projectr
         }
 
         /// <summary>
-        /// Need to be called before writing any log to local file
+        /// Starts a new logging session for either calibration or core game, and sets up the file paths for the logs.
         /// </summary>
-        /// <param name="logTime">Generation time of the log</param>
-        /// <returns>If success</returns>
+        /// <param name="logTime">The timestamp indicating the start of the log.</param>
+        /// <param name="isCoreGame">Indicates whether the log is for a core game session or calibration.</param>
         private bool StartLog(DateTime logTime, bool isCoreGame)
         {
             TryEndLog();
@@ -741,6 +925,11 @@ namespace com.hive.projectr
             return isSuccess;
         }
 
+        /// <summary>
+        /// Gets the largest existing session number of the day.
+        /// </summary>
+        /// <param name="time">Current time as a DateTime object.</param>
+        /// <returns>Retrieved largest session number.</returns>
         public int GetMaxSessionNumOfDay(DateTime time)
         {
             var sessionNum = 0;
@@ -763,6 +952,11 @@ namespace com.hive.projectr
             return sessionNum;
         }
 
+        /// <summary>
+        /// Generates a CSV header for a specific data type.
+        /// </summary>
+        /// <typeparam name="T">The type of the data (must implement ICSVData).</typeparam>
+        /// <returns>A CSV header string.</returns>
         public string GenerateCSVHeader<T>() where T : ICSVData
         {
             using (var writer = new StringWriter())
@@ -773,6 +967,12 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Generates CSV content from a list of data records.
+        /// </summary>
+        /// <typeparam name="T">The type of the data records.</typeparam>
+        /// <param name="records">The data records to convert into CSV content.</param>
+        /// <returns>A CSV content string.</returns>
         public string GenerateCSVContent<T>(IEnumerable<T> records) where T : ICSVData
         {
             using (var writer = new StringWriter())
@@ -783,6 +983,11 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Appends a log entry to the appropriate log type (e.g., coordinates or summary).
+        /// </summary>
+        /// <param name="type">The type of log (e.g., Coordinates, Summary).</param>
+        /// <param name="text">The text to append to the log.</param>
         private void AppendLog(CSVType type, string text)
         {
             if (string.IsNullOrEmpty(text))
@@ -806,6 +1011,11 @@ namespace com.hive.projectr
         #endregion
 
         #region Public
+        /// <summary>
+        /// Gets a list of directories of log storage for a specified player.
+        /// </summary>
+        /// <param name="username">Current player's username.</param>
+        /// <returns>Retrieved list of log directories.</returns>
         public List<string> GetCSVDirectoriesForUser(string username)
         {
             if (string.IsNullOrEmpty(username))

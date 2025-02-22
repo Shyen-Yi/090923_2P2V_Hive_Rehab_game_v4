@@ -8,14 +8,38 @@ using UnityEngine.Audio;
 
 namespace com.hive.projectr
 {
+    /// @ingroup Core
+    /// @class SoundPlayback
+    /// @brief Represents a sound playback instance, including the associated AudioSource, play time, and playback configuration.
+    ///
+    /// The `SoundPlayback` class is used to manage individual instances of sound playback. It stores the `AudioSource` that plays the sound,
+    /// the play time of the sound, and the configuration data that determines how the sound should behave during playback. It allows for
+    /// tracking and controlling each sound instance, ensuring the proper management of audio resources and behavior during playback.
     public class SoundPlayback
     {
+        /// <summary>
+        /// The AudioSource component responsible for playing the sound.
+        /// </summary>
         public AudioSource audioSource;
+
+        /// <summary>
+        /// The time at which the sound will start playing.
+        /// </summary>
         public float playTime;
+
+        /// <summary>
+        /// The configuration data associated with the sound, including its type and other playback settings.
+        /// </summary>
         public SoundConfigData configData;
 
         private Coroutine _routine;
 
+        /// <summary>
+        /// Initializes a new instance of the SoundPlayback class.
+        /// </summary>
+        /// <param name="audioSource">The AudioSource that will play the sound.</param>
+        /// <param name="playTime">The time when the sound should start playing.</param>
+        /// <param name="configData">The configuration data that defines the sound's properties.</param>
         public SoundPlayback(AudioSource audioSource, float playTime, SoundConfigData configData)
         {
             Update(audioSource, playTime, configData);
@@ -30,6 +54,10 @@ namespace com.hive.projectr
             audioSource.loop = configData.IsLoop;
         }
 
+        /// <summary>
+        /// Starts the playback of the sound by setting the AudioSource's properties and playing it.
+        /// </summary>
+        /// <param name="onFinishCallback">The callback to invoke when the playback finishes.</param>
         public void Play(Action onFinished)
         {
             if (audioSource != null)
@@ -42,6 +70,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Pauses the playback of the sound.
+        /// </summary>
         public void Pause()
         {
             if (audioSource != null)
@@ -52,6 +83,9 @@ namespace com.hive.projectr
             ReleaseRoutine();
         }
 
+        /// <summary>
+        /// Stops the playback of the sound.
+        /// </summary>
         public void Stop()
         {
             if (audioSource != null)
@@ -85,24 +119,46 @@ namespace com.hive.projectr
         }
     }
 
+    /// @ingroup Core
+    /// @class SoundManager
+    /// @brief Manages the playback of sound effects and music in the game, including handling sound sources, sound types, and mixer groups.
+    /// 
+    /// The `SoundManager` class is responsible for playing sound effects and managing audio resources in the game. It allows for playing
+    /// sounds with different configurations, including looping sounds, one-time sounds, and adjusting sound volumes based on the
+    /// application’s focus. It also manages active and inactive sound sources, caches audio clips, and integrates with Unity’s audio mixer.
     public class SoundManager : SingletonBase<SoundManager>, ICoreManager
     {
+        // Dictionary to manage cached sound clips
         private Dictionary<SoundType, AudioClip> _clipCacheDict;
-        private Dictionary<SoundType, List<AudioSource>> _activeSourceDict;
-        private Dictionary<SoundType, Queue<AudioSource>> _inactiveSourceDict;
 
+        // Active audio sources for each sound type
+        private Dictionary<SoundType, List<AudioSource>> _activeSourceDict;
+
+        // Inactive audio sources for each sound type
+        private Dictionary<SoundType, Queue<AudioSource>> _inactiveSourceDict;
+        
+        // Pending sound playbacks that are scheduled to play
         private List<SoundPlayback> _playbackRequests;
+
+        // Active sound playbacks, organized by sound type
         private Dictionary<SoundType, List<SoundPlayback>> _activePlaybackDict;
+
+        // Audio mixer groups for background and effects
         private Dictionary<AudioMixerGroupType, AudioMixerGroup> _mixerGroupDict;
 
+        // Root transform for audio sources
         private Transform _sourceRoot;
-        private AudioMixer _mainMixer;
-        private AudioMixerGroup _backgroundGroup;
-        private AudioMixerGroup _effectsGroup;
 
+        // Main audio mixer for managing sound groups
+        private AudioMixer _mainMixer;
+
+        // Path to the main mixer resource
         private static readonly string MixerGroupResourcePath = "AudioMixers/Main/MainMixer";
 
         #region Lifecycle
+        /// <summary>
+        /// Initializes the SoundManager, setting up audio sources, mixers, and playback requests.
+        /// </summary>
         public void OnInit()
         {
             _sourceRoot = GameObject.FindGameObjectWithTag(TagNames.AudioSourceRoot).transform;
@@ -120,6 +176,9 @@ namespace com.hive.projectr
             MonoBehaviourUtil.OnApplicationFocusBack += OnFocusBack;
         }
 
+        /// <summary>
+        /// Disposes of the SoundManager, cleaning up audio sources and other resources.
+        /// </summary>
         public void OnDispose()
         {
             _sourceRoot = null;
@@ -164,18 +223,27 @@ namespace com.hive.projectr
         #endregion
 
         #region Event
+        /// <summary>
+        /// Handles focus regained event, restoring background volume.
+        /// </summary>
         private void OnFocusBack()
         {
             var volume = 1f;
             SetAudioMixerGroupVolume(AudioMixerGroupType.Background, volume);
         }
 
+        /// <summary>
+        /// Handles focus lost event, reducing background volume.
+        /// </summary>
         private void OnFocusLost()
         {
             var volume = GameGeneralConfig.GetData().SoundVolumePercentageWhenInBackground / 100f;
             SetAudioMixerGroupVolume(AudioMixerGroupType.Background, volume);
         }
 
+        /// <summary>
+        /// Main update method called each frame. It handles pending playback requests.
+        /// </summary>
         private void Tick()
         {
             if (_playbackRequests.Count > 0)
@@ -210,6 +278,10 @@ namespace com.hive.projectr
         }
         #endregion
 
+        #region Sound Playback Management
+        /// <summary>
+        /// Retrieves an audio mixer group for a given type.
+        /// </summary>
         private AudioMixerGroup GetAudioMixerGroup(AudioMixerGroupType type)
         {
             if (_mixerGroupDict.TryGetValue(type, out var group))
@@ -238,6 +310,9 @@ namespace com.hive.projectr
             return group;
         }
 
+        /// <summary>
+        /// Sets the volume of a specified audio mixer group.
+        /// </summary>
         private void SetAudioMixerGroupVolume(AudioMixerGroupType groupType, float volume)
         {
             var group = GetAudioMixerGroup(groupType);
@@ -248,18 +323,6 @@ namespace com.hive.projectr
                     : -80;
 
                 _mainMixer.SetFloat($"{group.name}Volume", db);
-            }
-        }
-
-        private void AssignAudioSourceToAudioMixerGroup(AudioSource source, AudioMixerGroupType groupType)
-        {
-            if (source == null)
-                return;
-
-            var mixerGroup = GetAudioMixerGroup(groupType);
-            if (mixerGroup != null)
-            {
-                source.outputAudioMixerGroup = mixerGroup;
             }
         }
 
@@ -299,12 +362,32 @@ namespace com.hive.projectr
                 }
             }
         }
+        #endregion
 
+        #region Sound Playback API
+        /// <summary>
+        /// Plays a sound of the specified type.
+        /// </summary>
         public void PlaySound(SoundType soundType, float delay = 0)
         {
             PlaySoundAndGetSource(soundType, delay);
         }
 
+        private void AssignAudioSourceToAudioMixerGroup(AudioSource source, AudioMixerGroupType groupType)
+        {
+            if (source == null)
+                return;
+
+            var mixerGroup = GetAudioMixerGroup(groupType);
+            if (mixerGroup != null)
+            {
+                source.outputAudioMixerGroup = mixerGroup;
+            }
+        }
+
+        /// <summary>
+        /// Plays a sound and returns the AudioSource used to play it.
+        /// </summary>
         public async Task<AudioSource> PlaySoundAndGetSource(SoundType soundType, float delay = 0)
         {
             var soundData = SoundConfig.GetData(soundType);
@@ -448,5 +531,6 @@ namespace com.hive.projectr
             source.enabled = true;
             return source;
         }
+        #endregion
     }
 }

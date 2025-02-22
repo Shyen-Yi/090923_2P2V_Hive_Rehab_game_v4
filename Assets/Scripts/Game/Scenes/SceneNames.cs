@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace com.hive.projectr
 {
+    /// @ingroup GameScene
+    /// @class SceneNames
+    /// @brief A collection of scene names used in the game.
+    /// 
+    /// The `SceneNames` class contains static string fields representing the names of various scenes in the game. These names
+    /// are used for scene management, such as loading, transitioning, and managing scene-specific logic and UI components.
     public static class SceneNames
     {
         public static string MainMenu = "MainMenu";

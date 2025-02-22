@@ -4,6 +4,13 @@ using UnityEngine;
 
 namespace com.hive.projectr
 {
+    /// @ingroup GameCommon
+    /// @class TagNames
+    /// @brief A collection of constant tag names used throughout the game for tagging game objects in Unity.
+    /// 
+    /// The `TagNames` class contains static string fields for various tags used in the game. These tags are typically assigned to
+    /// GameObjects in Unity to help identify and organize objects within the scene. The class provides a central place to define
+    /// all tag names, ensuring consistency across the game and making it easier to modify tags in one location.
     public static class TagNames
     {
         public static string VacuumAir = "VacuumAir";

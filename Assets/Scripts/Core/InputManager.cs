@@ -6,8 +6,20 @@ using Leap;
 
 namespace com.hive.projectr
 {
+    /// <summary>
+    /// @ingroup Core
+    /// @class InputManager
+    /// @brief Manages user input for the game, including cursor movement, clicking, and handling interactions with UI elements.
+    /// 
+    /// The `InputManager` class handles user input through various methods, such as cursor control, pointer events (clicks, hovers), 
+    /// and tracking of the user's hand movement through a motion tracker (e.g., Leap Motion). It manages the behavior of the cursor 
+    /// and updates the UI interaction, such as triggering pointer enter, exit, click, and other interactions on UI elements.
+    /// </summary>
     public class InputManager : SingletonBase<InputManager>, ICoreManager
     {
+        /// <summary>
+        /// Gets the current screen position of the cursor.
+        /// </summary>
         public Vector3 CursorScreenPosition
         {
             get
@@ -21,6 +33,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Gets the MotionTracker component, which tracks the user's hand movement.
+        /// </summary>
         public MotionTracker MotionTracker
         {
             get
@@ -34,6 +49,9 @@ namespace com.hive.projectr
         }
         private MotionTracker _motionTracker;
 
+        /// <summary>
+        /// Gets the UICursor component, which represents the cursor's position on the screen.
+        /// </summary>
         public UICursor UICursor
         {
             get
@@ -65,6 +83,9 @@ namespace com.hive.projectr
         private bool _isPinching;
 
         #region Lifecycle
+        /// <summary>
+        /// Initializes the input manager, setting up the event system, cursor, and input handling.
+        /// </summary>
         public void OnInit()
         {
             _eventSystem = EventSystem.current;
@@ -76,12 +97,18 @@ namespace com.hive.projectr
             Cursor.visible = DebugConfig.GetData().ShowBuiltInCursor;
         }
 
+        /// <summary>
+        /// Disposes of the input manager by cleaning up event subscriptions and input handling.
+        /// </summary>
         public void OnDispose()
         {
             MonoBehaviourUtil.OnUpdate -= Tick;
             UICursor.OnClick -= OnClick;
         }
 
+        /// <summary>
+        /// Handles the click event when the user clicks on a clickable object.
+        /// </summary>
         private void OnClick()
         {
             var clickable = GetPointerClickableObject(_raycastResults);
@@ -91,11 +118,17 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Update method called each frame to handle cursor movement and input.
+        /// </summary>
         private void Tick()
         {
             CursorTick();
         }
 
+        /// <summary>
+        /// Updates the cursor position, tracks the movement of the user's hand, and processes the cursor input.
+        /// </summary>
         private void CursorTick()
         {
             if (UICursor != null && MotionTracker != null)
@@ -149,7 +182,7 @@ namespace com.hive.projectr
                 {
                     var horizontal = Input.GetAxisRaw("Horizontal");
                     var vertical = Input.GetAxisRaw("Vertical");
-                    _cursorPos += new Vector3(horizontal, vertical, 0) * MotionTracker.Sensitivity;
+                    _cursorPos += new Vector3(horizontal, vertical, 0) * MotionTracker.Sensitivity * Time.deltaTime * 100;
                 }
 
                 if ((_prevCursorPos - _cursorPos).sqrMagnitude > 1)
@@ -165,6 +198,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Updates pointer events and triggers interactions such as pointer entering, exiting, clicking, and pressing on UI elements.
+        /// </summary>
         private void CursorInputTick()
         {
             _pointerEventData.position = UICursor.GetPosition();
@@ -274,22 +310,38 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Checks whether the cursor can trigger click events.
+        /// </summary>
+        /// <returns>True if the cursor meets all conditions and can trigger click events; otherwise, false.</returns>
         public bool CanClick()
         {
             return _hasMovedCursor;
         }
 
+        /// <summary>
+        /// Temporarily moves the cursor to the center of screen by adding a temporary offset (_cursorPosOffset).
+        /// </summary>
         public void CenterCursor()
         {
             _cursorPosOffset = new Vector3(Screen.width / 2, Screen.height / 2, 0) - CursorScreenPosition;
             _hasMovedCursor = false; // need to move before clicking is enabled
         }
 
+        /// <summary>
+        /// Removes the temporary offset from the cursor (_cursorPosOffset).
+        /// </summary>
         public void DecenterCursor()
         {
             _cursorPosOffset = Vector3.zero;
         }
 
+        /// <summary>
+        /// Gets the first GameObject underneath the cursor that can handle PointerDown events.
+        /// Return null if no such object can be found.
+        /// </summary>
+        /// <param name="results">A list of RaycastResult objects from a raycast operation.</param>
+        /// <returns>The first GameObject underneath the cursor that can handle PointerDown events.</returns>
         private GameObject GetPointerPressableObject(List<RaycastResult> results)
         {
             if (results == null || results.Count < 1)
@@ -307,6 +359,12 @@ namespace com.hive.projectr
             return null;
         }
 
+        /// <summary>
+        /// Gets the first GameObject underneath the cursor that can handle PointerClick events.
+        /// Return null if no such object can be found.
+        /// </summary>
+        /// <param name="results">A list of RaycastResult objects from a raycast operation.</param>
+        /// <returns>The first GameObject underneath the cursor that can handle PointerClick events.</returns>
         private GameObject GetPointerClickableObject(List<RaycastResult> results)
         {
             if (results == null || results.Count < 1)
@@ -385,6 +443,12 @@ namespace com.hive.projectr
             return isPinching;
         }
 
+        /// <summary>
+        /// Checks if a LeapMotion Hand object provides valid position data and can be used for valid game input.
+        /// </summary>
+        /// <param name="hand">LeapMotion Hand object.</param>
+        /// <param name="position">Relative world position of hand to the motion tracking sensor.</param>
+        /// <returns>True if the Hand object provides valid position data; otherwise, false.</returns>
         private bool HasValidHandRelativeWorldPosition(Hand hand, out Vector3 position)
         {
             position = Vector3.zero;
@@ -405,11 +469,17 @@ namespace com.hive.projectr
         #endregion
 
         #region Public
+        /// <summary>
+        /// Shows the cursor.
+        /// </summary>
         public void ShowCursor()
         {
             UICursor.Enable();
         }
 
+        /// <summary>
+        /// Hides the cursor.
+        /// </summary>
         public void HideCursor()
         {
             UICursor.Disable();

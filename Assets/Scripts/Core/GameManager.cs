@@ -5,10 +5,23 @@ using UnityEngine;
 
 namespace com.hive.projectr
 {
+    /// @ingroup Core
+    /// @class GameManager
+    /// @brief Manages the overall game flow, including initializing systems, handling game state, and managing core game features.
+    ///
+    /// The GameManager class is responsible for initializing all essential game systems such as scene management, camera,
+    /// configuration, input, and other core services. It ensures proper initialization and management of the game's systems
+    /// and handles game state transitions like entering the main menu or quitting the game.
     public class GameManager : MonoBehaviour
     {
+        /// <summary>
+        /// Gets the singleton instance of the GameManager.
+        /// </summary>
         public static GameManager Instance { get; private set; }
 
+        /// <summary>
+        /// Indicates whether the game is currently focused (active).
+        /// </summary>
         public bool IsFocused => _monoBehaviourUtil != null ? _monoBehaviourUtil.IsFocused : false;
 
         private GameSceneManager _sceneManager;
@@ -27,6 +40,10 @@ namespace com.hive.projectr
 
         private bool _isGameInitialized;
 
+        /// <summary>
+        /// Initializes the GameManager and sets up various game systems such as time management, scene management, input,
+        /// camera, and other core systems. It also ensures the game starts in the main menu.
+        /// </summary>
         private void Awake()
         {
             Instance = this;
@@ -46,6 +63,10 @@ namespace com.hive.projectr
             DontDestroyOnLoad(gameObject);
         }
 
+        /// <summary>
+        /// Initializes all game systems when the game object is enabled. This includes setting up services like the scene manager,
+        /// input manager, level manager, and more.
+        /// </summary>
         private void OnEnable()
         {
             _timeManager = new TimeManager();
@@ -96,6 +117,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Cleans up and disposes of all game systems when the game object is disabled.
+        /// </summary>
         private void OnDisable()
         {
             _sceneManager.OnDispose();
@@ -134,6 +158,9 @@ namespace com.hive.projectr
             _monoBehaviourUtil = null;
         }
 
+        /// <summary>
+        /// Quits the game, either stopping play mode in the Unity editor or closing the application in a built version.
+        /// </summary>
         public void QuitGame()
         {
 #if UNITY_EDITOR

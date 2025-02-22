@@ -14,6 +14,14 @@ namespace com.hive.projectr
         public List<string> typeElements;
     }
 
+    /// @ingroup EditorClasses
+    /// @class ConfigTypeGenerator
+    /// @brief A Unity editor tool for generating new enum types for configuration fields based on user input.
+    /// 
+    /// The `ConfigTypeGenerator` class is a Unity editor window that allows users to generate new enum types for configuration fields.
+    /// The user can input a type key, check if a type with the same name already exists, load existing values from an enum type,
+    /// validate and generate the necessary enum script file for configuration use. It helps automate the creation of type definitions
+    /// for configuration data fields in Unity projects.
     public class ConfigTypeGenerator : EditorWindow
     {
         private static readonly string OutputPath = "Assets/Scripts/Config/Types";
@@ -26,6 +34,9 @@ namespace com.hive.projectr
         private ConfigTypeGeneratorDummy _dummyData;
         private SerializedObject _serializedDummy;
 
+        /// <summary>
+        /// Creates and shows the ConfigTypeGenerator window in the Unity Editor.
+        /// </summary>
         [MenuItem("Tools/Hive Toolkit/Config Type Generator")]
         public static void ShowWindow()
         {
@@ -33,12 +44,18 @@ namespace com.hive.projectr
             window.titleContent = new GUIContent("Config Type Generator");
         }
 
+        /// <summary>
+        /// Initializes the ConfigTypeGenerator window with default data when enabled.
+        /// </summary>
         private void OnEnable()
         {
             _dummyData = ScriptableObject.CreateInstance<ConfigTypeGeneratorDummy>();
             _serializedDummy = new SerializedObject(_dummyData);
         }
 
+        /// <summary>
+        /// Cleans up resources when the window is disabled.
+        /// </summary>
         private void OnDisable()
         {
             if (_serializedDummy != null)
@@ -54,6 +71,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// The GUI for the ConfigTypeGenerator, allowing users to input the type key, check if types exist, validate headers, and generate the config type file.
+        /// </summary>
         public void OnGUI()
         {
             _serializedDummy.Update();

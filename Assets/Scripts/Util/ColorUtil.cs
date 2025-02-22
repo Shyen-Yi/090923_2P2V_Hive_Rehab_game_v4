@@ -4,8 +4,16 @@ using UnityEngine;
 
 namespace com.hive.projectr
 {
+    /// <summary>
+    /// @ingroup Utility
+    /// @class ColorUtil
+    /// @brief A utility class for general color-related definitions and operations.
+    /// </summary>
     public static class ColorUtil
     {
+        /// <summary>
+        /// A static class containing predefined colors.
+        /// </summary>
         public static class Colors
         {
             public static Color DateRed = GetColorFromHex("#C76645");
@@ -17,6 +25,12 @@ namespace com.hive.projectr
             public static Color LightGrey = GetColorFromHex("#E1EAE2");
         }
 
+        /// <summary>
+        /// Converts a hex color string to a Unity Color object.
+        /// Supports both RGB and RGBA formats.
+        /// </summary>
+        /// <param name="hex">The hex color string (e.g., "#FFFFFF" or "#FFFFFFFF").</param>
+        /// <returns>A Unity Color object representing the given hex color.</returns>
         public static Color GetColorFromHex(string hex)
         {
             // In case the string is formatted '0xFFFFFF'

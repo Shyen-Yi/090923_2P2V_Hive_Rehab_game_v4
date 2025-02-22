@@ -5,10 +5,23 @@ using System;
 
 namespace com.hive.projectr
 {
+    /// <summary>
+    /// @ingroup Utility
+    /// @class TimeUtil
+    /// @brief A utility class for performing general time-related operations.
+    /// </summary>
     public static class TimeUtil
     {
+        /// <summary>
+        /// Gets the current date and time from the TimeManager instance as a DateTime object.
+        /// </summary>
         public static DateTime Now => TimeManager.Instance.GetCurrentDateTime();
 
+        /// <summary>
+        /// Retrieves the name of the month for a given month number.
+        /// </summary>
+        /// <param name="month">The month number (1 for January, 2 for February, etc.).</param>
+        /// <returns>The name of the month as a string. If the month number is invalid, an empty string is returned.</returns>
         public static string GetMonthName(int month)
         {
             switch (month)

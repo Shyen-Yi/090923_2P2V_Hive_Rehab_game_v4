@@ -2,6 +2,12 @@ using System;
 
 namespace com.hive.projectr
 {
+    /// @ingroup GameCommon
+    /// @class GameDay
+    /// @brief Represents a single game day and handles related events.
+    ///
+    /// The GameDay class is used to represent a specific day in the game, managing related events and
+    /// interactions that occur within that time frame.
     [Serializable]
     public struct GameDay : IComparable
     {

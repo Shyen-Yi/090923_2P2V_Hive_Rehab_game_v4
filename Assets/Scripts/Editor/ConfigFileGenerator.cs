@@ -9,6 +9,13 @@ using System.Text.RegularExpressions;
 
 namespace com.hive.projectr
 {
+    /// @ingroup Core
+    /// @enum ConfigHeaderType
+    /// @brief Defines the supported data types for configuration headers.
+    /// 
+    /// This enum defines the different types of data that can be used as configuration header types. It supports primitive types like
+    /// `Int32`, `Boolean`, `String`, as well as more complex types like `AnimationCurve`, `Vector2Int`, and `AssetReference`. 
+    /// These types are used to define the type of each configuration field when generating config files.
     public enum ConfigHeaderType
     {
         Enum = 0,
@@ -32,28 +39,74 @@ namespace com.hive.projectr
         AssetReference = 18,
     }
 
+    /// @ingroup Core
+    /// @enum ConfigHeaderTypeNamespace
+    /// @brief Defines the namespaces associated with configuration header types.
+    /// 
+    /// This enum defines the namespaces for different types used in configuration headers. It allows the system to categorize
+    /// types based on their namespace, ensuring that the correct namespace is applied when generating code for configuration files.
     public enum ConfigHeaderTypeNamespace
     {
-        System,
-        ProjectR,
-        UnityEngine,
-        AddressableAssets,
+        System,         ///< The System namespace (for types like `Int32`, `String`, etc.).
+        ProjectR,       ///< The ProjectR namespace (for custom types specific to the project).
+        UnityEngine,    ///< The UnityEngine namespace (for types like `Vector3`, `AnimationCurve`, etc.).
+        AddressableAssets ///< The AddressableAssets namespace (for asset references).
     }
 
+    /// @ingroup Core
+    /// @class ConfigHeader
+    /// @brief Represents a configuration header that defines the structure of a configuration field.
+    /// 
+    /// The `ConfigHeader` class defines the properties of a configuration field, including its name, type, namespace, and optional
+    /// type name if the field is an enum. It is used to describe the structure of fields in a configuration, and it is serialized
+    /// to support the generation of configuration files.
     [Serializable]
     public class ConfigHeader
     {
+        /// <summary>
+        /// The name of the configuration field.
+        /// </summary>
         public string name;
+
+        /// <summary>
+        /// The type of the configuration field, as defined by the `ConfigHeaderType` enum.
+        /// </summary>
         public ConfigHeaderType type;
+
+        /// <summary>
+        /// The namespace of the configuration field type, as defined by the `ConfigHeaderTypeNamespace` enum.
+        /// </summary>
         public ConfigHeaderTypeNamespace typeNamespace;
+
+        /// <summary>
+        /// The name of the enum type, if the configuration field is of an enum type.
+        /// </summary>
         public string enumTypeName;
     }
 
+    /// @ingroup Editor
+    /// @class ConfigFileGeneratorDummy
+    /// @brief A temporary ScriptableObject used for serializing, testing and setting up configuration headers in the Unity editor.
+    /// 
+    /// The `ConfigFileGeneratorDummy` class is a ScriptableObject used in the Unity editor for testing the generation of config files.
+    /// It contains a list of `ConfigHeader` objects that define the structure of a configuration file, which can be serialized
+    /// and used to generate or validate configuration files in the editor.
     public class ConfigFileGeneratorDummy : ScriptableObject
     {
+        /// <summary>
+        /// A list of configuration headers that define the structure of the configuration file.
+        /// </summary>
         public List<ConfigHeader> headers = new List<ConfigHeader>();
     }
 
+    /// @ingroup Editor
+    /// @class ConfigFileGenerator
+    /// @brief A Unity editor tool that creates or replaces ScriptableObject configuration files based on user input.
+    /// 
+    /// The `ConfigFileGenerator` class is a custom Unity editor tool that assists in generating or replacing ScriptableObject configuration
+    /// files. It provides an interface for entering the key, checking if a file already exists, loading existing configuration data, 
+    /// validating header data, and generating new config files. The tool allows for seamless integration of configuration files into
+    /// Unity projects by automating the creation and modification of script files.
     public class ConfigFileGenerator : EditorWindow
     {
         private string _key;
@@ -69,6 +122,9 @@ namespace com.hive.projectr
         private static readonly string TemplatePath = "Assets/Scripts/Config/ScriptableObjects/Template.cs";
         private static readonly string OutputEditorPath = "Assets/Scripts/Config/ScriptableObjects/Editor";
 
+        /// <summary>
+        /// Creates and shows the ConfigFileGenerator window in the Unity Editor.
+        /// </summary>
         [MenuItem("Tools/Hive Toolkit/Config File Generator")]
         public static void ShowWindow()
         {
@@ -76,12 +132,18 @@ namespace com.hive.projectr
             window.titleContent = new GUIContent("Config File Generator", "Create a new or replace the existing config SO");
         }
 
+        /// <summary>
+        /// Initializes the ConfigFileGenerator window with default data.
+        /// </summary>
         private void OnEnable()
         {
             _dummyData = ScriptableObject.CreateInstance<ConfigFileGeneratorDummy>();
             _serializedDummyData = new SerializedObject(_dummyData);
         }
 
+        /// <summary>
+        /// The GUI for the ConfigFileGenerator, allowing users to input the SO key, check if files exist, validate headers, and generate the config file.
+        /// </summary>
         public void OnGUI()
         {
             _serializedDummyData.Update();
@@ -273,6 +335,9 @@ namespace com.hive.projectr
             _serializedDummyData.ApplyModifiedProperties();
         }
 
+        /// <summary>
+        /// Cleans up resources when the window is disabled.
+        /// </summary>
         private void OnDisable()
         {
             if (_serializedDummyData != null)
@@ -287,6 +352,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Generates the ScriptableObject configuration file based on the provided data.
+        /// </summary>
         private void Generate()
         {
             if (!File.Exists(TemplatePath))
@@ -313,6 +381,9 @@ namespace com.hive.projectr
             AssetDatabase.Refresh();
         }
 
+        /// <summary>
+        /// Writes the custom editor script for the generated ScriptableObject.
+        /// </summary>
         private void WriteEditorScript()
         {
             var editorFileName = $"{_key}SOEditor.cs";
@@ -345,6 +416,9 @@ namespace com.hive.projectr
             File.WriteAllText(outputEditorPath, script);
         }
 
+        /// <summary>
+        /// Returns a string that represents the header definitions for the generated script.
+        /// </summary>
         private string GetHeadersDef()
         {
             var privateSerializedSb = new StringBuilder();
@@ -392,6 +466,9 @@ namespace com.hive.projectr
 {publicPropSb}";
         }
 
+        /// <summary>
+        /// Gets the appropriate namespace based on the given string value.
+        /// </summary>
         private string GetNamespace(ConfigHeaderTypeNamespace type)
         {
             switch (type)
@@ -410,6 +487,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Converts a namespace string to a corresponding ConfigHeaderTypeNamespace value.
+        /// </summary>
         private ConfigHeaderTypeNamespace GetNamespace(string nameSpace)
         {
             if (nameSpace == "System")

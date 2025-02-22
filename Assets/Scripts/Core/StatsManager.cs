@@ -8,7 +8,14 @@ namespace com.hive.projectr
 {
     public struct LevelStats
     {
+        /// <summary>
+        /// The level the player is on.
+        /// </summary>
         public int level;
+
+        /// <summary>
+        /// The number of asteroids collected in the level.
+        /// </summary>
         public int collectedCount;
 
         public LevelStats(int level, int collectedCount)
@@ -21,32 +28,60 @@ namespace com.hive.projectr
     [Serializable]
     public class PlayedDays
     {
+        /// <summary>
+        /// The set of game days the player has played.
+        /// </summary>
         public HashSet<GameDay> days;
     }
 
+    /// @ingroup Core
+    /// @class StatsManager
+    /// @brief Manages player statistics, including tracking played days, performance streaks, and level statistics.
+    /// 
+    /// The `StatsManager` class tracks various statistics related to the player's progress in the game. It tracks days the player has played,
+    /// calculates the player's playing streak, and manages performance ratings after completing levels. It also saves and loads this data to
+    /// and from `PlayerPrefs`, ensuring persistent player statistics across sessions.
     public class StatsManager : SingletonBase<StatsManager>, ICoreManager
     {
         #region Properties
+        /// <summary>
+        /// The player's current playing streak.
+        /// </summary>
         public int PlayingStreak { get; private set; }
+
+        /// <summary>
+        /// The current performance type based on level completion.
+        /// </summary>
         public PerformanceType PerformanceType { get; private set; }
+
+        /// <summary>
+        /// A description of the player's performance.
+        /// </summary>
         public string PerformanceDesc { get; private set; }
         #endregion
 
         #region Fields
-        private HashSet<GameDay> _playedDays;
-        private int _lastCollectedCount;
+        private HashSet<GameDay> _playedDays; // Days the player has played
+        private int _lastCollectedCount; // The last number of items or goals collected by the player
         #endregion
 
         #region Lifecycle
+        /// <summary>
+        /// Initializes the StatsManager by loading the player's played days, performance streak, and performance data.
+        /// </summary>
         public void OnInit()
         {
             InitPlayedDays();
             InitPlayingStreak();
             InitPerformance();
 
+            // Subscribe to display name updates
             SettingManager.OnDisplayNameUpdated += OnDisplayNameUpdated;
         }
 
+        /// <summary>
+        /// Disposes of the StatsManager by clearing the played days and unsubscribing from events.
+        /// </summary>
         public void OnDispose()
         {
             _playedDays.Clear();
@@ -56,6 +91,10 @@ namespace com.hive.projectr
         }
         #endregion
 
+        #region Initialization Methods
+        /// <summary>
+        /// Reinitializes statistics when the display name is updated.
+        /// </summary>
         private void OnDisplayNameUpdated()
         {
             InitPlayedDays();
@@ -63,6 +102,9 @@ namespace com.hive.projectr
             InitPerformance();
         }
 
+        /// <summary>
+        /// Initializes the played days, loading data from PlayerPrefs if available.
+        /// </summary>
         private void InitPlayedDays()
         {
             if (_playedDays == null)
@@ -106,6 +148,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Initializes the playing streak by calculating the number of consecutive days the player has played.
+        /// </summary>
         private void InitPlayingStreak()
         {
             var streak = 0;
@@ -156,6 +201,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Initializes the performance statistics, including loading the last performance type and description from PlayerPrefs.
+        /// </summary>
         private void InitPerformance()
         {
             var lastPerformanceKey = PlayerPrefsUtil.GetUserSpecificKey(PlayerPrefKeys.LastPerformance);
@@ -181,13 +229,24 @@ namespace com.hive.projectr
                 }
             }
         }
+        #endregion
 
+        #region Public Methods
+        /// <summary>
+        /// Checks if the player played on a specific date.
+        /// </summary>
+        /// <param name="date">The date to check.</param>
+        /// <returns>True if the player played on that date, otherwise false.</returns>
         public bool DidPlayOnDate(DateTime date)
         {
             var gameDay = new GameDay(date);
             return _playedDays.Contains(gameDay);
         }
 
+        /// <summary>
+        /// Handles the completion of a level and updates the player's performance based on the collected count.
+        /// </summary>
+        /// <param name="stats">The level statistics, including level number and collected count.</param>
         public void OnLevelCompleted(LevelStats stats)
         {
             var performance = PerformanceType.None;
@@ -226,5 +285,6 @@ namespace com.hive.projectr
 
             _lastCollectedCount = stats.collectedCount;
         }
+        #endregion
     }
 }

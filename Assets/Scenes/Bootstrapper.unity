@@ -689,7 +689,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 94966008886804337, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.1525416
+      value: 1.1525418
       objectReference: {fileID: 0}
     - target: {fileID: 94966008886804337, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.y
@@ -737,15 +737,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 94966008886804347, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9626853
+      value: 0.9626852
       objectReference: {fileID: 0}
     - target: {fileID: 94966008886804347, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9626853
+      value: 0.9626852
       objectReference: {fileID: 0}
     - target: {fileID: 94966008886804347, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.9626853
+      value: 0.9626852
       objectReference: {fileID: 0}
     - target: {fileID: 94966008886804349, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1425,7 +1425,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380932, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.81747013
+      value: 0.8174701
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380932, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.y
@@ -1485,7 +1485,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380942, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.8310231
+      value: 0.83102316
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380942, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.y
@@ -1605,7 +1605,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380966, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9829069
+      value: 0.98290694
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380966, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.y
@@ -1653,7 +1653,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380974, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.8700398
+      value: 0.8700399
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380974, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.y
@@ -1701,15 +1701,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380988, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.96268374
+      value: 0.9626837
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380988, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.96268374
+      value: 0.9626837
       objectReference: {fileID: 0}
     - target: {fileID: 2429651104374380988, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.96268374
+      value: 0.9626837
       objectReference: {fileID: 0}
     - target: {fileID: 2456613887823087108, guid: c55930d782899a54b8a075356072bed6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -10468,9 +10468,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1945195034}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23c1ce4fb46143f46bc5cb5224c934f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 663f4f0590ce6ca46b7caf5e6bcced7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  leapProvider: {fileID: 632829442}
 --- !u!81 &1945195038
 AudioListener:
   m_ObjectHideFlags: 0

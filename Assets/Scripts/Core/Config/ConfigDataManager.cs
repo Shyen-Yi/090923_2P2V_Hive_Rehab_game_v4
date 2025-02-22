@@ -5,12 +5,22 @@ using UnityEngine;
 
 namespace com.hive.projectr
 {
+    /// @ingroup Core
+    /// @class ConfigDataManager
+    /// @brief Manages configuration data by loading and initializing `ConfigSO` assets and their corresponding `ConfigData` objects.
+    /// 
+    /// The `ConfigDataManager` class is responsible for loading all configuration ScriptableObjects (ConfigSO) from the specified
+    /// resources path, initializing their corresponding `ConfigData` objects, and storing them in a dictionary. It also handles
+    /// disposing of the loaded data when the application is closed or when it is no longer needed.
     public class ConfigDataManager : SingletonBase<ConfigDataManager>, ICoreManager
     {
         private static readonly string SOResourcesPath = "Config";
 
         private Dictionary<Type, GameConfigBase> _dataDict;
 
+        /// <summary>
+        /// Initializes the ConfigDataManager by loading all configuration ScriptableObjects and their corresponding ConfigData objects.
+        /// </summary>
         public void OnInit()
         {
             _dataDict = new Dictionary<Type, GameConfigBase>();
@@ -34,6 +44,9 @@ namespace com.hive.projectr
             }
         }
 
+        /// <summary>
+        /// Disposes of all loaded configuration data and clears the dictionary.
+        /// </summary>
         public void OnDispose()
         {
             var types = new List<Type>(_dataDict.Keys);

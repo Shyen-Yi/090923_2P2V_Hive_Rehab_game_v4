@@ -7,8 +7,20 @@ using System.IO.Compression;
 
 namespace com.hive.projectr
 {
+    /// <summary>
+    /// @ingroup Utility
+    /// @class FileUtil
+    /// @brief A utility class for general file-related operations.
+    /// </summary>
     public class FileUtil
     {
+        /// <summary>
+        /// Creates a zip file from multiple source directories, excluding specific file extensions.
+        /// </summary>
+        /// <param name="sourceDirectories">An array of directories to include in the zip file.</param>
+        /// <param name="destinationZipFilePath">The destination path where the zip file will be saved.</param>
+        /// <param name="excludeFileExtensions">A set of file extensions to exclude from the zip file.</param>
+        /// <returns>True if the zip file was created succesfully; otherwise, false.</returns>
         public static bool CreateZipFromDirectories(string[] sourceDirectories, string destinationZipFilePath, HashSet<string> excludeFileExtensions)
         {
             if (sourceDirectories == null || sourceDirectories.Length < 1)
