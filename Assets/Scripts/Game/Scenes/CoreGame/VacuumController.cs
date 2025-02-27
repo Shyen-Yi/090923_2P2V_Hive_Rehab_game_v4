@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 namespace com.hive.projectr
 {
@@ -12,6 +11,7 @@ namespace com.hive.projectr
         private VacuumConfig _config;
         private bool _isActive;
         private Vector3 _initScale;
+        private float _scaleFactor;
 
         private static readonly int AirIsActiveBoolHash = Animator.StringToHash("isActive");
         private static readonly int BaseIsActiveBoolHash = Animator.StringToHash("isActive");
@@ -45,16 +45,18 @@ namespace com.hive.projectr
             SoundManager.Instance.StopSound(SoundType.VacuumEnable);
         }
 
-        public void InitVisual(float scale)
+        public void InitScale(float scale)
         {
-            // scale
-            _config.VisualScalableRoot.localScale = new Vector3(_initScale.x * scale, _initScale.y, _initScale.z);
+            _scaleFactor = scale;
+            _config.VisualScalableRoot.localScale = new Vector3(_initScale.x * _scaleFactor, _initScale.y, _initScale.z);
+        }
 
-            // pos
+        public void InitPos()
+        {
             if (CoreGameConfig.GetData().RandomizeVacuumPositionAlongScreen)
             {
                 var size = Mathf.Max(_config.BaseConfig.ActiveRenderer.size.x, _config.BaseConfig.InactiveRenderer.size.x);
-                var offset = size * (1 - scale) / 2;
+                var offset = size * (1 - _scaleFactor) / 2;
                 var pos = Random.Range(-offset, offset);
                 var oriVisualPos = _config.VisualScalableRoot.localPosition;
                 _config.VisualScalableRoot.localPosition = new Vector3(pos, oriVisualPos.y, oriVisualPos.z);

@@ -400,6 +400,7 @@ namespace com.hive.projectr
             var index = Random.Range(0, vacuumControllers.Count);
             var activeController = vacuumControllers[index];
             activeController.Activate();
+            activeController.InitPos();
 
             SoundManager.Instance.PlaySound(SoundType.AsteroidCaught);
         }
@@ -648,7 +649,7 @@ namespace com.hive.projectr
             foreach (var controller in _vacuumControllers.Values)
             {
                 controller.Deactivate();
-                controller.InitVisual(_levelConfigData.VacuumSize);
+                controller.InitScale(_levelConfigData.VacuumSize);
             }
 
             _spacecraftController.Deactivate();
